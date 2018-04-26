@@ -1,0 +1,37 @@
+# PDF files containing specs and schematics of plotter and drivers
+*.pdf
+
+# swap files
+*.swp
+
+# stash of qt
+*.stash
+
+# obj files
+*.o
+
+# binaries
+*.bin
+*.elf
+
+# linker map
+*.map
+
+# debug files
+*.su
+
+# info of includes files for make
+*.d
+
+# lists
+*.lst
+
+# python compiled files
+*.pyc
+
+# python caches
+__pycache__
+
+# log files
+*.log
+
