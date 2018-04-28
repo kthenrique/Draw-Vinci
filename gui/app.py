@@ -19,9 +19,15 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # Menus Initialisation
+        self.ui.actionQuit.triggered.connect(self.close) # Quit
+
+
         self.show()
 
-app = QApplication(sys.argv)
-win = AppWindow()
-sys.exit(app.exec_())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = AppWindow()
+    sys.exit(app.exec_())
 

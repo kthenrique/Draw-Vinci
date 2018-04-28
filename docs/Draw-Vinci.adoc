@@ -6,5 +6,18 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 :listing-caption: Listing
 :toc: left
 
+== Introduction
+
+== Specifications
+
+=== Formats supported
+
+== Functionalities
+
+== Communication
+
+=== Protocol
+
+
 
 

@@ -11,23 +11,25 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(409, 558)
+        MainWindow.resize(409, 561)
         MainWindow.setMinimumSize(QtCore.QSize(409, 558))
         MainWindow.setStyleSheet("")
+        MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
-        self.graphicsView.setGeometry(QtCore.QRect(10, 30, 390, 310))
+        self.graphicsView.setGeometry(QtCore.QRect(10, 40, 390, 310))
         self.graphicsView.setMinimumSize(QtCore.QSize(390, 310))
         self.graphicsView.setMaximumSize(QtCore.QSize(390, 310))
+        self.graphicsView.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.graphicsView.setObjectName("graphicsView")
-        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(10, 350, 391, 151))
-        self.groupBox.setObjectName("groupBox")
-        self.tabWidget = QtWidgets.QTabWidget(self.groupBox)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 390, 151))
+        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidget.setGeometry(QtCore.QRect(10, 360, 390, 151))
         self.tabWidget.setMinimumSize(QtCore.QSize(390, 0))
         self.tabWidget.setMaximumSize(QtCore.QSize(390, 16777215))
+        self.tabWidget.setStyleSheet("")
+        self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
+        self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setObjectName("tabWidget")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -131,44 +133,40 @@ class Ui_MainWindow(object):
 "    border-image: url(./img/pen_off_hover.png) 0;\n"
 " }\n"
 "\n"
-" QPushButton:pressed  {\n"
+" QPushButton:on  {\n"
 "    border-image: url(./img/pen_on.png) 0;\n"
 " }")
         self.pushButton_7.setText("")
+        self.pushButton_7.setCheckable(True)
         self.pushButton_7.setDefault(False)
         self.pushButton_7.setFlat(False)
         self.pushButton_7.setObjectName("pushButton_7")
         self.textEdit = QtWidgets.QTextEdit(self.tab_2)
         self.textEdit.setGeometry(QtCore.QRect(260, 10, 121, 101))
+        self.textEdit.setStyleSheet(" QTextEdit{\n"
+"    background-color: rgb(76, 76, 76);\n"
+"    border-radius: 1px;\n"
+" }")
         self.textEdit.setObjectName("textEdit")
         self.comboBox = QtWidgets.QComboBox(self.tab_2)
         self.comboBox.setGeometry(QtCore.QRect(140, 10, 111, 27))
+        self.comboBox.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.comboBox.setObjectName("comboBox")
         self.pushButton_8 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_8.setGeometry(QtCore.QRect(140, 40, 111, 27))
+        self.pushButton_8.setGeometry(QtCore.QRect(140, 40, 71, 27))
         self.pushButton_8.setObjectName("pushButton_8")
-        self.pushButton_9 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_9.setGeometry(QtCore.QRect(30, 90, 21, 21))
-        self.pushButton_9.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/pause.png) -1;\n"
-" }\n"
-" QPushButton:pressed  {\n"
-"    border-image: url(./img/pause_pressed.png) 0;\n"
+        self.lineEdit = QtWidgets.QLineEdit(self.tab_2)
+        self.lineEdit.setGeometry(QtCore.QRect(140, 80, 113, 27))
+        self.lineEdit.setStyleSheet("QLineEdit {\n"
+"background-color: rgb(255, 255, 255);\n"
 " }")
-        self.pushButton_9.setText("")
-        self.pushButton_9.setObjectName("pushButton_9")
-        self.pushButton_10 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_10.setGeometry(QtCore.QRect(50, 90, 21, 21))
-        self.pushButton_10.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/play.png) -1;\n"
-" }\n"
-" QPushButton:pressed  {\n"
-"    border-image: url(./img/play_pressed.png) 0;\n"
-" }")
-        self.pushButton_10.setText("")
-        self.pushButton_10.setObjectName("pushButton_10")
-        self.pushButton_11 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_11.setGeometry(QtCore.QRect(70, 90, 21, 21))
+        self.lineEdit.setObjectName("lineEdit")
+        self.groupBox_2 = QtWidgets.QGroupBox(self.tab_2)
+        self.groupBox_2.setGeometry(QtCore.QRect(9, 90, 101, 21))
+        self.groupBox_2.setTitle("")
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.pushButton_11 = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_11.setGeometry(QtCore.QRect(60, 0, 21, 21))
         self.pushButton_11.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/stop.png) -1;\n"
 " }\n"
@@ -176,12 +174,52 @@ class Ui_MainWindow(object):
 "    border-image: url(./img/stop_pressed.png) 0;\n"
 " }")
         self.pushButton_11.setText("")
+        self.pushButton_11.setCheckable(True)
+        self.pushButton_11.setChecked(True)
+        self.pushButton_11.setAutoExclusive(True)
         self.pushButton_11.setObjectName("pushButton_11")
-        self.lineEdit = QtWidgets.QLineEdit(self.tab_2)
-        self.lineEdit.setGeometry(QtCore.QRect(140, 80, 113, 27))
-        self.lineEdit.setObjectName("lineEdit")
-        self.pushButton_21 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_21.setGeometry(QtCore.QRect(10, 90, 21, 21))
+        self.pushButton_22 = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_22.setGeometry(QtCore.QRect(80, 0, 21, 21))
+        self.pushButton_22.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/speed_up.png) -1;\n"
+" }\n"
+" QPushButton::hover {\n"
+" }\n"
+"\n"
+" QPushButton:pressed {\n"
+"\n"
+" }\n"
+"\n"
+"")
+        self.pushButton_22.setText("")
+        self.pushButton_22.setCheckable(False)
+        self.pushButton_22.setObjectName("pushButton_22")
+        self.pushButton_10 = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_10.setGeometry(QtCore.QRect(40, 0, 21, 21))
+        self.pushButton_10.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/play.png) -1;\n"
+" }\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/play_pressed.png) 0;\n"
+" }")
+        self.pushButton_10.setText("")
+        self.pushButton_10.setCheckable(True)
+        self.pushButton_10.setAutoExclusive(True)
+        self.pushButton_10.setObjectName("pushButton_10")
+        self.pushButton_9 = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_9.setGeometry(QtCore.QRect(20, 0, 21, 21))
+        self.pushButton_9.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/pause.png) -1;\n"
+" }\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/pause_pressed.png) 0;\n"
+" }")
+        self.pushButton_9.setText("")
+        self.pushButton_9.setCheckable(True)
+        self.pushButton_9.setAutoExclusive(True)
+        self.pushButton_9.setObjectName("pushButton_9")
+        self.pushButton_21 = QtWidgets.QPushButton(self.groupBox_2)
+        self.pushButton_21.setGeometry(QtCore.QRect(0, 0, 21, 21))
         self.pushButton_21.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/slow_down.png) -1;\n"
 " }\n"
@@ -196,31 +234,50 @@ class Ui_MainWindow(object):
 "")
         self.pushButton_21.setText("")
         self.pushButton_21.setObjectName("pushButton_21")
-        self.pushButton_22 = QtWidgets.QPushButton(self.tab_2)
-        self.pushButton_22.setGeometry(QtCore.QRect(90, 90, 21, 21))
-        self.pushButton_22.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/speed_up.png) -1;\n"
-" }\n"
-" QPushButton::hover {\n"
-" }\n"
-"\n"
-" QPushButton:pressed {\n"
-"\n"
-" }\n"
-"\n"
-"")
-        self.pushButton_22.setText("")
-        self.pushButton_22.setObjectName("pushButton_22")
+        self.pushButton_23 = QtWidgets.QPushButton(self.tab_2)
+        self.pushButton_23.setGeometry(QtCore.QRect(220, 40, 31, 27))
+        self.pushButton_23.setText("")
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("img/port_refresh.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_23.setIcon(icon)
+        self.pushButton_23.setObjectName("pushButton_23")
+        self.groupBox_2.raise_()
+        self.pushButton_3.raise_()
+        self.pushButton_4.raise_()
+        self.pushButton_5.raise_()
+        self.pushButton_6.raise_()
+        self.pushButton_7.raise_()
+        self.textEdit.raise_()
+        self.comboBox.raise_()
+        self.pushButton_8.raise_()
+        self.lineEdit.raise_()
+        self.pushButton_23.raise_()
         self.tabWidget.addTab(self.tab_2, "")
-        self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_2.setGeometry(QtCore.QRect(10, 0, 201, 31))
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.pushButton_2 = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton_2.setGeometry(QtCore.QRect(110, 0, 85, 27))
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox.setGeometry(QtCore.QRect(10, 10, 161, 21))
+        self.groupBox.setTitle("")
+        self.groupBox.setFlat(False)
+        self.groupBox.setCheckable(False)
+        self.groupBox.setChecked(False)
+        self.groupBox.setObjectName("groupBox")
+        self.pushButton_2 = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_2.setGeometry(QtCore.QRect(90, 0, 71, 21))
+        self.pushButton_2.setMinimumSize(QtCore.QSize(0, 0))
+        self.pushButton_2.setStyleSheet("")
+        self.pushButton_2.setCheckable(True)
+        self.pushButton_2.setAutoExclusive(True)
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.pushButton.setGeometry(QtCore.QRect(0, 0, 85, 27))
+        self.pushButton = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton.setGeometry(QtCore.QRect(0, 0, 71, 21))
+        self.pushButton.setMinimumSize(QtCore.QSize(10, 0))
+        self.pushButton.setStyleSheet("")
+        self.pushButton.setCheckable(True)
+        self.pushButton.setChecked(True)
+        self.pushButton.setAutoExclusive(True)
         self.pushButton.setObjectName("pushButton")
+        self.groupBox.raise_()
+        self.graphicsView.raise_()
+        self.tabWidget.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 409, 27))
@@ -267,8 +324,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.groupBox.setTitle(_translate("MainWindow", "GroupBox"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Draw-Vinci"))
         self.pushButton_12.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_13.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_14.setText(_translate("MainWindow", "PushButton"))
@@ -279,10 +335,10 @@ class Ui_MainWindow(object):
         self.pushButton_19.setText(_translate("MainWindow", "PushButton"))
         self.pushButton_20.setText(_translate("MainWindow", "PushButton"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Draw"))
-        self.pushButton_7.setToolTip(_translate("MainWindow", "<html><head/><body><p>Pen Up</p></body></html>"))
+        self.pushButton_7.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Pen Up</span></p></body></html>"))
         self.pushButton_8.setText(_translate("MainWindow", "Connect"))
+        self.pushButton_23.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Refresh Ports</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Control"))
-        self.groupBox_2.setTitle(_translate("MainWindow", "GroupBox"))
         self.pushButton_2.setText(_translate("MainWindow", "Manual"))
         self.pushButton.setText(_translate("MainWindow", "Auto"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
