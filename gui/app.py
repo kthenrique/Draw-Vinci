@@ -24,7 +24,6 @@ class AppWindow(QMainWindow):
 
         # Configuring UART Port
         self.port = QSerialPort()
-        self.port.setPortName("Custom")
         self.port.setBaudRate(QSerialPort.Baud9600)
         self.port.setDataBits(QSerialPort.Data8)
         self.port.setParity(QSerialPort.NoParity)
@@ -49,6 +48,8 @@ class AppWindow(QMainWindow):
         apt_ports = QSerialPortInfo.availablePorts()
         for port in apt_ports:
             self.ui.portsBox.addItem(port.portName())
+
+        self.port.setPortName(self.ui.portsBox.currentText())
 
     def connect_port(self):
         self.port.setPortName(self.ui.portsBox.currentText())

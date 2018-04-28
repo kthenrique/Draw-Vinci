@@ -82,7 +82,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -409,6 +409,12 @@
        <string notr="true">QLineEdit {
 background-color: rgb(255, 255, 255);
  }</string>
+      </property>
+      <property name="cursorPosition">
+       <number>0</number>
+      </property>
+      <property name="clearButtonEnabled">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
