@@ -26,7 +26,7 @@
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGraphicsView" name="graphicsView">
+   <widget class="QGraphicsView" name="canvas">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -82,13 +82,13 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>Draw</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton_12">
+     <widget class="QPushButton" name="lineButton">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -101,7 +101,7 @@
        <string>PushButton</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_13">
+     <widget class="QPushButton" name="ellipseButton">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -114,7 +114,7 @@
        <string>PushButton</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_14">
+     <widget class="QPushButton" name="rectangleButton">
       <property name="geometry">
        <rect>
         <x>50</x>
@@ -210,7 +210,7 @@
      <attribute name="title">
       <string>Control</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="upButton">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -236,7 +236,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="leftButton">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -262,7 +262,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="rightButton">
       <property name="geometry">
        <rect>
         <x>70</x>
@@ -288,7 +288,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_6">
+     <widget class="QPushButton" name="downButton">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -314,7 +314,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_7">
+     <widget class="QPushButton" name="penButton">
       <property name="geometry">
        <rect>
         <x>40</x>
@@ -354,7 +354,7 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QTextEdit" name="textEdit">
+     <widget class="QTextEdit" name="termEdit">
       <property name="geometry">
        <rect>
         <x>260</x>
@@ -370,7 +370,7 @@
  }</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="portsBox">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -383,7 +383,7 @@
        <string notr="true">background-color: rgb(255, 255, 255);</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_8">
+     <widget class="QPushButton" name="connectButton">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -396,7 +396,7 @@
        <string>Connect</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="promptEdit">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -423,7 +423,7 @@ background-color: rgb(255, 255, 255);
       <property name="title">
        <string/>
       </property>
-      <widget class="QPushButton" name="pushButton_11">
+      <widget class="QPushButton" name="stopButton">
        <property name="geometry">
         <rect>
          <x>60</x>
@@ -453,7 +453,7 @@ background-color: rgb(255, 255, 255);
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_22">
+      <widget class="QPushButton" name="speedUpButton">
        <property name="geometry">
         <rect>
          <x>80</x>
@@ -482,7 +482,7 @@ background-color: rgb(255, 255, 255);
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_10">
+      <widget class="QPushButton" name="playButton">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -509,7 +509,7 @@ background-color: rgb(255, 255, 255);
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_9">
+      <widget class="QPushButton" name="pauseButton">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -536,7 +536,7 @@ background-color: rgb(255, 255, 255);
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_21">
+      <widget class="QPushButton" name="slowDownButton">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -564,7 +564,7 @@ background-color: rgb(255, 255, 255);
        </property>
       </widget>
      </widget>
-     <widget class="QPushButton" name="pushButton_23">
+     <widget class="QPushButton" name="refreshButton">
       <property name="geometry">
        <rect>
         <x>220</x>
@@ -585,16 +585,16 @@ background-color: rgb(255, 255, 255);
       </property>
      </widget>
      <zorder>groupBox_2</zorder>
-     <zorder>pushButton_3</zorder>
-     <zorder>pushButton_4</zorder>
-     <zorder>pushButton_5</zorder>
-     <zorder>pushButton_6</zorder>
-     <zorder>pushButton_7</zorder>
-     <zorder>textEdit</zorder>
-     <zorder>comboBox</zorder>
-     <zorder>pushButton_8</zorder>
-     <zorder>lineEdit</zorder>
-     <zorder>pushButton_23</zorder>
+     <zorder>upButton</zorder>
+     <zorder>leftButton</zorder>
+     <zorder>rightButton</zorder>
+     <zorder>downButton</zorder>
+     <zorder>penButton</zorder>
+     <zorder>termEdit</zorder>
+     <zorder>portsBox</zorder>
+     <zorder>connectButton</zorder>
+     <zorder>promptEdit</zorder>
+     <zorder>refreshButton</zorder>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox">
@@ -618,7 +618,7 @@ background-color: rgb(255, 255, 255);
     <property name="checked">
      <bool>false</bool>
     </property>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="manualButton">
      <property name="geometry">
       <rect>
        <x>90</x>
@@ -646,7 +646,7 @@ background-color: rgb(255, 255, 255);
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="autoButton">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -679,7 +679,7 @@ background-color: rgb(255, 255, 255);
     </widget>
    </widget>
    <zorder>groupBox</zorder>
-   <zorder>graphicsView</zorder>
+   <zorder>canvas</zorder>
    <zorder>tabWidget</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
