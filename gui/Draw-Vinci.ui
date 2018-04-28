@@ -39,32 +39,6 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>85</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Auto</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>0</y>
-      <width>85</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Manual</string>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
@@ -230,15 +204,23 @@
       <widget class="QPushButton" name="pushButton_3">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>10</y>
-         <width>21</width>
+         <width>31</width>
          <height>21</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true"> QPushButton {
-	border-image:url(./img/up.png) -1;
+	border-image:url(./img/up.png) 0 ;
+}
+
+ QPushButton:hover {
+	border-image: url(./img/up_hover.png) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/up_click.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -248,15 +230,23 @@
       <widget class="QPushButton" name="pushButton_4">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>30</y>
          <width>21</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/left.png) -1;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/left_hover.png) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/left_click.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -269,12 +259,20 @@
          <x>70</x>
          <y>30</y>
          <width>21</width>
-         <height>21</height>
+         <height>31</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/right.png) -1;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/right_hover.png) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/right_click.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -284,15 +282,23 @@
       <widget class="QPushButton" name="pushButton_6">
        <property name="geometry">
         <rect>
-         <x>50</x>
-         <y>50</y>
-         <width>21</width>
+         <x>40</x>
+         <y>60</y>
+         <width>31</width>
          <height>21</height>
         </rect>
        </property>
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/down.png) -1;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/down_hover.png) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/down_click.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -302,14 +308,38 @@
       <widget class="QPushButton" name="pushButton_7">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>40</x>
          <y>30</y>
-         <width>21</width>
-         <height>21</height>
+         <width>31</width>
+         <height>31</height>
         </rect>
        </property>
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pen Up&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="autoFillBackground">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"> QPushButton {
+	border-image:url(./img/pen_off.png) 0 ;
+}
+ QPushButton:hover {
+	border-image: url(./img/pen_off_hover.png) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/pen_on.png) 0;
+ }</string>
+       </property>
        <property name="text">
-        <string>O</string>
+        <string/>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QTextEdit" name="textEdit">
@@ -357,6 +387,9 @@
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/pause.png) -1;
+ }
+ QPushButton:pressed  {
+	border-image: url(./img/pause_pressed.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -375,6 +408,9 @@
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/play.png) -1;
+ }
+ QPushButton:pressed  {
+	border-image: url(./img/play_pressed.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -393,6 +429,9 @@
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/stop.png) -1;
+ }
+ QPushButton:pressed  {
+	border-image: url(./img/stop_pressed.png) 0;
  }</string>
        </property>
        <property name="text">
@@ -421,7 +460,16 @@
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/slow_down.png) -1;
- }</string>
+ }
+
+ QPushButton::hover {
+ }
+
+ QPushButton:pressed {
+
+ }
+
+</string>
        </property>
        <property name="text">
         <string/>
@@ -439,13 +487,60 @@
        <property name="styleSheet">
         <string notr="true"> QPushButton {
 	border-image:url(./img/speed_up.png) -1;
- }</string>
+ }
+ QPushButton::hover {
+ }
+
+ QPushButton:pressed {
+
+ }
+
+</string>
        </property>
        <property name="text">
         <string/>
        </property>
       </widget>
      </widget>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>GroupBox</string>
+    </property>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>85</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Auto</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_2">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>0</y>
+       <width>85</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Manual</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -465,12 +560,14 @@
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuSetup">
     <property name="title">
      <string>Settings</string>
     </property>
+    <addaction name="actionPreferences"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -512,6 +609,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>
