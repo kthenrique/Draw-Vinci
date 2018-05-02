@@ -13,6 +13,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(409, 561)
         MainWindow.setMinimumSize(QtCore.QSize(409, 558))
+        MainWindow.setToolTip("")
         MainWindow.setStyleSheet("")
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -27,7 +28,65 @@ class Ui_MainWindow(object):
         self.tabWidget.setGeometry(QtCore.QRect(10, 360, 390, 151))
         self.tabWidget.setMinimumSize(QtCore.QSize(390, 0))
         self.tabWidget.setMaximumSize(QtCore.QSize(390, 16777215))
-        self.tabWidget.setStyleSheet("")
+        self.tabWidget.setStyleSheet("QTabWidget::pane { /* The tab widget frame */\n"
+"    border-top: 2px solid #C2C7CB;\n"
+"    border-left: 2px solid #C2C7CB;\n"
+"    border-right: 2px solid #C2C7CB;\n"
+" border-bottom: 2px solid #C2C7CB;\n"
+"\n"
+"}\n"
+"\n"
+"QTabWidget::tab-bar {\n"
+"    left: 1px; /* move to the right by 5px */\n"
+"}\n"
+"\n"
+"/* Style the tab using the tab sub-control. Note that\n"
+"    it reads QTabBar _not_ QTabWidget */\n"
+"QTabBar::tab {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,\n"
+"                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);\n"
+"    border: 2px solid #C4C4C3;\n"
+"    border-bottom-color: #C2C7CB; /* same as the pane color */\n"
+"    border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"    min-width: 6ex;\n"
+"    padding: 2px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected, QTabBar::tab:hover {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,\n"
+"                                stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected {\n"
+"    border-color: #9B9B9B;\n"
+"    border-bottom-color: #C2C7CB; /* same as pane color */\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected {\n"
+"    margin-top: 2px; /* make non-selected tabs look smaller */\n"
+"}\n"
+"\n"
+"/* make use of negative margins for overlapping tabs */\n"
+"QTabBar::tab:selected {\n"
+"    /* expand/overlap to the left and right by 4px */\n"
+"    margin-left: -4px;\n"
+"    margin-right: -4px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:first:selected {\n"
+"    margin-left: 0; /* the first selected tab has nothing to overlap with on the left */\n"
+"}\n"
+"\n"
+"QTabBar::tab:last:selected {\n"
+"    margin-right: 0; /* the last selected tab has nothing to overlap with on the right */\n"
+"}\n"
+"\n"
+"QTabBar::tab:only-one {\n"
+"    margin: 1; /* if there is only one tab, we don\'t want overlapping margins */\n"
+"}")
         self.tabWidget.setTabPosition(QtWidgets.QTabWidget.North)
         self.tabWidget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tabWidget.setObjectName("tabWidget")
@@ -376,12 +435,13 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Draw-Vinci"))
-        MainWindow.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">Eraser</p></body></html>"))
+        self.ellipseButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">ellipse</p></body></html>"))
         self.rectangleButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">rectangle</p></body></html>"))
         self.lineButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">line</p></body></html>"))
         self.freehandButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">freehand</p></body></html>"))
         self.textButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">text</p></body></html>"))
-        self.eraserButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">eraser</span></p></body></html>"))
+        self.eraserButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">eraser</p></body></html>"))
+        self.polygonButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">polygon</p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Draw"))
         self.penButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Pen Up</span></p></body></html>"))
         self.connectButton.setText(_translate("MainWindow", "Connect"))
