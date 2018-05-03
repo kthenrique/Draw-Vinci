@@ -13,14 +13,32 @@
 import sys
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QButtonGroup
+
 from draw_vinci import Ui_MainWindow
+from canvas import MainScene
 
 class AppWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # Tools Group of buttons
+        self.toolsButtonGroup = QButtonGroup()
+        self.toolsButtonGroup.setExclusive(True)
+        self.toolsButtonGroup.addButton(self.ui.eraserButton, 1)
+        self.toolsButtonGroup.addButton(self.ui.freehandButton, 2)
+        self.toolsButtonGroup.addButton(self.ui.lineButton, 3)
+        self.toolsButtonGroup.addButton(self.ui.textButton, 4)
+        self.toolsButtonGroup.addButton(self.ui.rectangleButton, 5)
+        self.toolsButtonGroup.addButton(self.ui.ellipseButton, 6)
+        self.toolsButtonGroup.addButton(self.ui.polygonButton, 7)
+
+        # Creating canvas
+        self.scene = MainScene(self.toolsButtonGroup)
+        self.ui.canvas.setScene(self.scene)
+        self.ui.canvas.show()
 
         # Configuring UART Port
         self.port = QSerialPort()
@@ -59,5 +77,6 @@ class AppWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = AppWindow()
+
     sys.exit(app.exec_())
 
