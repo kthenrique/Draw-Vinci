@@ -47,12 +47,14 @@ class MainScene(QGraphicsScene):
         if self.toolsButtonGroup.checkedId() == 3: # line
             self.isDrawing = True
             self.line.setP1(self.clickedPos)
+            self.line.setP2(self.clickedPos)
             self.item = self.addLine(self.line)
         if self.toolsButtonGroup.checkedId() == 4: # text
             pass
         if self.toolsButtonGroup.checkedId() == 5: # rectangle
             self.isDrawing = True
             self.rectangle.setTopLeft(self.clickedPos)
+            self.rectangle.setBottomRight(self.clickedPos)
             self.item = self.addRect(self.rectangle)
         if self.toolsButtonGroup.checkedId() == 6: # ellipse
             pass
