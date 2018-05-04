@@ -168,6 +168,11 @@ class Ui_MainWindow(object):
         self.freehandButton.setIcon(icon7)
         self.freehandButton.setCheckable(True)
         self.freehandButton.setObjectName("freehandButton")
+        self.fontBox = QtWidgets.QFontComboBox(self.drawTab)
+        self.fontBox.setGeometry(QtCore.QRect(210, 10, 181, 25))
+        self.fontBox.setEditable(False)
+        self.fontBox.setFrame(True)
+        self.fontBox.setObjectName("fontBox")
         self.tabWidget.addTab(self.drawTab, "")
         self.controlTab = QtWidgets.QWidget()
         self.controlTab.setObjectName("controlTab")
@@ -251,6 +256,7 @@ class Ui_MainWindow(object):
         self.penButton.setObjectName("penButton")
         self.termEdit = QtWidgets.QTextEdit(self.controlTab)
         self.termEdit.setGeometry(QtCore.QRect(260, 10, 131, 101))
+        self.termEdit.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.termEdit.setStyleSheet(" QTextEdit{\n"
 "    background-color: rgb(76, 76, 76);\n"
 "    border-radius: 1px;\n"

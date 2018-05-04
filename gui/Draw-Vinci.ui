@@ -366,6 +366,22 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QFontComboBox" name="fontBox">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>10</y>
+        <width>181</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="controlTab">
      <attribute name="title">
@@ -523,6 +539,9 @@ QTabBar::tab:only-one {
         <width>131</width>
         <height>101</height>
        </rect>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>ArrowCursor</cursorShape>
       </property>
       <property name="styleSheet">
        <string notr="true"> QTextEdit{

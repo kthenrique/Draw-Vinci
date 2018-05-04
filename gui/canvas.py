@@ -10,9 +10,10 @@
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
 
+from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
-        QCursor)
+        QCursor, QTextCursor)
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH = 390
@@ -33,13 +34,13 @@ class MainScene(QGraphicsScene):
         self.toolsButtonGroup.buttonPressed.connect(self.setIconTool)
 
         # The drawable elements
-        self.tools     = (None,
+        self.tools     = [None,
                           QPainterPath(),
                           QLineF(),
-                          None,
+                          '',          # str instead of QString
                           QRectF(),
                           QRectF(),
-                          QPolygonF())
+                          QPolygonF()]
 
         # Icons for cursor and toolLabel
         self.pixTools  = (QPixmap("./img/eraser.png"),
@@ -55,42 +56,56 @@ class MainScene(QGraphicsScene):
         self.isDrawing  = False    # While drawing
         self.clickedPos = None     # position where drawing began
         self.item       = None     # Item being drawn
+        self.isTyping   = False    # Flags when to add a text until next click
 
     # Reimplementing mouse events
     def mousePressEvent(self, e):
-        self.isDrawing = True
-        pos = e.scenePos()
-        self.clickedPos = QPointF(pos.x(), pos.y())
-
-        self.index = self.toolsButtonGroup.checkedId()
-
-        if self.index == 0: # eraser
-            pass
-        if self.index == 1: # freehand
-            self.tools[self.index].moveTo(pos)
-            self.item = self.addPath(self.tools[self.index])
-        if self.index == 2: # line
-            self.tools[self.index].setP1(self.clickedPos)
-            self.tools[self.index].setP2(self.clickedPos)
-            self.item = self.addLine(self.tools[self.index])
-        if self.index == 3: # text
-            pass
-        if self.index == 4: # rectangle
-            self.tools[self.index].setTopLeft(self.clickedPos)
-            self.tools[self.index].setBottomRight(self.clickedPos)
-            self.item = self.addRect(self.tools[self.index])
-        if self.index == 5: # ellipse
-            self.tools[self.index].setTopLeft(self.clickedPos)
-            self.tools[self.index].setBottomRight(self.clickedPos)
-            self.item = self.addEllipse(self.tools[self.index])
-        if self.index == 6: # polygon
-            if self.item:
-                self.tools[self.index].append(self.clickedPos)
-                self.item.setPolygon(self.tools[self.index])
-            else:
-                self.tools[self.index].clear()
-                self.tools[self.index].append(self.clickedPos)
-                self.item = self.addPolygon(self.tools[self.index])
+        if e.button() == Qt.LeftButton:
+            self.isDrawing = True
+            pos = e.scenePos()
+            self.clickedPos = QPointF(pos.x(), pos.y())
+            self.index = self.toolsButtonGroup.checkedId()
+            if self.index == 0: # eraser
+                pass
+            if self.index == 1: # freehand
+                self.tools[self.index].moveTo(pos)
+                self.item = self.addPath(self.tools[self.index])
+            if self.index == 2: # line
+                self.tools[self.index].setP1(self.clickedPos)
+                self.tools[self.index].setP2(self.clickedPos)
+                self.item = self.addLine(self.tools[self.index])
+            if self.index == 3: # text
+                self.item = None
+                self.isTyping  = not self.isTyping
+                if self.isTyping:
+                    self.tools[self.index] = ''
+                    self.item = self.addText(self.tools[self.index])
+                    self.item.setTextInteractionFlags(Qt.TextEditable)
+                    self.item.setPos(self.clickedPos)
+                    textCursor = QTextCursor()
+                    textCursor.setVisualNavigation(True)
+                    textCursor.insertBlock()
+                    textCursor.insertBlock()
+                    textCursor.insertBlock()
+                    self.item.setTextCursor(textCursor)
+                    #self.item.setFont()
+                    #self.item.setTextWidth()
+            if self.index == 4: # rectangle
+                self.tools[self.index].setTopLeft(self.clickedPos)
+                self.tools[self.index].setBottomRight(self.clickedPos)
+                self.item = self.addRect(self.tools[self.index])
+            if self.index == 5: # ellipse
+                self.tools[self.index].setTopLeft(self.clickedPos)
+                self.tools[self.index].setBottomRight(self.clickedPos)
+                self.item = self.addEllipse(self.tools[self.index])
+            if self.index == 6: # polygon
+                if self.item:
+                    self.tools[self.index].append(self.clickedPos)
+                    self.item.setPolygon(self.tools[self.index])
+                else:
+                    self.tools[self.index].clear()
+                    self.tools[self.index].append(self.clickedPos)
+                    self.item = self.addPolygon(self.tools[self.index])
 
     def mouseDoubleClickEvent(self, e):
         self.isDrawing = False
@@ -145,9 +160,18 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].remove(toRemove)
 
     def mouseReleaseEvent(self, e):
-        if self.index != 6:
+        if self.index != 6 and self.index != 3:
             self.isDrawing = False
             self.item  = None
+
+    # Reimplementing keypress events
+    def keyPressEvent(self, e):
+        if self.isTyping:
+            if e.key() == Qt.Key_Backspace:
+                self.tools[self.index] = self.tools[self.index][:-1]
+            else:
+                self.tools[self.index] = self.tools[self.index] + e.text()
+            self.item.setPlainText(self.tools[self.index])
 
     def setIconTool(self, button):
         ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
