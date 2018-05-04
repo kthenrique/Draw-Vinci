@@ -98,8 +98,12 @@ class AppWindow(QMainWindow):
         ''' Callback of connectButton:
                 trying to connect to the port chosen.
         '''
+        self.port.close()
         self.port.setPortName(self.ui.portsBox.currentText())
         if not self.port.open(QIODevice.ReadWrite):
+            self.connectionLabel.setText('<html><head/><body><p align="center">\
+                    <span style=" font-weight:600; color:#cc0000;">OFFLINE\
+                    </span></p></body></html>')
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), 900)
         else:
             self.connectionLabel.setText('<html><head/><body><p align="center">\
