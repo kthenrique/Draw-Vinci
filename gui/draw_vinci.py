@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(419, 566)
+        MainWindow.resize(419, 558)
         MainWindow.setMinimumSize(QtCore.QSize(409, 558))
         MainWindow.setToolTip("")
         MainWindow.setStyleSheet("")
@@ -19,7 +19,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.canvas = QtWidgets.QGraphicsView(self.centralwidget)
-        self.canvas.setGeometry(QtCore.QRect(10, 40, 400, 320))
+        self.canvas.setGeometry(QtCore.QRect(10, 30, 400, 320))
         self.canvas.setMinimumSize(QtCore.QSize(400, 320))
         self.canvas.setMaximumSize(QtCore.QSize(400, 320))
         self.canvas.setMouseTracking(True)
@@ -28,7 +28,7 @@ class Ui_MainWindow(object):
         self.canvas.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.canvas.setObjectName("canvas")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(10, 370, 400, 151))
+        self.tabWidget.setGeometry(QtCore.QRect(10, 360, 400, 151))
         self.tabWidget.setMinimumSize(QtCore.QSize(390, 0))
         self.tabWidget.setMaximumSize(QtCore.QSize(400, 16777215))
         self.tabWidget.setStyleSheet("QTabWidget::pane { /* The tab widget frame */\n"
@@ -266,82 +266,6 @@ class Ui_MainWindow(object):
         self.promptEdit.setCursorPosition(0)
         self.promptEdit.setClearButtonEnabled(True)
         self.promptEdit.setObjectName("promptEdit")
-        self.groupBox_2 = QtWidgets.QGroupBox(self.controlTab)
-        self.groupBox_2.setGeometry(QtCore.QRect(9, 90, 101, 21))
-        self.groupBox_2.setTitle("")
-        self.groupBox_2.setObjectName("groupBox_2")
-        self.stopButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.stopButton.setGeometry(QtCore.QRect(60, 0, 21, 21))
-        self.stopButton.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/stop.png) -1;\n"
-" }\n"
-" QPushButton:pressed  {\n"
-"    border-image: url(./img/stop_pressed.png) 0;\n"
-" }")
-        self.stopButton.setText("")
-        self.stopButton.setCheckable(True)
-        self.stopButton.setChecked(True)
-        self.stopButton.setAutoExclusive(True)
-        self.stopButton.setObjectName("stopButton")
-        self.speedUpButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.speedUpButton.setGeometry(QtCore.QRect(80, 0, 21, 21))
-        self.speedUpButton.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/speed_up.png) -1;\n"
-" }\n"
-" QPushButton::hover {\n"
-" }\n"
-"\n"
-" QPushButton:pressed {\n"
-"\n"
-" }\n"
-"\n"
-"")
-        self.speedUpButton.setText("")
-        self.speedUpButton.setCheckable(False)
-        self.speedUpButton.setObjectName("speedUpButton")
-        self.playButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.playButton.setGeometry(QtCore.QRect(40, 0, 21, 21))
-        self.playButton.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/play.png) -1;\n"
-" }\n"
-" QPushButton:pressed  {\n"
-"    border-image: url(./img/play_pressed.png) 0;\n"
-" }\n"
-" QPushButton:hover  {\n"
-"    border-image: url(./img/play_hover.svg) 0;\n"
-" }")
-        self.playButton.setText("")
-        self.playButton.setCheckable(True)
-        self.playButton.setAutoExclusive(True)
-        self.playButton.setObjectName("playButton")
-        self.pauseButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.pauseButton.setGeometry(QtCore.QRect(20, 0, 21, 21))
-        self.pauseButton.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/pause.png) -1;\n"
-" }\n"
-" QPushButton:pressed  {\n"
-"    border-image: url(./img/pause_pressed.png) 0;\n"
-" }")
-        self.pauseButton.setText("")
-        self.pauseButton.setCheckable(True)
-        self.pauseButton.setAutoExclusive(True)
-        self.pauseButton.setObjectName("pauseButton")
-        self.slowDownButton = QtWidgets.QPushButton(self.groupBox_2)
-        self.slowDownButton.setGeometry(QtCore.QRect(0, 0, 21, 21))
-        self.slowDownButton.setStyleSheet(" QPushButton {\n"
-"    border-image:url(./img/slow_down.png) -1;\n"
-" }\n"
-"\n"
-" QPushButton::hover {\n"
-" }\n"
-"\n"
-" QPushButton:pressed {\n"
-"\n"
-" }\n"
-"\n"
-"")
-        self.slowDownButton.setText("")
-        self.slowDownButton.setObjectName("slowDownButton")
         self.refreshButton = QtWidgets.QPushButton(self.controlTab)
         self.refreshButton.setGeometry(QtCore.QRect(220, 40, 31, 27))
         self.refreshButton.setText("")
@@ -349,17 +273,106 @@ class Ui_MainWindow(object):
         icon7.addPixmap(QtGui.QPixmap("img/port_refresh.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.refreshButton.setIcon(icon7)
         self.refreshButton.setObjectName("refreshButton")
-        self.groupBox_2.raise_()
-        self.upButton.raise_()
-        self.leftButton.raise_()
-        self.rightButton.raise_()
-        self.downButton.raise_()
-        self.penButton.raise_()
-        self.termEdit.raise_()
-        self.portsBox.raise_()
-        self.connectButton.raise_()
-        self.promptEdit.raise_()
-        self.refreshButton.raise_()
+        self.playButton = QtWidgets.QPushButton(self.controlTab)
+        self.playButton.setGeometry(QtCore.QRect(50, 90, 21, 21))
+        self.playButton.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/play_off.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:hover {\n"
+"    border-image: url(./img/play_hover.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/play_on.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:on  {\n"
+"    border-image: url(./img/play_on.svg) 0;\n"
+" }\n"
+"")
+        self.playButton.setText("")
+        self.playButton.setCheckable(True)
+        self.playButton.setAutoExclusive(True)
+        self.playButton.setObjectName("playButton")
+        self.stopButton = QtWidgets.QPushButton(self.controlTab)
+        self.stopButton.setGeometry(QtCore.QRect(70, 90, 21, 21))
+        self.stopButton.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/stop_off.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:hover {\n"
+"    border-image: url(./img/stop_hover.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/stop_on.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:on  {\n"
+"    border-image: url(./img/stop_on.svg) 0;\n"
+" }\n"
+"")
+        self.stopButton.setText("")
+        self.stopButton.setCheckable(True)
+        self.stopButton.setChecked(True)
+        self.stopButton.setAutoExclusive(True)
+        self.stopButton.setObjectName("stopButton")
+        self.speedUpButton = QtWidgets.QPushButton(self.controlTab)
+        self.speedUpButton.setGeometry(QtCore.QRect(90, 90, 21, 21))
+        self.speedUpButton.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/speed_up.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:hover {\n"
+"    border-image: url(./img/speed_up_hover.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/speed_up_pressed.svg) 0;\n"
+" }")
+        self.speedUpButton.setText("")
+        self.speedUpButton.setCheckable(False)
+        self.speedUpButton.setObjectName("speedUpButton")
+        self.pauseButton = QtWidgets.QPushButton(self.controlTab)
+        self.pauseButton.setGeometry(QtCore.QRect(30, 90, 21, 21))
+        self.pauseButton.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/pause_off.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:hover {\n"
+"    border-image: url(./img/pause_hover.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/pause_on.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:on  {\n"
+"    border-image: url(./img/pause_on.svg) 0;\n"
+" }\n"
+"")
+        self.pauseButton.setText("")
+        self.pauseButton.setCheckable(True)
+        self.pauseButton.setAutoExclusive(True)
+        self.pauseButton.setObjectName("pauseButton")
+        self.slowDownButton = QtWidgets.QPushButton(self.controlTab)
+        self.slowDownButton.setGeometry(QtCore.QRect(10, 90, 21, 21))
+        self.slowDownButton.setStyleSheet(" QPushButton {\n"
+"    border-image:url(./img/slow_down.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:hover {\n"
+"    border-image: url(./img/slow_down_hover.svg) 0;\n"
+" }\n"
+"\n"
+" QPushButton:pressed  {\n"
+"    border-image: url(./img/slow_down_pressed.svg) 0;\n"
+" }\n"
+"\n"
+"")
+        self.slowDownButton.setText("")
+        self.slowDownButton.setObjectName("slowDownButton")
         self.tabWidget.addTab(self.controlTab, "")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 0, 160, 31))

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 12.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 51448)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   style="enable-background:new 0 0 136.743 136.704"
+   space="preserve"
+   sodipodi:docname="speed_up_hover.svg"
+   viewBox="0 0 136.743 136.704"
+   sodipodi:version="0.32"
+   version="1.1"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <defs
+     id="defs3781">
+    <radialGradient
+       r="63.55"
+       cx="68.356"
+       cy="68.329"
+       gradientUnits="userSpaceOnUse"
+       id="XMLID_2_">
+      <stop
+         offset="0"
+         style="stop-color:#D4E4F7"
+         id="stop8" />
+      <stop
+         offset="1"
+         style="stop-color:#bbbbbb;stop-opacity:1"
+         id="stop10" />
+    </radialGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     bordercolor="#666666"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     pagecolor="#ffffff"
+     inkscape:zoom="3.7242283"
+     inkscape:window-x="0"
+     borderopacity="1.0"
+     inkscape:current-layer="Layer_1"
+     inkscape:cx="84.881095"
+     inkscape:cy="84.186301"
+     inkscape:window-y="25"
+     inkscape:window-height="719"
+     inkscape:pageopacity="0.0"
+     showgrid="false"
+     inkscape:window-maximized="1" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 136.74,68.33 c 0,34.835 -27.326,64.902 -62.045,68.094 C 39.964,139.616 7.464,115.195 1.111,80.847 -5.242,46.508 16.191,11.916 49.846,2.477 c 33.665,-9.439 70.043,8.891 82.458,41.57 2.95,7.744 4.44,16.007 4.44,24.287"
+     style="fill:#818181;opacity:0.5;fill-opacity:1"
+     id="path5" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 131.91,68.33 c 0,34.631 -28.917,63.549 -63.549,63.549 -34.633,0 -63.55,-28.918 -63.55,-63.549 0,-34.633 28.917,-63.55 63.55,-63.55 34.629,-0.001 63.549,28.915 63.549,63.549"
+     style="fill:url(#XMLID_2_)"
+     id="path12" />
+  <path
+     inkscape:connector-curvature="0"
+     d="M 131.80813,73.475459 C 121.89823,102.17734 91.753666,119.91884 61.845559,114.66098 30.124688,109.08487 7.4518208,79.108408 10.497869,47.089344 -1.3416679,81.359082 19.550373,119.6437 54.78304,128.22304 c 36.376376,8.85061 73.48491,-17.36232 77.02509,-54.747581"
+     style="fill:#adadad;fill-opacity:1"
+     id="path14"
+     inkscape:transform-center-x="1.1512718"
+     inkscape:transform-center-y="18.223637" />
+  <path
+     inkscape:connector-curvature="0"
+     d="M 118.08188,60.236734 C 109.43596,57.827705 106.14443,42.124604 100.82159,35.818919 90.876504,24.035435 73.809237,18.331879 58.651954,19.588374 42.620342,20.915175 26.494332,31.024306 17.805983,44.627536 c -0.02552,0.0386 -0.0301,0.04749 -0.01323,0.02131 C 23.147167,36.45875 26.733577,28.014565 34.337415,21.349241 46.939838,10.299587 64.339451,5.5299871 80.819613,8.5044515 97.859843,11.579656 112.47549,22.741529 120.72598,37.865888 c 2.55233,4.67439 10.59956,26.061307 -2.64144,22.37222"
+     style="fill:#d7d7d7;fill-opacity:1"
+     id="path16"
+     inkscape:transform-center-x="-0.050415915"
+     inkscape:transform-center-y="-36.711116" />
+  <metadata
+     id="metadata3778">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2010-03-23T18:01:47</dc:date>
+        <dc:description>Drawing by Francesco 'Architetto' Rollandin. From OCAL 0.18 release.</dc:description>
+        <dc:source>https://openclipart.org/detail/33583/architetto----pulsante-02-by-anonymous</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Anonymous</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>arrow</rdf:li>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>right</rdf:li>
+            <rdf:li>sign</rdf:li>
+            <rdf:li>symbol</rdf:li>
+            <rdf:li>triangle</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g836"
+     transform="matrix(0.7421072,0,0,0.7421072,6.9960641,15.725485)">
+    <g
+       id="g822">
+      <path
+         inkscape:connector-curvature="0"
+         d="m 30.100992,38.382536 v 53.022 c 0,5.399 -2.216,15.433004 5.681,15.813004 6.644,0.323 14.157,-8.493004 18.84,-12.189004 7.759,-6.117 15.516,-12.235 23.275,-18.354 7.476,-5.896 1.938,-10.271 -3.596,-14.651 -8.334,-6.6 -16.669,-13.2 -25.002,-19.799 -2.684,-2.125 -5.366,-4.25 -8.049,-6.374 -2.695,-2.136 -11.147,-2.472 -11.147,2.534"
+         style="fill:#ffffff;opacity:0.5"
+         id="path18" />
+      <path
+         inkscape:connector-curvature="0"
+         d="m 32.101992,34.369536 c -5.175,2.503 -2.903,14.432 -2.903,18.904 v 33.111 c 0,4.376 -2.163,16.078004 1.398,19.720004 6.829,6.98 17.41,-4.71 22.374,-8.624004 8.074,-6.369 16.148,-12.736 24.224,-19.104 1.999,-1.577 4.77,-3.234 5.614,-5.767 1.409,-4.229 -2.137,-6.694 -4.95,-8.923 -7.932,-6.279 -15.861,-12.561 -23.795,-18.84 -5.579,-4.423 -13.927,-14.36 -21.958,-10.478 m 0.962,71.296004 c -4.182,-2.018 -2.061,-14.494004 -2.061,-17.969004 v -33.113 c 0,-3.473 -2.082,-14.782 0.62,-17.698 5.79,-6.25 16.196,5.314 20.227,8.507 7.833,6.204 15.67,12.406 23.503,18.61 1.675,1.326 4.416,2.885 5.466,4.862 1.966,3.713 -2.338,6.201 -4.742,8.098 -7.71,6.079 -15.421,12.159 -23.131,18.24 -4.49,3.544 -13.231,13.683004 -19.878,10.463004"
+         style="fill:#818181;fill-opacity:1;opacity:0.5"
+         id="path20" />
+    </g>
+    <g
+       transform="translate(53.702401)"
+       id="g828"
+       style="opacity:0.5">
+      <path
+         id="path824"
+         style="fill:#ffffff"
+         d="m 30.100992,38.382536 v 53.022 c 0,5.399 -2.216,15.433004 5.681,15.813004 6.644,0.323 14.157,-8.493004 18.84,-12.189004 7.759,-6.117 15.516,-12.235 23.275,-18.354 7.476,-5.896 1.938,-10.271 -3.596,-14.651 -8.334,-6.6 -16.669,-13.2 -25.002,-19.799 -2.684,-2.125 -5.366,-4.25 -8.049,-6.374 -2.695,-2.136 -11.147,-2.472 -11.147,2.534"
+         inkscape:connector-curvature="0" />
+      <path
+         id="path826"
+         style="fill:#818181;fill-opacity:1"
+         d="m 32.101992,34.369536 c -5.175,2.503 -2.903,14.432 -2.903,18.904 v 33.111 c 0,4.376 -2.163,16.078004 1.398,19.720004 6.829,6.98 17.41,-4.71 22.374,-8.624004 8.074,-6.369 16.148,-12.736 24.224,-19.104 1.999,-1.577 4.77,-3.234 5.614,-5.767 1.409,-4.229 -2.137,-6.694 -4.95,-8.923 -7.932,-6.279 -15.861,-12.561 -23.795,-18.84 -5.579,-4.423 -13.927,-14.36 -21.958,-10.478 m 0.962,71.296004 c -4.182,-2.018 -2.061,-14.494004 -2.061,-17.969004 v -33.113 c 0,-3.473 -2.082,-14.782 0.62,-17.698 5.79,-6.25 16.196,5.314 20.227,8.507 7.833,6.204 15.67,12.406 23.503,18.61 1.675,1.326 4.416,2.885 5.466,4.862 1.966,3.713 -2.338,6.201 -4.742,8.098 -7.71,6.079 -15.421,12.159 -23.131,18.24 -4.49,3.544 -13.231,13.683004 -19.878,10.463004"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

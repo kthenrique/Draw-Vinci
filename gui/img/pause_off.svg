@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 12.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 51448)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   style="enable-background:new 0 0 136.743 136.704"
+   space="preserve"
+   sodipodi:docname="pause_off.svg"
+   viewBox="0 0 136.743 136.704"
+   sodipodi:version="0.32"
+   version="1.1"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <defs
+     id="defs3781">
+    <radialGradient
+       r="63.55"
+       cx="68.356"
+       cy="68.329"
+       gradientUnits="userSpaceOnUse"
+       id="XMLID_2_">
+      <stop
+         offset="0"
+         style="stop-color:#D4E4F7"
+         id="stop8" />
+      <stop
+         offset="1"
+         style="stop-color:#f0f77f;stop-opacity:1"
+         id="stop10" />
+    </radialGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     bordercolor="#666666"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     pagecolor="#ffffff"
+     inkscape:zoom="2.6334271"
+     inkscape:window-x="0"
+     borderopacity="1.0"
+     inkscape:current-layer="Layer_1"
+     inkscape:cx="28.116226"
+     inkscape:cy="57.599085"
+     inkscape:window-y="25"
+     inkscape:window-height="719"
+     inkscape:pageopacity="0.0"
+     showgrid="false"
+     inkscape:window-maximized="1" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 136.74,68.33 c 0,34.835 -27.326,64.902 -62.045,68.094 C 39.964,139.616 7.464,115.195 1.111,80.847 -5.242,46.508 16.191,11.916 49.846,2.477 c 33.665,-9.439 70.043,8.891 82.458,41.57 2.95,7.744 4.44,16.007 4.44,24.287"
+     style="fill:#aaaf54;fill-opacity:1"
+     id="path5" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 131.91,68.33 c 0,34.631 -28.917,63.549 -63.549,63.549 -34.633,0 -63.55,-28.918 -63.55,-63.549 0,-34.633 28.917,-63.55 63.55,-63.55 34.629,-0.001 63.549,28.915 63.549,63.549"
+     style="fill:url(#XMLID_2_)"
+     id="path12" />
+  <path
+     inkscape:connector-curvature="0"
+     d="m 125.78,43.627 c 5.136,29.927 -12.74,59.992 -41.484,69.786 C 53.81,123.801 19.504,108.447 6.755,78.918 12.881,114.654 49.627,138.147 84.637,128.7 120.78,118.94 140.68,78.097 125.78,43.627"
+     style="fill:#eaf268;fill-opacity:1"
+     id="path14" />
+  <path
+     inkscape:connector-curvature="0"
+     d="M 108.05,40.118 C 99.261,41.937 89.142,29.486 81.522,26.319 67.284,20.4 49.5,23.148 36.602,31.208 22.959,39.731 13.255,56.104 11.763,72.176 c -0.005,0.046 -0.005,0.056 -0.002,0.025 1.008,-9.733 0.328,-18.882 4.034,-28.29 6.141,-15.595 19.423,-27.805 35.435,-32.71 16.556,-5.072 34.661,-1.845 48.923,7.82 4.41,2.986 21.36,18.311 7.9,21.097"
+     style="fill:#f8fcb3;fill-opacity:1"
+     id="path16" />
+  <metadata
+     id="metadata3778">
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://creativecommons.org/licenses/publicdomain/" />
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title />
+        <dc:date>2010-03-23T18:01:47</dc:date>
+        <dc:description>Drawing by Francesco 'Architetto' Rollandin. From OCAL 0.18 release.</dc:description>
+        <dc:source>https://openclipart.org/detail/33583/architetto----pulsante-02-by-anonymous</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Anonymous</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>arrow</rdf:li>
+            <rdf:li>icon</rdf:li>
+            <rdf:li>right</rdf:li>
+            <rdf:li>sign</rdf:li>
+            <rdf:li>symbol</rdf:li>
+            <rdf:li>triangle</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Reproduction" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#Distribution" />
+        <cc:permits
+           rdf:resource="http://creativecommons.org/ns#DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="g823"
+     transform="translate(-5.5730384,1.9756468)">
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#aaaf54;stroke-width:1.3241868;stroke-opacity:1"
+       id="rect841-3"
+       width="15.644642"
+       height="46.933926"
+       x="51.316338"
+       y="42.88689" />
+    <rect
+       y="42.88689"
+       x="80.906097"
+       height="46.933926"
+       width="15.644642"
+       id="rect843-6"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#aaaf54;stroke-width:1.3241868;stroke-opacity:1" />
+  </g>
+</svg>

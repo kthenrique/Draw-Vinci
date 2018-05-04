@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>419</width>
-    <height>566</height>
+    <height>558</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -33,7 +33,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>30</y>
       <width>400</width>
       <height>320</height>
      </rect>
@@ -67,7 +67,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>370</y>
+      <y>360</y>
       <width>400</width>
       <height>151</height>
      </rect>
@@ -565,162 +565,6 @@ background-color: rgb(255, 255, 255);
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="geometry">
-       <rect>
-        <x>9</x>
-        <y>90</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string/>
-      </property>
-      <widget class="QPushButton" name="stopButton">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>0</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"> QPushButton {
-	border-image:url(./img/stop.png) -1;
- }
- QPushButton:pressed  {
-	border-image: url(./img/stop_pressed.png) 0;
- }</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="speedUpButton">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>0</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"> QPushButton {
-	border-image:url(./img/speed_up.png) -1;
- }
- QPushButton::hover {
- }
-
- QPushButton:pressed {
-
- }
-
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="playButton">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>0</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"> QPushButton {
-	border-image:url(./img/play.png) -1;
- }
- QPushButton:pressed  {
-	border-image: url(./img/play_pressed.png) 0;
- }
- QPushButton:hover  {
-	border-image: url(./img/play_hover.svg) 0;
- }</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pauseButton">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>0</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"> QPushButton {
-	border-image:url(./img/pause.png) -1;
- }
- QPushButton:pressed  {
-	border-image: url(./img/pause_pressed.png) 0;
- }</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="slowDownButton">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>21</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"> QPushButton {
-	border-image:url(./img/slow_down.png) -1;
- }
-
- QPushButton::hover {
- }
-
- QPushButton:pressed {
-
- }
-
-</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </widget>
      <widget class="QPushButton" name="refreshButton">
       <property name="geometry">
        <rect>
@@ -741,17 +585,177 @@ background-color: rgb(255, 255, 255);
         <normaloff>img/port_refresh.png</normaloff>img/port_refresh.png</iconset>
       </property>
      </widget>
-     <zorder>groupBox_2</zorder>
-     <zorder>upButton</zorder>
-     <zorder>leftButton</zorder>
-     <zorder>rightButton</zorder>
-     <zorder>downButton</zorder>
-     <zorder>penButton</zorder>
-     <zorder>termEdit</zorder>
-     <zorder>portsBox</zorder>
-     <zorder>connectButton</zorder>
-     <zorder>promptEdit</zorder>
-     <zorder>refreshButton</zorder>
+     <widget class="QPushButton" name="playButton">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>90</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> QPushButton {
+	border-image:url(./img/play_off.svg) 0;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/play_hover.svg) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/play_on.svg) 0;
+ }
+
+ QPushButton:on  {
+	border-image: url(./img/play_on.svg) 0;
+ }
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="stopButton">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>90</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> QPushButton {
+	border-image:url(./img/stop_off.svg) 0;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/stop_hover.svg) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/stop_on.svg) 0;
+ }
+
+ QPushButton:on  {
+	border-image: url(./img/stop_on.svg) 0;
+ }
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="speedUpButton">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>90</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> QPushButton {
+	border-image:url(./img/speed_up.svg) 0;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/speed_up_hover.svg) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/speed_up_pressed.svg) 0;
+ }</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pauseButton">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>90</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> QPushButton {
+	border-image:url(./img/pause_off.svg) 0;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/pause_hover.svg) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/pause_on.svg) 0;
+ }
+
+ QPushButton:on  {
+	border-image: url(./img/pause_on.svg) 0;
+ }
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="slowDownButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>21</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"> QPushButton {
+	border-image:url(./img/slow_down.svg) 0;
+ }
+
+ QPushButton:hover {
+	border-image: url(./img/slow_down_hover.svg) 0;
+ }
+
+ QPushButton:pressed  {
+	border-image: url(./img/slow_down_pressed.svg) 0;
+ }
+
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="horizontalLayoutWidget">
