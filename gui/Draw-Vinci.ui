@@ -277,6 +277,9 @@ QTabBar::tab:only-one {
       <property name="checkable">
        <bool>true</bool>
       </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
       <property name="autoExclusive">
        <bool>false</bool>
       </property>

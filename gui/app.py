@@ -61,7 +61,10 @@ class AppWindow(QMainWindow):
         self.artworkLabel = QLabel()    # Name of image being edited
         self.artworkLabel.setAlignment(Qt.AlignLeft)
         self.artworkLabel.setTextFormat(Qt.RichText)
-        self.ui.statusbar.addPermanentWidget(self.artworkLabel)
+        self.toolLabel = QLabel()       # Icon of tool last used
+        self.toolLabel.setAlignment(Qt.AlignLeft)
+        self.toolLabel.setTextFormat(Qt.RichText)
+        self.ui.statusbar.addPermanentWidget(self.toolLabel)
         self.ui.statusbar.addPermanentWidget(self.connectionLabel)
 
         # Write OFFLINE to connectionStatus - statusbar
@@ -70,7 +73,7 @@ class AppWindow(QMainWindow):
                 </span></p></body></html>')
 
         # Creating canvas
-        self.scene = MainScene(self.toolsButtonGroup, self.artworkLabel)
+        self.scene = MainScene(self.toolsButtonGroup, self.artworkLabel, self)
         self.ui.canvas.setScene(self.scene)
         self.ui.canvas.show()
 

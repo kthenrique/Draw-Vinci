@@ -135,6 +135,7 @@ class Ui_MainWindow(object):
         icon3.addPixmap(QtGui.QPixmap("img/eraser.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.eraserButton.setIcon(icon3)
         self.eraserButton.setCheckable(True)
+        self.eraserButton.setChecked(True)
         self.eraserButton.setAutoExclusive(False)
         self.eraserButton.setObjectName("eraserButton")
         self.ellipseButton = QtWidgets.QPushButton(self.drawTab)
