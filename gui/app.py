@@ -7,13 +7,14 @@
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
 # -- Last update: 2018 Apr 28
 # ----------------------------------------------------------------------------
-# -- Description: 
+# -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
 
 import sys
+from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtCore import QIODevice
-from PyQt5.QtWidgets import QApplication, QMainWindow, QButtonGroup
+from PyQt5.QtWidgets import QApplication, QMainWindow, QButtonGroup, QLabel
 
 from draw_vinci import Ui_MainWindow
 from canvas import MainScene
@@ -58,9 +59,25 @@ class AppWindow(QMainWindow):
         self.ui.connectButton.clicked.connect(self.connect_port)   # connect
         self.ui.refreshButton.clicked.connect(self.refresh_ports)  # refresh
 
+        # Configuring statusbar 
+        self.connectionStatus = QLabel() # connection state: online - offline
+        self.connectionStatus.setAlignment(Qt.AlignHCenter)
+        self.connectionStatus.setTextFormat(Qt.RichText)
+        self.artworkStatus = QLabel()    # Name of image being edited
+        self.ui.statusbar.addPermanentWidget(self.connectionStatus)
+        self.ui.statusbar.addPermanentWidget(self.artworkStatus)
+
+        # Write OFFLINE to connectionStatus - statusbar
+        self.connectionStatus.setText('<html><head/><body><p align="center">\
+                <span style=" font-weight:600; color:#cc0000;">OFFLINE\
+                </span></p></body></html>')
+
         self.show()
 
     def refresh_ports(self):
+        ''' Callback of refreshButton:
+                refreshing the list of available serial ports to connect.
+        '''
         self.ui.portsBox.clear()
         self.ui.portsBox.addItem("Custom")
         apt_ports = QSerialPortInfo.availablePorts()
@@ -70,8 +87,17 @@ class AppWindow(QMainWindow):
         self.port.setPortName(self.ui.portsBox.currentText())
 
     def connect_port(self):
+        ''' Callback of connectButton:
+                trying to connect to the port chosen.
+        '''
         self.port.setPortName(self.ui.portsBox.currentText())
-        self.port.open(QIODevice.ReadWrite);
+        if not self.port.open(QIODevice.ReadWrite):
+            self.ui.statusbar.showMessage("ERROR: {0:2d} - vide docs!".format(self.port.error()), 900)
+        else:
+            self.connectionStatus.setText('<html><head/><body><p align="center">\
+                    <span style=" font-weight:600; color:#73d216;">ONLINE</span>\
+                    </p></body></html>')
+
 
 
 if __name__ == '__main__':
