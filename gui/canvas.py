@@ -11,21 +11,22 @@
 # ----------------------------------------------------------------------------
 
 from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtGui import QPainter, QPixmap, QColor, QPolygonF
+from PyQt5.QtGui import QPainter, QPixmap, QColor, QPolygonF, QPicture, QPainterPath
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH = 390
 CANVAS_HEIGHT = 310
 
 class MainScene(QGraphicsScene):
-    def __init__(self, toolsButtonGroup):
+    def __init__(self, toolsButtonGroup, artworkLabel):
         super().__init__()
         self.setSceneRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
         self.toolsButtonGroup = toolsButtonGroup
+        self.artworkLabel = artworkLabel
 
         # The drawable elements
         self.eraser    = None
-        self.freehand  = None
+        self.freehand  = QPainterPath()
         self.line      = QLineF()
         self.text      = None
         self.rectangle = QRectF()
@@ -41,27 +42,41 @@ class MainScene(QGraphicsScene):
         pos = e.scenePos()
         self.clickedPos = QPointF(pos.x(), pos.y())
         if self.toolsButtonGroup.checkedId() == 1: # eraser
-            pass
+            pic = QPixmap("./img/eraser.png")
+            self.artworkLabel.setPixmap(pic)
         if self.toolsButtonGroup.checkedId() == 2: # freehand
-            pass
+            pic = QPixmap("./img/freehand.png")
+            self.artworkLabel.setPixmap(pic)
+            self.isDrawing = True
+            self.freehand.moveTo(pos)
+            self.item = self.addPath(self.freehand)
         if self.toolsButtonGroup.checkedId() == 3: # line
+            pic = QPixmap("./img/line.png")
+            self.artworkLabel.setPixmap(pic)
             self.isDrawing = True
             self.line.setP1(self.clickedPos)
             self.line.setP2(self.clickedPos)
             self.item = self.addLine(self.line)
         if self.toolsButtonGroup.checkedId() == 4: # text
-            pass
+            pic = QPixmap("./img/text.png")
+            self.artworkLabel.setPixmap(pic)
         if self.toolsButtonGroup.checkedId() == 5: # rectangle
+            pic = QPixmap("./img/rectangle.png")
+            self.artworkLabel.setPixmap(pic)
             self.isDrawing = True
             self.rectangle.setTopLeft(self.clickedPos)
             self.rectangle.setBottomRight(self.clickedPos)
             self.item = self.addRect(self.rectangle)
         if self.toolsButtonGroup.checkedId() == 6: # ellipse
+            pic = QPixmap("./img/ellipse.png")
+            self.artworkLabel.setPixmap(pic)
             self.isDrawing = True
             self.ellipse.setTopLeft(self.clickedPos)
             self.ellipse.setBottomRight(self.clickedPos)
             self.item = self.addEllipse(self.ellipse)
         if self.toolsButtonGroup.checkedId() == 7: # polygon
+            pic = QPixmap("./img/polygon.png")
+            self.artworkLabel.setPixmap(pic)
             self.isDrawing = True
             self.polygon.united(QPolygonF(self.clickedPos))
             self.item = self.addPolygon(self.polygon)
@@ -76,7 +91,8 @@ class MainScene(QGraphicsScene):
             if self.toolsButtonGroup.checkedId() == 1: # eraser
                 pass
             if self.toolsButtonGroup.checkedId() == 2: # freehand
-                pass
+                self.freehand.lineTo(pos)
+                self.item.setPath(self.freehand)
             if self.toolsButtonGroup.checkedId() == 3: # line
                 self.line.setP2(mousePos)
                 self.item.setLine(self.line)

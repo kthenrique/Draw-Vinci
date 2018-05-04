@@ -36,11 +36,6 @@ class AppWindow(QMainWindow):
         self.toolsButtonGroup.addButton(self.ui.ellipseButton, 6)
         self.toolsButtonGroup.addButton(self.ui.polygonButton, 7)
 
-        # Creating canvas
-        self.scene = MainScene(self.toolsButtonGroup)
-        self.ui.canvas.setScene(self.scene)
-        self.ui.canvas.show()
-
         # Configuring UART Port
         self.port = QSerialPort()
         self.port.setBaudRate(QSerialPort.Baud9600)
@@ -60,17 +55,24 @@ class AppWindow(QMainWindow):
         self.ui.refreshButton.clicked.connect(self.refresh_ports)  # refresh
 
         # Configuring statusbar 
-        self.connectionStatus = QLabel() # connection state: online - offline
-        self.connectionStatus.setAlignment(Qt.AlignHCenter)
-        self.connectionStatus.setTextFormat(Qt.RichText)
-        self.artworkStatus = QLabel()    # Name of image being edited
-        self.ui.statusbar.addPermanentWidget(self.connectionStatus)
-        self.ui.statusbar.addPermanentWidget(self.artworkStatus)
+        self.connectionLabel = QLabel() # connection state: online - offline
+        self.connectionLabel.setAlignment(Qt.AlignHCenter)
+        self.connectionLabel.setTextFormat(Qt.RichText)
+        self.artworkLabel = QLabel()    # Name of image being edited
+        self.artworkLabel.setAlignment(Qt.AlignLeft)
+        self.artworkLabel.setTextFormat(Qt.RichText)
+        self.ui.statusbar.addPermanentWidget(self.artworkLabel)
+        self.ui.statusbar.addPermanentWidget(self.connectionLabel)
 
         # Write OFFLINE to connectionStatus - statusbar
-        self.connectionStatus.setText('<html><head/><body><p align="center">\
+        self.connectionLabel.setText('<html><head/><body><p align="center">\
                 <span style=" font-weight:600; color:#cc0000;">OFFLINE\
                 </span></p></body></html>')
+
+        # Creating canvas
+        self.scene = MainScene(self.toolsButtonGroup, self.artworkLabel)
+        self.ui.canvas.setScene(self.scene)
+        self.ui.canvas.show()
 
         self.show()
 
@@ -92,9 +94,9 @@ class AppWindow(QMainWindow):
         '''
         self.port.setPortName(self.ui.portsBox.currentText())
         if not self.port.open(QIODevice.ReadWrite):
-            self.ui.statusbar.showMessage("ERROR: {0:2d} - vide docs!".format(self.port.error()), 900)
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), 900)
         else:
-            self.connectionStatus.setText('<html><head/><body><p align="center">\
+            self.connectionLabel.setText('<html><head/><body><p align="center">\
                     <span style=" font-weight:600; color:#73d216;">ONLINE</span>\
                     </p></body></html>')
 
