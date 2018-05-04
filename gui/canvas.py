@@ -48,9 +48,10 @@ class MainScene(QGraphicsScene):
                           QPixmap("./img/text.png"),
                           QPixmap("./img/rectangle.png"),
                           QPixmap("./img/ellipse.png"),
-                          QPixmap("./img/polygon.png"))
+                          QPixmap("./img/polygon.png"),
+                          QPixmap("./img/select.png"))
 
-        self.index      = 1        # According to the tools buttons
+        self.index      = 0        # According to the tools buttons
         self.isDrawing  = False    # While drawing
         self.clickedPos = None     # position where drawing began
         self.item       = None     # Item being drawn
@@ -61,7 +62,7 @@ class MainScene(QGraphicsScene):
         pos = e.scenePos()
         self.clickedPos = QPointF(pos.x(), pos.y())
 
-        self.index = self.toolsButtonGroup.checkedId() - 1
+        self.index = self.toolsButtonGroup.checkedId()
 
         if self.index == 0: # eraser
             pass
@@ -138,16 +139,19 @@ class MainScene(QGraphicsScene):
 
                 self.item.setRect(self.tools[self.index])
             if self.index == 6: # polygon
-                pass
+                self.tools[self.index].append(mousePos)
+                self.item.setPolygon(self.tools[self.index])
+                toRemove = self.tools[self.index].lastIndexOf(self.tools[self.index].last())
+                self.tools[self.index].remove(toRemove)
 
     def mouseReleaseEvent(self, e):
-        self.isDrawing = False
         if self.index != 6:
+            self.isDrawing = False
             self.item  = None
 
     def setIconTool(self, button):
         ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
-        index = self.toolsButtonGroup.id(button) - 1
+        index = self.toolsButtonGroup.id(button)
         cursor = QCursor(self.pixTools[index])
         self.view.setCursor(cursor)
         self.toolLabel.setPixmap(self.pixTools[index])

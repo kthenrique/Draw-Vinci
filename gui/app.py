@@ -28,13 +28,14 @@ class AppWindow(QMainWindow):
         # Tools Group of buttons
         self.toolsButtonGroup = QButtonGroup()
         self.toolsButtonGroup.setExclusive(True)
-        self.toolsButtonGroup.addButton(self.ui.eraserButton, 1)
-        self.toolsButtonGroup.addButton(self.ui.freehandButton, 2)
-        self.toolsButtonGroup.addButton(self.ui.lineButton, 3)
-        self.toolsButtonGroup.addButton(self.ui.textButton, 4)
-        self.toolsButtonGroup.addButton(self.ui.rectangleButton, 5)
-        self.toolsButtonGroup.addButton(self.ui.ellipseButton, 6)
-        self.toolsButtonGroup.addButton(self.ui.polygonButton, 7)
+        self.toolsButtonGroup.addButton(self.ui.eraserButton, 0)
+        self.toolsButtonGroup.addButton(self.ui.freehandButton, 1)
+        self.toolsButtonGroup.addButton(self.ui.lineButton, 2)
+        self.toolsButtonGroup.addButton(self.ui.textButton, 3)
+        self.toolsButtonGroup.addButton(self.ui.rectangleButton, 4)
+        self.toolsButtonGroup.addButton(self.ui.ellipseButton, 5)
+        self.toolsButtonGroup.addButton(self.ui.polygonButton, 6)
+        self.toolsButtonGroup.addButton(self.ui.selectButton, 7)
 
         # Configuring UART Port
         self.port = QSerialPort()
@@ -109,7 +110,6 @@ class AppWindow(QMainWindow):
             self.connectionLabel.setText('<html><head/><body><p align="center">\
                     <span style=" font-weight:600; color:#73d216;">ONLINE</span>\
                     </p></body></html>')
-
 
 
 if __name__ == '__main__':

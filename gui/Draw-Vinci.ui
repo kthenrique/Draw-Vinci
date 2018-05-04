@@ -12,7 +12,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>409</width>
+    <width>419</width>
+    <height>558</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>419</width>
     <height>558</height>
    </size>
   </property>
@@ -184,7 +190,7 @@ QTabBar::tab:only-one {
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="anotherButton">
+     <widget class="QPushButton" name="selectButton">
       <property name="geometry">
        <rect>
         <x>160</x>
@@ -196,11 +202,15 @@ QTabBar::tab:only-one {
       <property name="text">
        <string/>
       </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/select.png</normaloff>img/select.png</iconset>
+      </property>
       <property name="checkable">
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="lineButton">
