@@ -66,6 +66,7 @@ class AppWindow(QMainWindow):
         self.toolLabel.setTextFormat(Qt.RichText)
         self.ui.statusbar.addPermanentWidget(self.toolLabel)
         self.ui.statusbar.addPermanentWidget(self.connectionLabel)
+        self.ui.statusbar.addPermanentWidget(self.artworkLabel)
 
         # Write OFFLINE to connectionStatus - statusbar
         self.connectionLabel.setText('<html><head/><body><p align="center">\
@@ -73,8 +74,9 @@ class AppWindow(QMainWindow):
                 </span></p></body></html>')
 
         # Creating canvas
-        self.scene = MainScene(self.toolsButtonGroup, self.artworkLabel, self)
+        self.scene = MainScene(self.toolsButtonGroup, self.toolLabel)
         self.ui.canvas.setScene(self.scene)
+        self.scene.view = self.ui.canvas
         self.ui.canvas.show()
 
         self.show()

@@ -19,12 +19,12 @@ CANVAS_WIDTH = 390
 CANVAS_HEIGHT = 310
 
 class MainScene(QGraphicsScene):
-    def __init__(self, toolsButtonGroup, toolLabel, win):
+    def __init__(self, toolsButtonGroup, toolLabel):
         super().__init__()
         self.setSceneRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
-        self.win = win
+        self.view = None
 
         self.toolsButtonGroup.buttonPressed.connect(self.setToolLabel)
 
@@ -38,12 +38,12 @@ class MainScene(QGraphicsScene):
                           QPolygonF())
 
         # Icons for cursor and toolLabel
-        self.pixTools  = (QPixmap("./img/eraser.png"),\
-                          QPixmap("./img/freehand.png"),\
-                          QPixmap("./img/line.png"),\
-                          QPixmap("./img/text.png"),\
-                          QPixmap("./img/rectangle.png"),\
-                          QPixmap("./img/ellipse.png"),\
+        self.pixTools  = (QPixmap("./img/eraser.png"),
+                          QPixmap("./img/freehand.png"),
+                          QPixmap("./img/line.png"),
+                          QPixmap("./img/text.png"),
+                          QPixmap("./img/rectangle.png"),
+                          QPixmap("./img/ellipse.png"),
                           QPixmap("./img/polygon.png"))
 
         self.index      = 1        # According to the tools buttons
@@ -79,17 +79,15 @@ class MainScene(QGraphicsScene):
             self.tools[self.index].setBottomRight(self.clickedPos)
             self.item = self.addEllipse(self.tools[self.index])
         if self.index == 6: # polygon
-            self.polygon.united(QPolygonF(self.clickedPos))
-            self.item = self.addPolygon(self.polygon)
+            self.tools[self.index].united(QPolygonF(self.clickedPos))
+            self.item = self.addPolygon(self.tools[self.index])
 
     def dragLeaveEvent(self, e):
         pass
 
     def mouseMoveEvent(self, e):
-        #pic = QPixmap("./img/polygon.png")
-        #self.toolLabel.setPixmap(pic)
-        #cool = QCursor(pic)
-        #self.win.setCursor(cool)
+        cursor = QCursor(self.pixTools[self.index])
+        self.view.setCursor(cursor)
         if self.isDrawing:
             pos = e.scenePos()
             mousePos = QPointF(pos.x(), pos.y())
@@ -132,11 +130,13 @@ class MainScene(QGraphicsScene):
 
                 self.item.setRect(self.tools[self.index])
             if self.index == 6: # polygon
-                self.polygon.united(QPolygonF(mousePos))
-                self.item.setPolygon(self.polygon)
+                self.tools[self.index].united(QPolygonF(mousePos))
+                self.item.setPolygon(self.tools[self.index])
 
     def mouseReleaseEvent(self, e):
         self.isDrawing = False
 
-    def setToolLabel(self, index):
-        self.toolLabel.setPixmap(self.pixTools[self.index])
+    def setToolLabel(self, button):
+        print("happened")
+        index = self.toolsButtonGroup.id(button) - 1
+        self.toolLabel.setPixmap(self.pixTools[index])
