@@ -23,6 +23,7 @@ class Ui_MainWindow(object):
         self.canvas.setMinimumSize(QtCore.QSize(400, 320))
         self.canvas.setMaximumSize(QtCore.QSize(400, 320))
         self.canvas.setMouseTracking(True)
+        self.canvas.setToolTip("")
         self.canvas.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.canvas.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.canvas.setObjectName("canvas")
@@ -428,7 +429,6 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Draw-Vinci"))
-        self.canvas.setToolTip(_translate("MainWindow", "canvas"))
         self.textButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">text</p></body></html>"))
         self.lineButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">line</p></body></html>"))
         self.polygonButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">polygon</p></body></html>"))

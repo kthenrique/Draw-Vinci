@@ -11,7 +11,7 @@
 # ----------------------------------------------------------------------------
 
 from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtGui import QPainter, QPixmap, QColor
+from PyQt5.QtGui import QPainter, QPixmap, QColor, QPolygonF
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH = 390
@@ -29,8 +29,8 @@ class MainScene(QGraphicsScene):
         self.line      = QLineF()
         self.text      = None
         self.rectangle = QRectF()
-        self.ellipse   = None
-        self.polygon   = None
+        self.ellipse   = QRectF()
+        self.polygon   = QPolygonF()
 
         self.isDrawing  = False
         self.clickedPos = None
@@ -57,9 +57,14 @@ class MainScene(QGraphicsScene):
             self.rectangle.setBottomRight(self.clickedPos)
             self.item = self.addRect(self.rectangle)
         if self.toolsButtonGroup.checkedId() == 6: # ellipse
-            pass
+            self.isDrawing = True
+            self.ellipse.setTopLeft(self.clickedPos)
+            self.ellipse.setBottomRight(self.clickedPos)
+            self.item = self.addEllipse(self.ellipse)
         if self.toolsButtonGroup.checkedId() == 7: # polygon
-            pass
+            self.isDrawing = True
+            self.polygon.united(QPolygonF(self.clickedPos))
+            self.item = self.addPolygon(self.polygon)
 
     def dragLeaveEvent(self, e):
         pass
@@ -93,9 +98,23 @@ class MainScene(QGraphicsScene):
 
                 self.item.setRect(self.rectangle)
             if self.toolsButtonGroup.checkedId() == 6: # ellipse
-                pass
+                if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
+                    self.ellipse.setBottomRight(self.clickedPos)
+                    self.ellipse.setTopLeft(mousePos)
+                elif self.clickedPos.y() > mousePos.y():
+                    self.ellipse.setBottomLeft(self.clickedPos)
+                    self.ellipse.setTopRight(mousePos)
+                elif self.clickedPos.x() > mousePos.x():
+                    self.ellipse.setTopRight(self.clickedPos)
+                    self.ellipse.setBottomLeft(mousePos)
+                else:
+                    self.ellipse.setBottomRight(mousePos)
+                    self.ellipse = self.ellipse.normalized()
+
+                self.item.setRect(self.ellipse)
             if self.toolsButtonGroup.checkedId() == 7: # polygon
-                pass
+                self.polygon.united(QPolygonF(mousePos))
+                self.item.setPolygon(self.polygon)
 
     def mouseReleaseEvent(self, e):
         self.isDrawing = False
