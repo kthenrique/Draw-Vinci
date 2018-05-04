@@ -19,6 +19,10 @@ CANVAS_WIDTH = 390
 CANVAS_HEIGHT = 310
 
 class MainScene(QGraphicsScene):
+    ''' THE CANVAS
+    Implementation of tools for drawing, updating the statusbar and keeping
+    of the current image being edited
+    '''
     def __init__(self, toolsButtonGroup, toolLabel):
         super().__init__()
         self.setSceneRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
@@ -79,11 +83,17 @@ class MainScene(QGraphicsScene):
             self.tools[self.index].setBottomRight(self.clickedPos)
             self.item = self.addEllipse(self.tools[self.index])
         if self.index == 6: # polygon
-            self.tools[self.index].united(QPolygonF(self.clickedPos))
-            self.item = self.addPolygon(self.tools[self.index])
+            if self.item:
+                self.tools[self.index].append(self.clickedPos)
+                self.item.setPolygon(self.tools[self.index])
+            else:
+                self.tools[self.index].clear()
+                self.tools[self.index].append(self.clickedPos)
+                self.item = self.addPolygon(self.tools[self.index])
 
-    def dragLeaveEvent(self, e):
-        pass
+    def mouseDoubleClickEvent(self, e):
+        self.isDrawing = False
+        self.item      = None
 
     def mouseMoveEvent(self, e):
         if self.isDrawing:
@@ -128,11 +138,12 @@ class MainScene(QGraphicsScene):
 
                 self.item.setRect(self.tools[self.index])
             if self.index == 6: # polygon
-                self.tools[self.index].united(QPolygonF(mousePos))
-                self.item.setPolygon(self.tools[self.index])
+                pass
 
     def mouseReleaseEvent(self, e):
         self.isDrawing = False
+        if self.index != 6:
+            self.item  = None
 
     def setIconTool(self, button):
         ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
