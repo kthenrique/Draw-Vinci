@@ -61,12 +61,13 @@ class AppWindow(QMainWindow):
         self.artworkLabel = QLabel()    # Name of image being edited
         self.artworkLabel.setAlignment(Qt.AlignLeft)
         self.artworkLabel.setTextFormat(Qt.RichText)
+        self.artworkLabel.setText("UNKNOWN_FILE")
         self.toolLabel = QLabel()       # Icon of tool last used
         self.toolLabel.setAlignment(Qt.AlignLeft)
         self.toolLabel.setTextFormat(Qt.RichText)
+        self.ui.statusbar.addPermanentWidget(self.artworkLabel)
         self.ui.statusbar.addPermanentWidget(self.toolLabel)
         self.ui.statusbar.addPermanentWidget(self.connectionLabel)
-        self.ui.statusbar.addPermanentWidget(self.artworkLabel)
 
         # Write OFFLINE to connectionStatus - statusbar
         self.connectionLabel.setText('<html><head/><body><p align="center">\

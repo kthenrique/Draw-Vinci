@@ -26,7 +26,7 @@ class MainScene(QGraphicsScene):
         self.toolLabel = toolLabel
         self.view = None
 
-        self.toolsButtonGroup.buttonPressed.connect(self.setToolLabel)
+        self.toolsButtonGroup.buttonPressed.connect(self.setIconTool)
 
         # The drawable elements
         self.tools     = (None,
@@ -86,8 +86,6 @@ class MainScene(QGraphicsScene):
         pass
 
     def mouseMoveEvent(self, e):
-        cursor = QCursor(self.pixTools[self.index])
-        self.view.setCursor(cursor)
         if self.isDrawing:
             pos = e.scenePos()
             mousePos = QPointF(pos.x(), pos.y())
@@ -136,7 +134,9 @@ class MainScene(QGraphicsScene):
     def mouseReleaseEvent(self, e):
         self.isDrawing = False
 
-    def setToolLabel(self, button):
-        print("happened")
+    def setIconTool(self, button):
+        ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
         index = self.toolsButtonGroup.id(button) - 1
+        cursor = QCursor(self.pixTools[index])
+        self.view.setCursor(cursor)
         self.toolLabel.setPixmap(self.pixTools[index])
