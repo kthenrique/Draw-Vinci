@@ -13,7 +13,7 @@
 from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
-        QCursor, QTextCursor, QTransform)
+        QCursor, QTextCursor, QTransform, QPen)
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH  = 390
@@ -44,7 +44,7 @@ class MainScene(QGraphicsScene):
                           QRectF(),
                           QRectF(),
                           QPolygonF(),
-                          QTransform()]
+                          None]
 
         # Icons for cursor and toolLabel
         self.pixTools  = (QPixmap("./img/eraser.png"),
@@ -66,6 +66,9 @@ class MainScene(QGraphicsScene):
     # Reimplementing mouse events
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
+            if self.tools[7]: # Resetting selection
+                self.removeItem(self.tools[7])
+                self.tools[7] = None
             self.isDrawing = True
             pos = e.scenePos()
             self.clickedPos = QPointF(pos.x(), pos.y())
@@ -111,7 +114,13 @@ class MainScene(QGraphicsScene):
                     self.tools[self.index].append(self.clickedPos)
                     self.item = self.addPolygon(self.tools[self.index])
             elif self.index == 7: # select
-                self.item = self.itemAt(self.clickedPos, self.tools[self.index])
+                self.item = self.itemAt(self.clickedPos, QTransform())
+                if self.item:
+                    self.setFocusItem(self.item)
+                    self.item.setSelected(True)
+                    rectangle = self.item.sceneBoundingRect()
+                    pen       = QPen(Qt.DotLine)
+                    self.tools[self.index] = self.addRect(rectangle, pen)
 
     def mouseDoubleClickEvent(self, e):
         if self.index == 6:
@@ -170,6 +179,8 @@ class MainScene(QGraphicsScene):
                 self.clickedPos = mousePos
                 if self.item:
                     self.item.moveBy(m.x(), m.y())
+                    mousePos = self.item.mapFromScene(mousePos)
+                    self.tools[self.index].moveBy(m.x(), m.y())
 
     def mouseReleaseEvent(self, e):
         if self.index != 6 and self.index != 3: # except polygons and text
