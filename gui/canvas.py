@@ -16,8 +16,10 @@ from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
         QCursor, QTextCursor, QTransform)
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
-CANVAS_WIDTH = 390
+CANVAS_WIDTH  = 390
 CANVAS_HEIGHT = 310
+VIEW_X        = 10
+VIEW_Y        = 30
 
 class MainScene(QGraphicsScene):
     ''' THE CANVAS
@@ -26,7 +28,7 @@ class MainScene(QGraphicsScene):
     '''
     def __init__(self, toolsButtonGroup, toolLabel):
         super().__init__()
-        self.setSceneRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
+        self.setSceneRect(VIEW_X, VIEW_Y, CANVAS_WIDTH, CANVAS_HEIGHT)
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
         self.statusbar = self.toolLabel.parentWidget()
@@ -70,14 +72,14 @@ class MainScene(QGraphicsScene):
             self.index = self.toolsButtonGroup.checkedId()
             if self.index == 0: # eraser
                 pass
-            if self.index == 1: # freehand
+            elif self.index == 1: # freehand
                 self.tools[self.index].moveTo(pos)
                 self.item = self.addPath(self.tools[self.index])
-            if self.index == 2: # line
+            elif self.index == 2: # line
                 self.tools[self.index].setP1(self.clickedPos)
                 self.tools[self.index].setP2(self.clickedPos)
                 self.item = self.addLine(self.tools[self.index])
-            if self.index == 3: # text
+            elif self.index == 3: # text
                 self.item = None
                 self.isTyping  = not self.isTyping
                 if self.isTyping:
@@ -93,29 +95,28 @@ class MainScene(QGraphicsScene):
                     self.item.setTextCursor(textCursor)
                     #self.item.setFont()
                     #self.item.setTextWidth()
-            if self.index == 4: # rectangle
+            elif self.index == 4: # rectangle
                 self.tools[self.index].setTopLeft(self.clickedPos)
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addRect(self.tools[self.index])
-            if self.index == 5: # ellipse
+            elif self.index == 5: # ellipse
                 self.tools[self.index].setTopLeft(self.clickedPos)
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addEllipse(self.tools[self.index])
-            if self.index == 6: # polygon
+            elif self.index == 6: # polygon
                 if not self.tools[self.index].isEmpty():
                     self.tools[self.index].append(self.clickedPos)
                     self.item.setPolygon(self.tools[self.index])
                 else:
                     self.tools[self.index].append(self.clickedPos)
                     self.item = self.addPolygon(self.tools[self.index])
-            if self.index == 7: # select
+            elif self.index == 7: # select
                 self.item = self.itemAt(self.clickedPos, self.tools[self.index])
-                if self.item:
-                    print(self.item)
 
     def mouseDoubleClickEvent(self, e):
-        self.isDrawing = False
-        self.tools[self.index].clear()
+        if self.index == 6:
+            self.isDrawing = False
+            self.tools[self.index].clear()
 
     def mouseMoveEvent(self, e):
         if self.isDrawing:
@@ -123,15 +124,15 @@ class MainScene(QGraphicsScene):
             mousePos = QPointF(pos.x(), pos.y())
             if self.index == 0: # eraser
                 pass
-            if self.index == 1: # freehand
+            elif self.index == 1: # freehand
                 self.tools[self.index].lineTo(pos)
                 self.item.setPath(self.tools[self.index])
-            if self.index == 2: # line
+            elif self.index == 2: # line
                 self.tools[self.index].setP2(mousePos)
                 self.item.setLine(self.tools[self.index])
-            if self.index == 3: # text
+            elif self.index == 3: # text
                 pass
-            if self.index == 4: # rectangle
+            elif self.index == 4: # rectangle
                 if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
                     self.tools[self.index].setBottomRight(self.clickedPos)
                     self.tools[self.index].setTopLeft(mousePos)
@@ -145,7 +146,7 @@ class MainScene(QGraphicsScene):
                     self.tools[self.index].setBottomRight(mousePos)
 
                 self.item.setRect(self.tools[self.index])
-            if self.index == 5: # ellipse
+            elif self.index == 5: # ellipse
                 if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
                     self.tools[self.index].setBottomRight(self.clickedPos)
                     self.tools[self.index].setTopLeft(mousePos)
@@ -159,14 +160,16 @@ class MainScene(QGraphicsScene):
                     self.tools[self.index].setBottomRight(mousePos)
 
                 self.item.setRect(self.tools[self.index])
-            if self.index == 6: # polygon
+            elif self.index == 6: # polygon
                 self.tools[self.index].append(mousePos)
                 self.item.setPolygon(self.tools[self.index])
                 toRemove = self.tools[self.index].lastIndexOf(self.tools[self.index].last())
                 self.tools[self.index].remove(toRemove)
-            if self.index == 7: # select
+            elif self.index == 7: # select
+                m = mousePos - self.clickedPos
+                self.clickedPos = mousePos
                 if self.item:
-                    self.item.setPos(mousePos)
+                    self.item.moveBy(m.x(), m.y())
 
     def mouseReleaseEvent(self, e):
         if self.index != 6 and self.index != 3: # except polygons and text
@@ -174,6 +177,7 @@ class MainScene(QGraphicsScene):
 
     # Reimplementing keypress events
     def keyPressEvent(self, e):
+        # Ctrl-Z Functionality
         if e.modifiers() and Qt.ControlModifier and e.key() == Qt.Key_Z:
             try:
                 self.itemsDrawn = self.items(Qt.AscendingOrder)
@@ -184,7 +188,7 @@ class MainScene(QGraphicsScene):
                 self.tools[6].clear()
             except:
                 self.statusbar.showMessage("There is no item in Canvas", 900)
-
+        # Text Functionality
         if self.isTyping:
             if e.key() == Qt.Key_Backspace:
                 self.tools[self.index] = self.tools[self.index][:-1]

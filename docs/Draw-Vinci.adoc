@@ -13,8 +13,19 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 === Formats supported
 
 == Functionalities
+=== Tools
+==== Eraser
+==== Line
+==== Freehand
+==== Text
+==== Rectangle
+==== Ellipse
+==== Select
+=== Key Combinations
+==== Undoing
 
 == Communication
+=== Error Table
 
 === Protocol
 

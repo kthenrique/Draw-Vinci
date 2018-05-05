@@ -111,8 +111,8 @@
     </property>
     <property name="maximumSize">
      <size>
-      <width>2000</width>
-      <height>2000</height>
+      <width>390</width>
+      <height>310</height>
      </size>
     </property>
     <property name="mouseTracking">
@@ -124,14 +124,28 @@
     <property name="styleSheet">
      <string notr="true">background-color: rgb(255, 255, 255);</string>
     </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
     <property name="frameShadow">
-     <enum>QFrame::Sunken</enum>
+     <enum>QFrame::Plain</enum>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
     </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="sceneRect">
+     <rectf>
+      <x>0.000000000000000</x>
+      <y>0.000000000000000</y>
+      <width>390.000000000000000</width>
+      <height>310.000000000000000</height>
+     </rectf>
     </property>
    </widget>
    <widget class="QTabWidget" name="tabWidget">
@@ -269,6 +283,9 @@ QTabBar::tab:only-one {
         <width>41</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;select&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -425,6 +442,9 @@ QTabBar::tab:only-one {
         <width>41</width>
         <height>41</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;freehand&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
