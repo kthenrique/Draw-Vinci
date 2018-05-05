@@ -29,6 +29,7 @@ class MainScene(QGraphicsScene):
         self.setSceneRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT)
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
+        self.statusbar = self.toolLabel.parentWidget()
         self.view = None
 
         self.toolsButtonGroup.buttonPressed.connect(self.setIconTool)
@@ -56,8 +57,8 @@ class MainScene(QGraphicsScene):
         self.index      = 0        # According to the tools buttons
         self.isDrawing  = False    # While drawing
         self.clickedPos = None     # position where drawing began
-        self.item       = None     # Item being drawn - last item drawn
         self.isTyping   = False    # Flags when to add a text until next click
+        self.item       = None     # Item being drawn - last item drawn
         self.itemsDrawn = None     # List of items on canvas
 
     # Reimplementing mouse events
@@ -174,8 +175,15 @@ class MainScene(QGraphicsScene):
     # Reimplementing keypress events
     def keyPressEvent(self, e):
         if e.modifiers() and Qt.ControlModifier and e.key() == Qt.Key_Z:
-            self.itemsDrawn = self.items(Qt.AscendingOrder)
-            self.removeItem(self.itemsDrawn[-1])
+            try:
+                self.itemsDrawn = self.items(Qt.AscendingOrder)
+                self.removeItem(self.itemsDrawn[-1])
+                # Cleaning in case smth was being drawn
+                self.isDrawing = False
+                self.isTyping  = False
+                self.tools[6].clear()
+            except:
+                self.statusbar.showMessage("There is no item in Canvas", 900)
 
         if self.isTyping:
             if e.key() == Qt.Key_Backspace:
