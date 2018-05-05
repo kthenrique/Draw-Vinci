@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 02
+# -- Last update: 2018 Mai 05
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
 from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
-        QCursor, QTextCursor)
+        QCursor, QTextCursor, QTransform)
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH = 390
@@ -40,7 +40,8 @@ class MainScene(QGraphicsScene):
                           '',          # str instead of QString
                           QRectF(),
                           QRectF(),
-                          QPolygonF()]
+                          QPolygonF(),
+                          QTransform()]
 
         # Icons for cursor and toolLabel
         self.pixTools  = (QPixmap("./img/eraser.png"),
@@ -55,8 +56,9 @@ class MainScene(QGraphicsScene):
         self.index      = 0        # According to the tools buttons
         self.isDrawing  = False    # While drawing
         self.clickedPos = None     # position where drawing began
-        self.item       = None     # Item being drawn
+        self.item       = None     # Item being drawn - last item drawn
         self.isTyping   = False    # Flags when to add a text until next click
+        self.itemsDrawn = None     # List of items on canvas
 
     # Reimplementing mouse events
     def mousePressEvent(self, e):
@@ -99,17 +101,20 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addEllipse(self.tools[self.index])
             if self.index == 6: # polygon
-                if self.item:
+                if not self.tools[self.index].isEmpty():
                     self.tools[self.index].append(self.clickedPos)
                     self.item.setPolygon(self.tools[self.index])
                 else:
-                    self.tools[self.index].clear()
                     self.tools[self.index].append(self.clickedPos)
                     self.item = self.addPolygon(self.tools[self.index])
+            if self.index == 7: # select
+                self.item = self.itemAt(self.clickedPos, self.tools[self.index])
+                if self.item:
+                    print(self.item)
 
     def mouseDoubleClickEvent(self, e):
         self.isDrawing = False
-        self.item      = None
+        self.tools[self.index].clear()
 
     def mouseMoveEvent(self, e):
         if self.isDrawing:
@@ -158,14 +163,20 @@ class MainScene(QGraphicsScene):
                 self.item.setPolygon(self.tools[self.index])
                 toRemove = self.tools[self.index].lastIndexOf(self.tools[self.index].last())
                 self.tools[self.index].remove(toRemove)
+            if self.index == 7: # select
+                if self.item:
+                    self.item.setPos(mousePos)
 
     def mouseReleaseEvent(self, e):
-        if self.index != 6 and self.index != 3:
+        if self.index != 6 and self.index != 3: # except polygons and text
             self.isDrawing = False
-            self.item  = None
 
     # Reimplementing keypress events
     def keyPressEvent(self, e):
+        if e.modifiers() and Qt.ControlModifier and e.key() == Qt.Key_Z:
+            self.itemsDrawn = self.items(Qt.AscendingOrder)
+            self.removeItem(self.itemsDrawn[-1])
+
         if self.isTyping:
             if e.key() == Qt.Key_Backspace:
                 self.tools[self.index] = self.tools[self.index][:-1]
