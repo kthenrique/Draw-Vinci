@@ -67,6 +67,8 @@ class MainScene(QGraphicsScene):
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
             if self.tools[7]: # Resetting selection
+                self.setFocus(0)
+                self.item.setFlag(4, False) # set it focusable
                 self.removeItem(self.tools[7])
                 self.tools[7] = None
             self.isDrawing = True
@@ -116,8 +118,8 @@ class MainScene(QGraphicsScene):
             elif self.index == 7: # select
                 self.item = self.itemAt(self.clickedPos, QTransform())
                 if self.item:
+                    self.item.setFlag(4) # set it focusable
                     self.setFocusItem(self.item)
-                    self.item.setSelected(True)
                     rectangle = self.item.sceneBoundingRect()
                     pen       = QPen(Qt.DotLine)
                     self.tools[self.index] = self.addRect(rectangle, pen)
@@ -199,6 +201,12 @@ class MainScene(QGraphicsScene):
                 self.tools[6].clear()
             except:
                 self.statusbar.showMessage("There is no item in Canvas", 900)
+        # Delete Functionality
+        if e.key() == Qt.Key_Delete:
+            if self.item == self.focusItem():
+                self.removeItem(self.tools[7])
+                self.tools[7] = None
+                self.removeItem(self.item)
         # Text Functionality
         if self.isTyping:
             if e.key() == Qt.Key_Backspace:
