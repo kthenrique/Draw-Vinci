@@ -37,7 +37,7 @@ class MainScene(QGraphicsScene):
         self.toolsButtonGroup.buttonPressed.connect(self.setIconTool)
 
         # The drawable elements
-        self.tools     = [None,
+        self.tools     = [1,
                           QPainterPath(),
                           QLineF(),
                           '',          # str instead of QString
@@ -76,7 +76,10 @@ class MainScene(QGraphicsScene):
             self.clickedPos = QPointF(pos.x(), pos.y())
             self.index = self.toolsButtonGroup.checkedId()
             if self.index == 0: # eraser
-                pass
+                self.item = self.itemAt(self.clickedPos, QTransform())
+                self.tools[self.index] = self.tools[self.index] - 0.1
+                if self.item:
+                    self.item.setOpacity(self.tools[self.index])
             elif self.index == 1: # freehand
                 self.tools[self.index].moveTo(pos)
                 self.item = self.addPath(self.tools[self.index])

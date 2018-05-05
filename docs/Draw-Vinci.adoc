@@ -13,6 +13,7 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 === Formats supported
 
 == Functionalities
+
 === Tools
 ==== Eraser
 ==== Line
@@ -21,8 +22,10 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 ==== Rectangle
 ==== Ellipse
 ==== Select
+
 === Key Combinations
 ==== Undoing
+==== Deleting selection
 
 == Communication
 === Error Table
