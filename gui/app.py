@@ -5,21 +5,29 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 05
+# -- Last update: 2018 Mai 06
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
 
 import sys
 from PyQt5.Qt import Qt                              # Some relevant constants
+from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
+        QProgressBar)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
-from PyQt5.QtCore import QIODevice
-from PyQt5.QtWidgets import QApplication, QMainWindow, QButtonGroup, QLabel
 
 from draw_vinci import Ui_MainWindow
 from canvas import MainScene
+from terminal import Terminal
 
 class AppWindow(QMainWindow):
+    '''
+    Main Window:
+        Where the drawing and menu functionalities take place. Besides, the
+        single messages sent to XMC4500 using the promptEdit will be handled
+        here too.
+    '''
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
@@ -46,19 +54,22 @@ class AppWindow(QMainWindow):
         self.port.setFlowControl(QSerialPort.NoFlowControl)
 
         # Ports refresh
-        self.refresh_ports()
-
-        # Menus Initialisation
-        self.ui.actionQuit.triggered.connect(self.close) # Quit
-
-        # Buttons Initialisation
-        self.ui.connectButton.clicked.connect(self.connect_port)   # connect
-        self.ui.refreshButton.clicked.connect(self.refresh_ports)  # refresh
+        self.refreshPorts()
 
         # Configuring statusbar 
-        self.connectionLabel = QLabel() # connection state: online - offline
-        self.connectionLabel.setAlignment(Qt.AlignHCenter)
-        self.connectionLabel.setTextFormat(Qt.RichText)
+        self.drawingProgress = QProgressBar() # Progress of auto sending G-CODE
+        self.drawingProgress.setMaximum(100)
+        self.drawingProgress.setMinimum(0)
+        self.drawingProgress.setValue(0)
+        self.drawingProgress.setStyleSheet("QProgressBar {\n"
+                "border: 1px solid grey;\n"
+                "border-radius: 5px;}\n"
+                "QProgressBar::chunk{\n"
+                "background-color: #CD96CD;\n"
+                "width: 10px;\n"
+                "margin: 0.5px;}")
+        self.drawingProgress.setMaximumHeight(15)
+        self.drawingProgress.setVisible(False)
         self.artworkLabel = QLabel()    # Name of image being edited
         self.artworkLabel.setAlignment(Qt.AlignLeft)
         self.artworkLabel.setTextFormat(Qt.RichText)
@@ -66,6 +77,10 @@ class AppWindow(QMainWindow):
         self.toolLabel = QLabel()       # Icon of tool last used
         self.toolLabel.setAlignment(Qt.AlignLeft)
         self.toolLabel.setTextFormat(Qt.RichText)
+        self.connectionLabel = QLabel() # connection state: online - offline
+        self.connectionLabel.setAlignment(Qt.AlignHCenter)
+        self.connectionLabel.setTextFormat(Qt.RichText)
+        self.ui.statusbar.addPermanentWidget(self.drawingProgress)
         self.ui.statusbar.addPermanentWidget(self.artworkLabel)
         self.ui.statusbar.addPermanentWidget(self.toolLabel)
         self.ui.statusbar.addPermanentWidget(self.connectionLabel)
@@ -81,9 +96,27 @@ class AppWindow(QMainWindow):
         self.scene.view = self.ui.canvas
         self.ui.canvas.show()
 
+        # Menus Initialisation
+        self.ui.actionQuit.triggered.connect(self.close) # Quit
+
+        # Buttons Initialisation
+        self.ui.connectButton.clicked.connect(self.connectPort)    # connect
+        self.ui.refreshButton.clicked.connect(self.refreshPorts)   # refresh
+        self.ui.playButton.toggled.connect(self.playIt)            # play
+        self.ui.stopButton.clicked.connect(self.stopIt)            # stop
+        self.ui.pauseButton.clicked.connect(self.pauseIt)          # pause
+        self.ui.slowDownButton.clicked.connect(self.slowItDown)    # slow down
+        self.ui.speedUpButton.clicked.connect(self.speedItUp)      # speed up
+
+        # Thread for permanent communication with XMC4500
+        self.terminalThread = Terminal(self.drawingProgress)
+
+        # Connect finishing of thread with stopButton
+        self.terminalThread.finished.connect(self.ui.stopButton.toggle)
+
         self.show()
 
-    def refresh_ports(self):
+    def refreshPorts(self):
         ''' Callback of refreshButton:
                 refreshing the list of available serial ports to connect.
         '''
@@ -95,7 +128,7 @@ class AppWindow(QMainWindow):
 
         self.port.setPortName(self.ui.portsBox.currentText())
 
-    def connect_port(self):
+    def connectPort(self):
         ''' Callback of connectButton:
                 trying to connect to the port chosen.
         '''
@@ -110,6 +143,27 @@ class AppWindow(QMainWindow):
             self.connectionLabel.setText('<html><head/><body><p align="center">\
                     <span style=" font-weight:600; color:#73d216;">ONLINE</span>\
                     </p></body></html>')
+
+    def playIt(self, isChecked):
+        '''
+        Initialise permanent communication with XMC4500; i.e. if in manual
+        the directional buttons will drive the plotter, and if in auto mode,
+        the image on canvas will be translated in G-CODE and sent to XMC4500.
+        '''
+        if isChecked:
+            self.terminalThread.start(QThread.HighestPriority)
+
+    def stopIt(self):
+        pass
+
+    def pauseIt(self):
+        pass
+
+    def slowItDown(self):
+        pass
+
+    def speedItUp(self):
+        pass
 
 
 if __name__ == '__main__':
