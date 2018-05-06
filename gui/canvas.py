@@ -5,16 +5,16 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 05
+# -- Last update: 2018 Mai 06
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
 
 from PyQt5.Qt import Qt                              # Some relevant constants
+from PyQt5.QtCore import QLineF, QRectF, QPointF
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
         QCursor, QTextCursor, QTransform, QPen)
-from PyQt5.QtCore import QLineF, QRectF, QPointF
 
 CANVAS_WIDTH  = 390
 CANVAS_HEIGHT = 310
@@ -34,7 +34,7 @@ class MainScene(QGraphicsScene):
         self.statusbar = self.toolLabel.parentWidget()
         self.view = None
 
-        self.toolsButtonGroup.buttonPressed.connect(self.setIconTool)
+        self.toolsButtonGroup.buttonToggled.connect(self.setIconTool)
 
         # The drawable elements
         self.tools     = [1,
@@ -221,6 +221,7 @@ class MainScene(QGraphicsScene):
     def setIconTool(self, button):
         ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
         index = self.toolsButtonGroup.id(button)
-        cursor = QCursor(self.pixTools[index])
+        pixel = self.pixTools[index]
+        cursor = QCursor(pixel, 0, pixel.height())
         self.view.setCursor(cursor)
         self.toolLabel.setPixmap(self.pixTools[index])

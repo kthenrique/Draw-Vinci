@@ -11,9 +11,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(410, 544)
-        MainWindow.setMinimumSize(QtCore.QSize(410, 0))
-        MainWindow.setMaximumSize(QtCore.QSize(10000, 10000))
+        MainWindow.resize(410, 535)
+        MainWindow.setMinimumSize(QtCore.QSize(410, 535))
+        MainWindow.setMaximumSize(QtCore.QSize(410, 535))
         MainWindow.setToolTip("")
         MainWindow.setStyleSheet("")
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
@@ -55,14 +55,14 @@ class Ui_MainWindow(object):
         self.canvas.setSceneRect(QtCore.QRectF(0.0, 0.0, 390.0, 310.0))
         self.canvas.setObjectName("canvas")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(10, 340, 390, 159))
+        self.tabWidget.setGeometry(QtCore.QRect(10, 340, 390, 151))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(18)
         sizePolicy.setVerticalStretch(12)
         sizePolicy.setHeightForWidth(self.tabWidget.sizePolicy().hasHeightForWidth())
         self.tabWidget.setSizePolicy(sizePolicy)
-        self.tabWidget.setMinimumSize(QtCore.QSize(390, 0))
-        self.tabWidget.setMaximumSize(QtCore.QSize(1000, 16777215))
+        self.tabWidget.setMinimumSize(QtCore.QSize(390, 151))
+        self.tabWidget.setMaximumSize(QtCore.QSize(390, 151))
         self.tabWidget.setStyleSheet("QTabWidget::pane { /* The tab widget frame */\n"
 "    border-top: 2px solid #C2C7CB;\n"
 "    border-left: 2px solid #C2C7CB;\n"
