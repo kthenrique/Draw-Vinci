@@ -287,11 +287,15 @@ class Ui_MainWindow(object):
         self.penButton.setObjectName("penButton")
         self.termEdit = QtWidgets.QTextEdit(self.controlTab)
         self.termEdit.setGeometry(QtCore.QRect(250, 10, 131, 101))
+        font = QtGui.QFont()
+        font.setFamily("Tlwg Typewriter")
+        self.termEdit.setFont(font)
         self.termEdit.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.termEdit.setStyleSheet(" QTextEdit{\n"
 "    background-color: rgb(76, 76, 76);\n"
 "    border-radius: 1px;\n"
 " }")
+        self.termEdit.setReadOnly(True)
         self.termEdit.setObjectName("termEdit")
         self.portsBox = QtWidgets.QComboBox(self.controlTab)
         self.portsBox.setGeometry(QtCore.QRect(130, 10, 111, 27))

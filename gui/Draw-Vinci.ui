@@ -631,6 +631,11 @@ QTabBar::tab:only-one {
         <height>101</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <family>Tlwg Typewriter</family>
+       </font>
+      </property>
       <property name="cursor" stdset="0">
        <cursorShape>ArrowCursor</cursorShape>
       </property>
@@ -639,6 +644,9 @@ QTabBar::tab:only-one {
 	background-color: rgb(76, 76, 76);
     border-radius: 1px;
  }</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QComboBox" name="portsBox">

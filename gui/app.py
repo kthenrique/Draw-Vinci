@@ -113,7 +113,7 @@ class AppWindow(QMainWindow):
         self.ui.speedUpButton.clicked.connect(self.speedItUp)      # speed up
 
         # Thread for permanent communication with XMC4500
-        self.terminalThread = Terminal(self.drawingProgress)
+        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit)
 
         # Connect finishing of thread with stopButton
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)

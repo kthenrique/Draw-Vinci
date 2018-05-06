@@ -23,15 +23,19 @@ class Terminal(QThread):
     In Auto Mode, it will translate the image in canvas into G-Code and send
     it to XMC4500.
     '''
-    def __init__(self, drawingProgress):
+
+    updateTerm = pyqtSignal(str)
+    def __init__(self, drawingProgress, termEdit):
         super().__init__()
         self.setObjectName("DrawVinci")
         self.drawingProgress = drawingProgress
+        self.termEdit  = termEdit
         self.statusbar = self.drawingProgress.parentWidget()
 
         # Connect signals
         self.finished.connect(self.prepFini)
         self.started.connect(self.prepInit)
+        self.updateTerm.connect(self.updateTermEdit)
 
         # Set a timer
         self.timer = QTimer()
@@ -57,9 +61,13 @@ class Terminal(QThread):
         self.timer.start()
 
     def prepFini(self):
+        self.updateTerm.emit("ALIVE")
         ''' Everything that should be done right before finishing this thread '''
         self.statusbar.showMessage("Thread Finished", TIMEOUT_STATUS)
         self.timer.stop()
         self.drawingProgress.setValue(0)
         self.drawingProgress.setVisible(False)
+
+    def updateTermEdit(self, text):
+        self.termEdit.append(text)
 
