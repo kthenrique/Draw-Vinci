@@ -481,7 +481,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="upButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>45</x>
         <y>10</y>
         <width>31</width>
         <height>21</height>
@@ -507,7 +507,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="leftButton">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>25</x>
         <y>30</y>
         <width>21</width>
         <height>31</height>
@@ -533,7 +533,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="rightButton">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>75</x>
         <y>30</y>
         <width>21</width>
         <height>31</height>
@@ -559,7 +559,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="downButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>45</x>
         <y>60</y>
         <width>31</width>
         <height>21</height>
@@ -585,7 +585,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="penButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>45</x>
         <y>30</y>
         <width>31</width>
         <height>31</height>

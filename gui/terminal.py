@@ -12,6 +12,8 @@
 
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer
 
+from constants import TIMEOUT_STATUS
+
 class Terminal(QThread):
     '''
     Terminal Thread:
@@ -56,7 +58,7 @@ class Terminal(QThread):
 
     def prepFini(self):
         ''' Everything that should be done right before finishing this thread '''
-        self.statusbar.showMessage("Thread Finished", 900)
+        self.statusbar.showMessage("Thread Finished", TIMEOUT_STATUS)
         self.timer.stop()
         self.drawingProgress.setValue(0)
         self.drawingProgress.setVisible(False)

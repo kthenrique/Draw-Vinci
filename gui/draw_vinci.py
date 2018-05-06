@@ -208,7 +208,7 @@ class Ui_MainWindow(object):
         self.controlTab = QtWidgets.QWidget()
         self.controlTab.setObjectName("controlTab")
         self.upButton = QtWidgets.QPushButton(self.controlTab)
-        self.upButton.setGeometry(QtCore.QRect(40, 10, 31, 21))
+        self.upButton.setGeometry(QtCore.QRect(45, 10, 31, 21))
         self.upButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/up.png) 0 ;\n"
 "}\n"
@@ -223,7 +223,7 @@ class Ui_MainWindow(object):
         self.upButton.setText("")
         self.upButton.setObjectName("upButton")
         self.leftButton = QtWidgets.QPushButton(self.controlTab)
-        self.leftButton.setGeometry(QtCore.QRect(20, 30, 21, 31))
+        self.leftButton.setGeometry(QtCore.QRect(25, 30, 21, 31))
         self.leftButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/left.png) -1;\n"
 " }\n"
@@ -238,7 +238,7 @@ class Ui_MainWindow(object):
         self.leftButton.setText("")
         self.leftButton.setObjectName("leftButton")
         self.rightButton = QtWidgets.QPushButton(self.controlTab)
-        self.rightButton.setGeometry(QtCore.QRect(70, 30, 21, 31))
+        self.rightButton.setGeometry(QtCore.QRect(75, 30, 21, 31))
         self.rightButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/right.png) -1;\n"
 " }\n"
@@ -253,7 +253,7 @@ class Ui_MainWindow(object):
         self.rightButton.setText("")
         self.rightButton.setObjectName("rightButton")
         self.downButton = QtWidgets.QPushButton(self.controlTab)
-        self.downButton.setGeometry(QtCore.QRect(40, 60, 31, 21))
+        self.downButton.setGeometry(QtCore.QRect(45, 60, 31, 21))
         self.downButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/down.png) -1;\n"
 " }\n"
@@ -268,7 +268,7 @@ class Ui_MainWindow(object):
         self.downButton.setText("")
         self.downButton.setObjectName("downButton")
         self.penButton = QtWidgets.QPushButton(self.controlTab)
-        self.penButton.setGeometry(QtCore.QRect(40, 30, 31, 31))
+        self.penButton.setGeometry(QtCore.QRect(45, 30, 31, 31))
         self.penButton.setAutoFillBackground(False)
         self.penButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/pen_off.png) 0 ;\n"

@@ -16,10 +16,7 @@ from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
         QCursor, QTextCursor, QTransform, QPen)
 
-CANVAS_WIDTH  = 390
-CANVAS_HEIGHT = 310
-VIEW_X        = 10
-VIEW_Y        = 30
+from constants import *
 
 class MainScene(QGraphicsScene):
     ''' THE CANVAS
@@ -203,7 +200,7 @@ class MainScene(QGraphicsScene):
                 self.isTyping  = False
                 self.tools[6].clear()
             except:
-                self.statusbar.showMessage("There is no item in Canvas", 900)
+                self.statusbar.showMessage("There is no item in Canvas", TIMEOUT_STATUS)
         # Delete Functionality
         if e.key() == Qt.Key_Delete:
             if self.item == self.focusItem():

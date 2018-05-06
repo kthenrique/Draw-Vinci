@@ -20,6 +20,7 @@ from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from draw_vinci import Ui_MainWindow
 from canvas import MainScene
 from terminal import Terminal
+from constants import TIMEOUT_STATUS
 
 class AppWindow(QMainWindow):
     '''
@@ -55,6 +56,9 @@ class AppWindow(QMainWindow):
 
         # Ports refresh
         self.refreshPorts()
+
+        # Connect promptEdit return event to send a single message to XMC4500
+        self.ui.promptEdit.returnPressed.connect(self.sendSingleMsg)
 
         # Configuring statusbar 
         self.drawingProgress = QProgressBar() # Progress of auto sending G-CODE
@@ -138,11 +142,19 @@ class AppWindow(QMainWindow):
             self.connectionLabel.setText('<html><head/><body><p align="center">\
                     <span style=" font-weight:600; color:#cc0000;">OFFLINE\
                     </span></p></body></html>')
-            self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), 900)
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), TIMEOUT_STATUS)
         else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Successfuly Connected"), TIMEOUT_STATUS)
             self.connectionLabel.setText('<html><head/><body><p align="center">\
-                    <span style=" font-weight:600; color:#73d216;">ONLINE</span>\
+                    <span style=" font-weight:600; color:#008000;">ONLINE</span>\
                     </p></body></html>')
+
+    def sendSingleMsg(self):
+        if self.port.isOpen():
+            ret = self.port.writeData(bytes(self.ui.promptEdit.text(), 'utf-8'))
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("{0} characters sent!".format(ret)), TIMEOUT_STATUS)
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
 
     def playIt(self, isChecked):
         '''
