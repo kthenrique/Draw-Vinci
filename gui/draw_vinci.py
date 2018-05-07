@@ -288,17 +288,46 @@ class Ui_MainWindow(object):
         self.termEdit = QtWidgets.QTextEdit(self.controlTab)
         self.termEdit.setGeometry(QtCore.QRect(250, 10, 131, 101))
         font = QtGui.QFont()
-        font.setFamily("Symbola")
+        font.setFamily("Tlwg Typewriter")
         font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
+        font.setBold(False)
+        font.setWeight(50)
         self.termEdit.setFont(font)
         self.termEdit.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.termEdit.setStyleSheet(" QTextEdit{\n"
-"    background-color: rgb(76, 76, 76);\n"
+"    background-color:rgb(0, 17, 44);\n"
 "    color: rgb(252, 255, 74);\n"
 "    border-radius: 1px;\n"
-" }")
+" }\n"
+"\n"
+"QScrollBar:vertical {           \n"
+"       border: 1px solid #999999;\n"
+"   background:white;\n"
+"  width:7px;    \n"
+"  margin: 0px 0px 0px 0px;\n"
+" }\n"
+"    QScrollBar::handle:vertical {\n"
+"       background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"      stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop:1 rgb(32, 47, 130));\n"
+"      min-height: 0px;\n"
+"    }\n"
+"    QScrollBar::add-line:vertical {\n"
+"        background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"       stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));\n"
+"      height: 0px;\n"
+"      subcontrol-position: bottom;\n"
+"      subcontrol-origin: margin;\n"
+"   }\n"
+"    QScrollBar::sub-line:vertical {\n"
+"       background: qlineargradient(x1:0, y1:0, x2:1, y2:0,\n"
+"      stop: 0  rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130),  stop:1 rgb(32, 47, 130));\n"
+"       height: 0 px;\n"
+"       subcontrol-position: top;\n"
+"      subcontrol-origin: margin;\n"
+"    }\n"
+"\n"
+"\n"
+"")
         self.termEdit.setReadOnly(True)
         self.termEdit.setObjectName("termEdit")
         self.portsBox = QtWidgets.QComboBox(self.controlTab)
@@ -465,7 +494,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuAbout.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

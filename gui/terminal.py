@@ -24,19 +24,17 @@ class Terminal(QThread):
     it to XMC4500.
     '''
 
-    updateTerm = pyqtSignal(str)
-    def __init__(self, drawingProgress, termEdit, autoButton):
+    updateTerm = pyqtSignal(str) # when the terminal should be written
+
+    def __init__(self, drawingProgress, termEdit):
         super().__init__()
         self.setTerminationEnabled(True)
         self.setObjectName("DrawVinci")
         self.drawingProgress = drawingProgress
         self.termEdit  = termEdit
         self.statusbar = self.drawingProgress.parentWidget()
-        self.autoButton = autoButton
 
         # Connect signals
-        self.finished.connect(self.prepFini)
-        self.started.connect(self.prepInit)
         self.updateTerm.connect(self.updateTermEdit)
 
         # Set a timer
@@ -47,41 +45,19 @@ class Terminal(QThread):
         self.flag = False
 
     def __del__(self):
-        print("Terminal class deleted")
         self.wait()
 
     @pyqtSlot()
     def run(self):
-        if self.autoButton:                        # Auto mode
-            while self.drawingProgress.value() != 10:
-                if self.isInterruptionRequested():
-                    print("thread interrupted")
-                    break
-            self.exit()
-        else:                                      # Manual mode
-            pass
+        while self.drawingProgress.value() != 10:
+            if self.isInterruptionRequested():
+                print("thread interrupted")
+                break
+        self.exit()
 
     def updateProgress(self):
         print(self.drawingProgress.value() + 1)
         self.drawingProgress.setValue(self.drawingProgress.value() + 1)
-
-    def prepInit(self):
-        ''' Everything that should be done before starting this thread '''
-        if self.autoButton:                        # Auto mode
-            self.drawingProgress.setVisible(True)
-            self.timer.start()
-        else:                                      # Manual mode
-            pass
-
-
-    def prepFini(self):
-        self.updateTerm.emit("ALIVE")
-        ''' Everything that should be done right before finishing this thread '''
-        self.statusbar.showMessage("Thread Finished", TIMEOUT_STATUS)
-        self.timer.stop()
-        self.drawingProgress.setValue(0)
-        self.drawingProgress.setVisible(False)
-        print("Terminal thread finished")
 
     def updateTermEdit(self, text):
         self.termEdit.append(text)

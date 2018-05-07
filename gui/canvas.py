@@ -31,7 +31,7 @@ class MainScene(QGraphicsScene):
         self.statusbar = self.toolLabel.parentWidget()
         self.view = None
 
-        self.toolsButtonGroup.buttonToggled.connect(self.setIconTool)
+        self.toolsButtonGroup.buttonClicked.connect(self.setIconTool)
 
         # The drawable elements
         self.tools     = [1,
@@ -217,8 +217,9 @@ class MainScene(QGraphicsScene):
 
     def setIconTool(self, button):
         ''' Sets the icon for the statusbar and the image for cursor on the canvas '''
-        index = self.toolsButtonGroup.id(button)
-        pixel = self.pixTools[index]
-        cursor = QCursor(pixel, 0, pixel.height())
-        self.view.setCursor(cursor)
-        self.toolLabel.setPixmap(self.pixTools[index])
+        if button.isChecked():
+            index = self.toolsButtonGroup.id(button)
+            pixel = self.pixTools[index]
+            cursor = QCursor(pixel, 0, pixel.height())
+            self.view.setCursor(cursor)
+            self.toolLabel.setPixmap(self.pixTools[index])

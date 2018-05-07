@@ -25,9 +25,9 @@ from constants import TIMEOUT_STATUS
 class AppWindow(QMainWindow):
     '''
     Main Window:
-        Where the drawing and menu functionalities take place. Besides, the
-        single messages sent to XMC4500 using the promptEdit will be handled
-        here too.
+    Where the drawing and menu functionalities take place. Besides, the
+    single messages sent to XMC4500 using the promptEdit will be handled
+    here too.
     '''
     def __init__(self):
         super().__init__()
@@ -94,16 +94,17 @@ class AppWindow(QMainWindow):
                 <span style=" font-weight:600; color:#cc0000;">OFFLINE\
                 </span></p></body></html>')
 
-        # Creating canvas
+        # Creating and initialising canvas
         self.scene = MainScene(self.toolsButtonGroup, self.toolLabel)
         self.ui.canvas.setScene(self.scene)
         self.scene.view = self.ui.canvas
+        self.scene.setIconTool(self.ui.eraserButton)
         self.ui.canvas.show()
 
         # Menus Initialisation
         self.ui.actionQuit.triggered.connect(self.close) # Quit
 
-        # Buttons Initialisation
+        # Control Buttons Initialisation
         self.ui.connectButton.clicked.connect(self.connectPort)    # connect
         self.ui.refreshButton.clicked.connect(self.refreshPorts)   # refresh
         self.ui.playButton.toggled.connect(self.playIt)            # play
@@ -112,17 +113,29 @@ class AppWindow(QMainWindow):
         self.ui.slowDownButton.clicked.connect(self.slowItDown)    # slow down
         self.ui.speedUpButton.clicked.connect(self.speedItUp)      # speed up
 
-        # Thread for permanent communication with XMC4500
-        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit, self.ui.autoButton)
+        # Directional Buttons Initialisation
+        self.ui.upButton.clicked.connect(self.goUp)                # up
+        self.ui.downButton.clicked.connect(self.goDown)            # down
+        self.ui.leftButton.clicked.connect(self.goLeft)            # left
+        self.ui.rightButton.clicked.connect(self.goRight)          # right
+        self.ui.penButton.toggled.connect(self.togglePen)          # pen
 
-        # Connect finishing of thread with stopButton
+        # Thread for permanent communication with XMC4500
+        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit)
+
+        # Connect thread signals
+        self.terminalThread.finished.connect(self.prepFini)
+        self.terminalThread.started.connect(self.prepInit)
+
+        # Connect finishing of thread with toggling of stopButton
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
 
         self.show()
 
     def refreshPorts(self):
-        ''' Callback of refreshButton:
-                refreshing the list of available serial ports to connect.
+        '''
+        Callback of refreshButton:
+        refreshing the list of available serial ports to connect.
         '''
         self.ui.portsBox.clear()
         self.ui.portsBox.addItem("Custom")
@@ -133,8 +146,9 @@ class AppWindow(QMainWindow):
         self.port.setPortName(self.ui.portsBox.currentText())
 
     def connectPort(self):
-        ''' Callback of connectButton:
-                trying to connect to the port chosen.
+        '''
+        Callback of connectButton:
+        trying to connect to the port chosen.
         '''
         self.port.close()
         self.port.setPortName(self.ui.portsBox.currentText())
@@ -150,12 +164,18 @@ class AppWindow(QMainWindow):
                     </p></body></html>')
 
     def sendSingleMsg(self, text):
+        '''
+        Sends one single text message to xmc4500, returning True if it was
+        successful and False otherwise
+        '''
         if self.port.isOpen():
             ret = self.port.writeData(bytes(text, 'utf-8'))
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("{0} characters sent!".format(ret)), TIMEOUT_STATUS)
-            self.ui.termEdit.append(text)
+            self.ui.termEdit.append('>' + text)
+            return True
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
+            return False
 
     def playIt(self, isChecked):
         '''
@@ -164,9 +184,19 @@ class AppWindow(QMainWindow):
         the image on canvas will be translated in G-CODE and sent to XMC4500.
         '''
         if isChecked:
-            self.terminalThread.start(QThread.HighestPriority)
+            if self.port.isOpen():
+                if self.ui.autoButton.isChecked():                 # AUTO MODE
+                    self.terminalThread.start(QThread.HighestPriority)
+                else:                                              # MANUAL MODE
+                    self.sendSingleMsg("#G91$")                      # set relative positioning
+            else:
+                self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
+                self.ui.stopButton.setChecked(True)
 
     def stopIt(self):
+        '''
+        Interrupt terminal thread when it is running
+        '''
         if self.terminalThread.isRunning():
             print("trying to interrupt thread")
             self.terminalThread.requestInterruption()
@@ -175,11 +205,66 @@ class AppWindow(QMainWindow):
         pass
 
     def slowItDown(self):
+        '''
+        send G-CODE to slow the plotter motors down
+        '''
         self.sendSingleMsg("G-CODE to slow down")
 
     def speedItUp(self):
+        '''
+        send G-CODE to speed the plotter motors up
+        '''
         self.sendSingleMsg("G-CODE to slow down")
 
+    def prepInit(self):
+        '''
+        Everything that should be done before starting terminalThread
+        '''
+        self.terminalThread.mode = "AUTO"
+        self.drawingProgress.setVisible(True)
+        self.terminalThread.timer.start()
+
+    def prepFini(self):
+        '''
+        Everything that should be done right before finishing terminalThread
+        '''
+        self.ui.statusbar.showMessage("Thread Finished", TIMEOUT_STATUS)
+        self.terminalThread.timer.stop()
+        self.drawingProgress.setValue(0)
+        self.drawingProgress.setVisible(False)
+
+    def goUp(self):
+        if self.ui.playButton.isChecked():
+            self.sendSingleMsg('#G1:UP$')
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
+
+    def goDown(self):
+        if self.ui.playButton.isChecked():
+            self.sendSingleMsg('#G1:DOWN$')
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
+
+    def goLeft(self):
+        if self.ui.playButton.isChecked():
+            self.sendSingleMsg('#G1:LEFT$')
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
+
+    def goRight(self):
+        if self.ui.playButton.isChecked():
+            self.sendSingleMsg('#G1:RIGHT$')
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
+
+    def togglePen(self):
+        if self.ui.playButton.isChecked():
+            if self.ui.penButton.isChecked():
+                self.sendSingleMsg('#G1:PENDOWN$')
+            else:
+                self.sendSingleMsg('#G1:PENUP$')
+        else:
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
