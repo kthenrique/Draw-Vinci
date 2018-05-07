@@ -335,7 +335,7 @@ class Ui_MainWindow(object):
         self.portsBox.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.portsBox.setObjectName("portsBox")
         self.connectButton = QtWidgets.QPushButton(self.controlTab)
-        self.connectButton.setGeometry(QtCore.QRect(130, 40, 71, 27))
+        self.connectButton.setGeometry(QtCore.QRect(130, 40, 111, 27))
         self.connectButton.setObjectName("connectButton")
         self.promptEdit = QtWidgets.QLineEdit(self.controlTab)
         self.promptEdit.setGeometry(QtCore.QRect(130, 80, 113, 27))
@@ -345,13 +345,6 @@ class Ui_MainWindow(object):
         self.promptEdit.setCursorPosition(0)
         self.promptEdit.setClearButtonEnabled(True)
         self.promptEdit.setObjectName("promptEdit")
-        self.refreshButton = QtWidgets.QPushButton(self.controlTab)
-        self.refreshButton.setGeometry(QtCore.QRect(210, 40, 31, 27))
-        self.refreshButton.setText("")
-        icon8 = QtGui.QIcon()
-        icon8.addPixmap(QtGui.QPixmap("img/port_refresh.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.refreshButton.setIcon(icon8)
-        self.refreshButton.setObjectName("refreshButton")
         self.playButton = QtWidgets.QPushButton(self.controlTab)
         self.playButton.setGeometry(QtCore.QRect(50, 90, 21, 21))
         self.playButton.setStyleSheet(" QPushButton {\n"
@@ -494,7 +487,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuAbout.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -513,7 +506,6 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.drawTab), _translate("MainWindow", "Draw"))
         self.penButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Pen Up</span></p></body></html>"))
         self.connectButton.setText(_translate("MainWindow", "Connect"))
-        self.refreshButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-weight:600;\">Refresh Ports</span></p></body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.controlTab), _translate("MainWindow", "Control"))
         self.menuFile.setTitle(_translate("MainWindow", "Fi&le"))
         self.menuSetup.setTitle(_translate("MainWindow", "Setti&ngs"))

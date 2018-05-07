@@ -17,6 +17,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
         QProgressBar)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 
+from pyudev import Context, Monitor
+from pyudev.pyqt5 import MonitorObserver
+
 from draw_vinci import Ui_MainWindow
 from canvas import MainScene
 from terminal import Terminal
@@ -33,6 +36,15 @@ class AppWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # Monitoring IO Ports
+        context = Context()
+        monitor = Monitor.from_netlink(context)
+        monitor.filter_by('COM') # WINDOWS
+        monitor.filter_by('tty') # LINUX
+        self.observer = MonitorObserver(monitor)
+        self.observer.deviceEvent.connect(self.updateConnection)
+        monitor.start()
 
         # Tools Group of buttons
         self.toolsButtonGroup = QButtonGroup()
@@ -106,7 +118,6 @@ class AppWindow(QMainWindow):
 
         # Control Buttons Initialisation
         self.ui.connectButton.clicked.connect(self.connectPort)    # connect
-        self.ui.refreshButton.clicked.connect(self.refreshPorts)   # refresh
         self.ui.playButton.toggled.connect(self.playIt)            # play
         self.ui.stopButton.clicked.connect(self.stopIt)            # stop
         self.ui.pauseButton.clicked.connect(self.pauseIt)          # pause
@@ -131,6 +142,17 @@ class AppWindow(QMainWindow):
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
 
         self.show()
+
+    def updateConnection(self, device):
+        self.refreshPorts()
+        if self.port.isOpen():
+            self.port.close()
+            if not self.port.open(QIODevice.ReadWrite):
+                self.connectionLabel.setText('<html><head/><body><p align="center">\
+                        <span style=" font-weight:600; color:#cc0000;">OFFLINE\
+                        </span></p></body></html>')
+                self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), TIMEOUT_STATUS)
+                self.ui.stopButton.setChecked(True)
 
     def refreshPorts(self):
         '''

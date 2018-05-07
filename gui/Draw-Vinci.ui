@@ -700,7 +700,7 @@ QScrollBar:vertical {
        <rect>
         <x>130</x>
         <y>40</y>
-        <width>71</width>
+        <width>111</width>
         <height>27</height>
        </rect>
       </property>
@@ -727,26 +727,6 @@ background-color: rgb(255, 255, 255);
       </property>
       <property name="clearButtonEnabled">
        <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="refreshButton">
-      <property name="geometry">
-       <rect>
-        <x>210</x>
-        <y>40</y>
-        <width>31</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Refresh Ports&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>img/port_refresh.png</normaloff>img/port_refresh.png</iconset>
       </property>
      </widget>
      <widget class="QPushButton" name="playButton">
