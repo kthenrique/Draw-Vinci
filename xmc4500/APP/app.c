@@ -1,15 +1,15 @@
 /*******************************************************************************
  * \file app.c                                                                 *
  *                                                                             *
- * \mainpage Third RTOS task for BEL4 - Technikum Wien                         *
+ * \mainpage DRAW-VINCI [BEL4 - Technikum Wien]                                *
  *                                                                             *
  * Build: make debug OR make flash                                             *
  * Connect a TTL USB cable to UART1, launch the GUI and connect                *
  *                                                                             *
- * @author Kelve T. Henrique                                                   *
+ * @author Kelve T. Henrique - Andreas Hofschweiger                            *
  *                                                                             *
  * @revision 1.0                                                               *
- * @date 04-2018                                                               *
+ * @date 05-2018                                                               *
  *******************************************************************************/
 
 /******************************************************************* INCLUDES */

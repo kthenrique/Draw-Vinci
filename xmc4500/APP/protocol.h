@@ -1,8 +1,8 @@
 /**
  * @file protocol.h
  *
- * @date: 03-2018
- * @author: Kelve T. Henrique
+ * @date: 05-2018
+ * @author: Kelve T. Henrique - Andreas Hofschweiger
  *
  * @brief 
  */
@@ -16,9 +16,15 @@
 #include <stdlib.h>
 
 typedef struct{
-    bool  isAvailable;
-    char  port; // 1:P1.1; 2:P1.0; 3:P5.1; 4:P5.7;
-    uint8_t duty;
+    uint8_t  MID[2];
+    uint8_t  CMD;               //0:BL1 1:BL2 2:TL1 3:TL2 4:RES
+    union{
+        uint64_t BLINK;          // in case it is BLx or RES
+        struct{                 // in case it is TLx
+            uint32_t HIGH;
+            uint32_t LOW;
+        } DURATION;
+    } DATA;
 }UART_PACKET;
 
 bool scrutinise(char *str, volatile UART_PACKET *packet);
