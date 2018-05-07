@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 06
+# -- Last update: 2018 Mai 07
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ class AppWindow(QMainWindow):
         self.refreshPorts()
 
         # Connect promptEdit return event to send a single message to XMC4500
-        self.ui.promptEdit.returnPressed.connect(self.sendSingleMsg)
+        self.ui.promptEdit.returnPressed.connect(lambda: self.sendSingleMsg(self.ui.promptEdit.text()))
 
         # Configuring statusbar 
         self.drawingProgress = QProgressBar() # Progress of auto sending G-CODE
@@ -113,7 +113,7 @@ class AppWindow(QMainWindow):
         self.ui.speedUpButton.clicked.connect(self.speedItUp)      # speed up
 
         # Thread for permanent communication with XMC4500
-        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit)
+        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit, self.ui.autoButton)
 
         # Connect finishing of thread with stopButton
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
@@ -149,10 +149,11 @@ class AppWindow(QMainWindow):
                     <span style=" font-weight:600; color:#008000;">ONLINE</span>\
                     </p></body></html>')
 
-    def sendSingleMsg(self):
+    def sendSingleMsg(self, text):
         if self.port.isOpen():
-            ret = self.port.writeData(bytes(self.ui.promptEdit.text(), 'utf-8'))
+            ret = self.port.writeData(bytes(text, 'utf-8'))
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("{0} characters sent!".format(ret)), TIMEOUT_STATUS)
+            self.ui.termEdit.append(text)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
 
@@ -166,16 +167,18 @@ class AppWindow(QMainWindow):
             self.terminalThread.start(QThread.HighestPriority)
 
     def stopIt(self):
-        pass
+        if self.terminalThread.isRunning():
+            print("trying to interrupt thread")
+            self.terminalThread.requestInterruption()
 
     def pauseIt(self):
         pass
 
     def slowItDown(self):
-        pass
+        self.sendSingleMsg("G-CODE to slow down")
 
     def speedItUp(self):
-        pass
+        self.sendSingleMsg("G-CODE to slow down")
 
 
 if __name__ == '__main__':

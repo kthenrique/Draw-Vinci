@@ -633,7 +633,10 @@ QTabBar::tab:only-one {
       </property>
       <property name="font">
        <font>
-        <family>Tlwg Typewriter</family>
+        <family>Symbola</family>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="cursor" stdset="0">
@@ -642,6 +645,7 @@ QTabBar::tab:only-one {
       <property name="styleSheet">
        <string notr="true"> QTextEdit{
 	background-color: rgb(76, 76, 76);
+    color: rgb(252, 255, 74);
     border-radius: 1px;
  }</string>
       </property>

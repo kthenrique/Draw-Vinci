@@ -288,11 +288,15 @@ class Ui_MainWindow(object):
         self.termEdit = QtWidgets.QTextEdit(self.controlTab)
         self.termEdit.setGeometry(QtCore.QRect(250, 10, 131, 101))
         font = QtGui.QFont()
-        font.setFamily("Tlwg Typewriter")
+        font.setFamily("Symbola")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.termEdit.setFont(font)
         self.termEdit.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.termEdit.setStyleSheet(" QTextEdit{\n"
 "    background-color: rgb(76, 76, 76);\n"
+"    color: rgb(252, 255, 74);\n"
 "    border-radius: 1px;\n"
 " }")
         self.termEdit.setReadOnly(True)
