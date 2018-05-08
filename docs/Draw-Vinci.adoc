@@ -92,6 +92,9 @@ Framework & Tools::
             .. uCOS III
         . Infineon
             .. XMCLIB
+    Documentation:::
+        . Asciidoctor
+            .. asciidoctor-pdf
 
 Dependencies::
     Python3:::
