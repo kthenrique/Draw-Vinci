@@ -14,7 +14,7 @@ from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QLineF, QRectF, QPointF
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
-        QCursor, QTextCursor, QTransform, QPen)
+        QCursor, QTextCursor, QTransform, QPen, QFont)
 
 from constants import *
 
@@ -29,7 +29,8 @@ class MainScene(QGraphicsScene):
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
         self.statusbar = self.toolLabel.parentWidget()
-        self.view = None
+        self.textTools  = None
+        self.view      = None
 
         self.toolsButtonGroup.buttonClicked.connect(self.setIconTool)
 
@@ -92,14 +93,11 @@ class MainScene(QGraphicsScene):
                     self.item = self.addText(self.tools[self.index])
                     self.item.setTextInteractionFlags(Qt.TextEditable)
                     self.item.setPos(self.clickedPos)
-                    textCursor = QTextCursor()
-                    textCursor.setVisualNavigation(True)
-                    textCursor.insertBlock()
-                    textCursor.insertBlock()
-                    textCursor.insertBlock()
-                    self.item.setTextCursor(textCursor)
-                    #self.item.setFont()
-                    #self.item.setTextWidth()
+                    font = QFont(self.textTools[0].currentFont())
+                    font.setPointSize(int(self.textTools[1].currentText()))
+                    font.setItalic(self.textTools[2].isChecked())
+                    font.setUnderline(self.textTools[3].isChecked())
+                    self.item.setFont(font)
             elif self.index == 4: # rectangle
                 self.tools[self.index].setTopLeft(self.clickedPos)
                 self.tools[self.index].setBottomRight(self.clickedPos)

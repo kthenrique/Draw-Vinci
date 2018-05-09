@@ -13,6 +13,7 @@
 import sys
 from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
         QProgressBar)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
@@ -23,7 +24,7 @@ from pyudev.pyqt5 import MonitorObserver
 from draw_vinci import Ui_MainWindow
 from canvas import MainScene
 from terminal import Terminal
-from constants import TIMEOUT_STATUS
+from constants import TIMEOUT_STATUS, FONT_SIZES
 
 class AppWindow(QMainWindow):
     '''
@@ -45,6 +46,10 @@ class AppWindow(QMainWindow):
         self.observer = MonitorObserver(monitor)
         self.observer.deviceEvent.connect(self.updateConnection)
         monitor.start()
+
+        # Fill fontSizeBox
+        self.ui.fontSizeBox.addItems([str(size) for size in FONT_SIZES])
+        self.ui.fontSizeBox.setValidator(QIntValidator())
 
         # Tools Group of buttons
         self.toolsButtonGroup = QButtonGroup()
@@ -111,6 +116,8 @@ class AppWindow(QMainWindow):
         self.ui.canvas.setScene(self.scene)
         self.scene.view = self.ui.canvas
         self.scene.setIconTool(self.ui.eraserButton)
+        self.scene.textTools = (self.ui.fontBox, self.ui.fontSizeBox,\
+                self.ui.italicButton, self.ui.underlineButton)
         self.ui.canvas.show()
 
         # Menus Initialisation
