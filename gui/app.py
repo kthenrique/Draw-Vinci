@@ -62,6 +62,7 @@ class AppWindow(QMainWindow):
         self.toolsButtonGroup.addButton(self.ui.ellipseButton, 5)
         self.toolsButtonGroup.addButton(self.ui.polygonButton, 6)
         self.toolsButtonGroup.addButton(self.ui.selectButton, 7)
+        self.toolsButtonGroup.addButton(self.ui.magnifierButton, 8)
 
         # Configuring UART Port
         self.port = QSerialPort()

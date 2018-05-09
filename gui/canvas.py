@@ -42,7 +42,8 @@ class MainScene(QGraphicsScene):
                           QRectF(),
                           QRectF(),
                           QPolygonF(),
-                          None]
+                          None,
+                          QRectF()]
 
         # Icons for cursor and toolLabel
         self.pixTools  = (QPixmap("./img/eraser.png"),
@@ -52,7 +53,8 @@ class MainScene(QGraphicsScene):
                           QPixmap("./img/rectangle.png"),
                           QPixmap("./img/ellipse.png"),
                           QPixmap("./img/polygon.png"),
-                          QPixmap("./img/select.png"))
+                          QPixmap("./img/select.png"),
+                          QPixmap("./img/magnifier.png"))
 
         self.index      = 0        # According to the tools buttons
         self.isDrawing  = False    # While drawing
@@ -121,11 +123,21 @@ class MainScene(QGraphicsScene):
                     rectangle = self.item.sceneBoundingRect()
                     pen       = QPen(Qt.DotLine)
                     self.tools[self.index] = self.addRect(rectangle, pen)
+            elif self.index == 8: # magnifier
+                self.tools[self.index].setTopLeft(self.clickedPos)
+                self.tools[self.index].setBottomRight(self.clickedPos)
+                pen       = QPen(Qt.DotLine)
+                self.item = self.addRect(self.tools[self.index], pen)
+        else:
+            if self.index == 8:               # magnifier
+                self.view.resetTransform()
 
     def mouseDoubleClickEvent(self, e):
-        if self.index == 6:
+        if self.index == 6:               # polygon
             self.isDrawing = False
             self.tools[self.index].clear()
+        if self.index == 7:               # select
+            self.view.fitInView(self.item)
 
     def mouseMoveEvent(self, e):
         if self.isDrawing:
@@ -181,10 +193,31 @@ class MainScene(QGraphicsScene):
                     self.item.moveBy(m.x(), m.y())
                     mousePos = self.item.mapFromScene(mousePos)
                     self.tools[self.index].moveBy(m.x(), m.y())
+            elif self.index == 8: # magnifier
+                if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
+                    self.tools[self.index].setBottomRight(self.clickedPos)
+                    self.tools[self.index].setTopLeft(mousePos)
+                elif self.clickedPos.y() > mousePos.y():
+                    self.tools[self.index].setBottomLeft(self.clickedPos)
+                    self.tools[self.index].setTopRight(mousePos)
+                elif self.clickedPos.x() > mousePos.x():
+                    self.tools[self.index].setTopRight(self.clickedPos)
+                    self.tools[self.index].setBottomLeft(mousePos)
+                else:
+                    self.tools[self.index].setBottomRight(mousePos)
+
+                self.item.setRect(self.tools[self.index])
 
     def mouseReleaseEvent(self, e):
-        if self.index != 6 and self.index != 3: # except polygons and text
+        if self.index in (0,1,2,4,5,7): # except polygon, text, magnifier
             self.isDrawing = False
+        if self.index == 8 and self.isDrawing:
+            self.isDrawing = False
+            self.view.fitInView(self.item)
+            self.removeItem(self.item)
+
+    def wheelEvent(self, e):
+        pass
 
     # Reimplementing keypress events
     def keyPressEvent(self, e):
