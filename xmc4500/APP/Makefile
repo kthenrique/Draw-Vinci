@@ -1,7 +1,8 @@
 ################################################################################
 # Makefile for XMC4500 RelaxKit using uCOS-III
-# v1, 04/2018
-# Martin Horauer, UAS Technikum Wien (MODIFIED BY: Kelve T. Henrique)
+# v1, 05/2018
+# Martin Horauer, UAS Technikum Wien 
+# (MODIFIED BY: Kelve T. Henrique - Andreas Hofscheiger)
 #
 # Supported: Windows, Linux, OSX
 # Requirements:
@@ -39,7 +40,6 @@ TRACE         = -D SEMI_HOSTING
 # DIRECTORIES
 SRCDIR        = .
 BIN           = ./bin
-DOC           = ./DOC
 SYS           = ../CMSIS
 XMCLIB        = ../XMCLIB
 OS            = ../UCOS3
@@ -61,7 +61,8 @@ XMC_USBLIBDIR = $(XMCLIB)/src/USB
 ################################################################################
 # TOOLS & ARGS
 #
-TERMINAL      = xfce4-terminal
+#TERMINAL      = xfce4-terminal
+TERMINAL      = gnome-terminal
 TOOLCHAIN     = arm-none-eabi
 AS            = $(TOOLCHAIN)-as
 CC            = $(TOOLCHAIN)-gcc
@@ -242,18 +243,14 @@ flash: $(TARGET)
 ################################################################################
 # ERASE DEVICE
 erase:
-	echo 'speed 4000\nconnect\nerase\nr\nq' | JLinkExe -Device XMC4500-1024 -if SWD
-
-################################################################################
-# DOCUMENTATION RULES
-doc: $(TARGET)
+	#echo 'speed 4000\nconnect\nerase\nr\nq' | JLinkExe -Device XMC4500-1024 -if SWD
+	echo -e 'connect\nerase\nspeed 4000\nr\nq' | JLinkExe -Device XMC4500-1024 -if SWD
 
 ################################################################################
 # CLEAN RULES
 clean:
 	$(RM) $(call FixPath, ${OBJS} ${DEPS} ${SU})
 	$(RM) $(call FixPath, ${BIN}/*)
-	$(RM) $(call FixPath, ${DOC}/html/*)
 
 ################################################################################
 # EOF

@@ -16,18 +16,14 @@
 #include <stdlib.h>
 
 typedef struct{
-    uint8_t  MID[2];
-    uint8_t  CMD;               //0:BL1 1:BL2 2:TL1 3:TL2 4:RES
-    union{
-        uint64_t BLINK;          // in case it is BLx or RES
-        struct{                 // in case it is TLx
-            uint32_t HIGH;
-            uint32_t LOW;
-        } DURATION;
-    } DATA;
-}UART_PACKET;
+    int8_t x_axis;
+    int8_t y_axis;
+    uint8_t z_axis;         //z_axis = 0 -> pen up (no painting), z_axis = 1 -> pen down (painting)
+    uint8_t pos_mode;       //pos_mode = 0 -> absolute positioning, pos_mode = 1 -> relative addressing
+    uint16_t speed;
+}COORDINATES;
 
-bool scrutinise(char *str, volatile UART_PACKET *packet);
+bool scrutinise(char *str, volatile COORDINATES *packet);
 
 void SendNack(void);
 void SendAck(void);

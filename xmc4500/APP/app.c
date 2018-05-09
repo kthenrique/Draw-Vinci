@@ -57,16 +57,10 @@
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
 static  OS_TCB   AppTaskPwm1_TCB; // Led1
-static  OS_TCB   AppTaskPwm2_TCB; // Led2
-static  OS_TCB   AppTaskPwm3_TCB; // P5.1
-static  OS_TCB   AppTaskPwm4_TCB; // P5.7
 
 static  CPU_STK  AppTaskStart_Stk  [APP_CFG_TASK_START_STK_SIZE];
 static  CPU_STK  AppTaskCom_Stk    [APP_CFG_TASK_COM_STK_SIZE];
 static  CPU_STK  AppTaskPwm1_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
-static  CPU_STK  AppTaskPwm2_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
-static  CPU_STK  AppTaskPwm3_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
-static  CPU_STK  AppTaskPwm4_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
 
 // Memory Block
 OS_MEM      Mem_Partition;
@@ -235,57 +229,6 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm1 \n");
 
-    // create AppTaskPwm2
-    OSTaskCreate ((OS_TCB     *) &AppTaskPwm2_TCB,
-                  (CPU_CHAR   *) "TaskPwm2",
-                  (OS_TASK_PTR ) AppTaskPwm,
-                  (void       *) &type[1],
-                  (OS_PRIO     ) APP_CFG_TASK_PWM_PRIO,
-                  (CPU_STK    *) &AppTaskPwm2_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE,
-                  (OS_MSG_QTY  ) 5u,
-                  (OS_TICK     ) 0u,
-                  (void       *) 0,
-                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                  (OS_ERR     *) &err);
-    if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm2 \n");
-
-    // create AppTaskPwm3
-    OSTaskCreate ((OS_TCB     *) &AppTaskPwm3_TCB,
-                  (CPU_CHAR   *) "TaskPwm3",
-                  (OS_TASK_PTR ) AppTaskPwm,
-                  (void       *) &type[2],
-                  (OS_PRIO     ) APP_CFG_TASK_PWM_PRIO,
-                  (CPU_STK    *) &AppTaskPwm3_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE,
-                  (OS_MSG_QTY  ) 5u,
-                  (OS_TICK     ) 0u,
-                  (void       *) 0,
-                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                  (OS_ERR     *) &err);
-    if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm3 \n");
-
-    // create AppTaskPwm4
-    OSTaskCreate ((OS_TCB     *) &AppTaskPwm4_TCB,
-                  (CPU_CHAR   *) "TaskPwm4",
-                  (OS_TASK_PTR ) AppTaskPwm,
-                  (void       *) &type[3],
-                  (OS_PRIO     ) APP_CFG_TASK_PWM_PRIO,
-                  (CPU_STK    *) &AppTaskPwm4_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE,
-                  (OS_MSG_QTY  ) 5u,
-                  (OS_TICK     ) 0u,
-                  (void       *) 0,
-                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                  (OS_ERR     *) &err);
-    if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm4 \n");
-
     APP_TRACE_DBG ("Deleting AppTaskStart ...\n");
     do {
         OSTaskDel((OS_TCB *)0, &err); // SCHEDULING POINT
@@ -302,13 +245,13 @@ static void AppTaskStart (void *p_arg){
  *                    AppTaskStart()
  * \returns none
  *
- * \brief It communicates with the UART_ISR (getting the messages comming from 
+ * \brief It communicates with the UART_ISR (getting the messages comming from
  *        PC) and with the AppTaskPwm Task (to manage the memory used by the packets
  *        structs).
  *        After receiving the msgs from UART_ISR, they're sent to a compliance test
  *        (scrutinise()); according to the msg, this task send messages to the relevant
  *        task queue.
- *  
+ *
  *        Debug trace mesages are output to the SEGGER J-Link GDB Server.
  *
  *        (1) Debug or Flash the application.
@@ -325,14 +268,14 @@ static void AppTaskCom (void *p_arg){
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
 
     bool volatile valid;
-    UART_PACKET volatile packet[NUM_MSG + 1];
-    uint8_t volatile actual = 0, actual_;
+    COORDINATES volatile packet;
+/*    uint8_t volatile actual = 0, actual_;*/
 
     (void) p_arg; // Just to silence compiler
 
     // initialise packets: Make them all available to use
-    for(uint8_t j = 0; j < (NUM_MSG+1); j++)
-        packet[j].isAvailable = true;
+/*    for(uint8_t j = 0; j < (NUM_MSG+1); j++)*/
+/*        packet[j].isAvailable = true;*/
 
     APP_TRACE_INFO ("AppTaskCom Loop...\n");
     while (DEF_ON) {
@@ -340,21 +283,21 @@ static void AppTaskCom (void *p_arg){
         memset (&msg, 0, MAX_MSG_LENGTH);
 
         // Make sure there is always at least one packet of memory available for a eventual message
-        actual = actual % (NUM_MSG + 1);
-        actual_ = actual;
-        while (!packet[actual].isAvailable){ // #packets > NUM_MSG => this loop should never block
-            actual++;
-            actual = actual % (NUM_MSG + 1);
-            if (actual_ == actual){
-                actual_ = NUM_MSG + 1;
-                break;
-            }
-        }
+/*        actual = actual % (NUM_MSG + 1);*/
+/*        actual_ = actual;*/
+/*        while (!packet[actual].isAvailable){ // #packets > NUM_MSG => this loop should never block*/
+/*            actual++;*/
+/*            actual = actual % (NUM_MSG + 1);*/
+/*            if (actual_ == actual){*/
+/*                actual_ = NUM_MSG + 1;*/
+/*                break;*/
+/*            }*/
+/*        }*/
 
-        if (actual_ == NUM_MSG +1){ // i.e. there's no packet of memory available
-            APP_TRACE_INFO ("SENDING MSGS TOO FAST\n"); // NEVER HAPPENED DURING TESTS =) but who knows?!
-            continue;
-        }
+/*        if (actual_ == NUM_MSG +1){ // i.e. there's no packet of memory available*/
+/*            APP_TRACE_INFO ("SENDING MSGS TOO FAST\n"); // NEVER HAPPENED DURING TESTS =) but who knows?!*/
+/*            continue;*/
+/*        }*/
 
         // Check if there is message
         p_msg = OSQPend (&UART_QUEUE,
@@ -382,7 +325,7 @@ static void AppTaskCom (void *p_arg){
 
         // scrutinise received msg for compliance with protocol
         APP_TRACE_INFO ("Calling scrutinise() ...\n");
-        valid = scrutinise(msg, &(packet[actual]));
+        valid = scrutinise(msg, &packet);
         if (!valid){
              APP_TRACE_INFO ("NO COMPLIANCE\n");
             // send NACK in return
@@ -391,71 +334,71 @@ static void AppTaskCom (void *p_arg){
         }
 
         // Distribute commands to tasks
-        packet[actual].isAvailable = false;
-        switch (packet[actual].port){
-            case '1':       // P1.1 -> AKA LED1
-                OSTaskQPost((OS_TCB    *) &AppTaskPwm1_TCB,
-                            (void      *) &packet[actual],
-                            (OS_MSG_SIZE) sizeof(packet[actual]),
-                            (OS_OPT     ) OS_OPT_POST_FIFO,
-                            (OS_ERR    *) &err);
-                if (err != OS_ERR_NONE){
-                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
-                    packet[actual].isAvailable = true;
-                    SendNack();
-                }else{
-                   actual++;
-                   SendAck();
-                }
-                break;
-            case '2':       // P1.0 -> AKA LED2
-                OSTaskQPost((OS_TCB    *) &AppTaskPwm2_TCB,
-                            (void      *) &packet[actual],
-                            (OS_MSG_SIZE) sizeof(packet[actual]),
-                            (OS_OPT     ) OS_OPT_POST_FIFO,
-                            (OS_ERR    *) &err);
-                if (err != OS_ERR_NONE){
-                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm2\n");
-                    packet[actual].isAvailable = true;
-                    SendNack();
-                }else{
-                   actual++;
-                   SendAck();
-                }
-                break;
-            case '3':       // P5.1
-                OSTaskQPost((OS_TCB    *) &AppTaskPwm3_TCB,
-                            (void      *) &packet[actual],
-                            (OS_MSG_SIZE) sizeof(packet[actual]),
-                            (OS_OPT     ) OS_OPT_POST_FIFO,
-                            (OS_ERR    *) &err);
-                if (err != OS_ERR_NONE){
-                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm3\n");
-                    packet[actual].isAvailable = true;
-                    SendNack();
-                }else{
-                   actual++;
-                   SendAck();
-                }
-                break;
-            case '4':       // P5.7
-                OSTaskQPost((OS_TCB    *) &AppTaskPwm4_TCB,
-                            (void      *) &packet[actual],
-                            (OS_MSG_SIZE) sizeof(packet[actual]),
-                            (OS_OPT     ) OS_OPT_POST_FIFO,
-                            (OS_ERR    *) &err);
-                if (err != OS_ERR_NONE){
-                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm4\n");
-                    packet[actual].isAvailable = true;
-                    SendNack();
-                }else{
-                   actual++;
-                   SendAck();
-                }
-                break;
-            default:
-                SendNack();
-        }
+/*        packet[actual].isAvailable = false;*/
+/*        switch (packet[actual].port){*/
+/*            case '1':       // P1.1 -> AKA LED1*/
+/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm1_TCB,*/
+/*                            (void      *) &packet[actual],*/
+/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
+/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
+/*                            (OS_ERR    *) &err);*/
+/*                if (err != OS_ERR_NONE){*/
+/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");*/
+/*                    packet[actual].isAvailable = true;*/
+/*                    SendNack();*/
+/*                }else{*/
+/*                   actual++;*/
+/*                   SendAck();*/
+/*                }*/
+/*                break;*/
+/*            case '2':       // P1.0 -> AKA LED2*/
+/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm2_TCB,*/
+/*                            (void      *) &packet[actual],*/
+/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
+/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
+/*                            (OS_ERR    *) &err);*/
+/*                if (err != OS_ERR_NONE){*/
+/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm2\n");*/
+/*                    packet[actual].isAvailable = true;*/
+/*                    SendNack();*/
+/*                }else{*/
+/*                   actual++;*/
+/*                   SendAck();*/
+/*                }*/
+/*                break;*/
+/*            case '3':       // P5.1*/
+/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm3_TCB,*/
+/*                            (void      *) &packet[actual],*/
+/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
+/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
+/*                            (OS_ERR    *) &err);*/
+/*                if (err != OS_ERR_NONE){*/
+/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm3\n");*/
+/*                    packet[actual].isAvailable = true;*/
+/*                    SendNack();*/
+/*                }else{*/
+/*                   actual++;*/
+/*                   SendAck();*/
+/*                }*/
+/*                break;*/
+/*            case '4':       // P5.7*/
+/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm4_TCB,*/
+/*                            (void      *) &packet[actual],*/
+/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
+/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
+/*                            (OS_ERR    *) &err);*/
+/*                if (err != OS_ERR_NONE){*/
+/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm4\n");*/
+/*                    packet[actual].isAvailable = true;*/
+/*                    SendNack();*/
+/*                }else{*/
+/*                   actual++;*/
+/*                   SendAck();*/
+/*                }*/
+/*                break;*/
+/*            default:*/
+/*                SendNack();*/
+/*        }*/
 
         APP_TRACE_INFO ("=======================\n");
     }
@@ -467,56 +410,57 @@ static void AppTaskCom (void *p_arg){
  * \ params p_arg ... argument passed to AppTaskPwm() at creation
  * \returns none
  *
- * \brief It waits until a message arrives in its queue. 
- *        After receiving something, it will adjust the duty cycle of the output 
+ * \brief It waits until a message arrives in its queue.
+ *        After receiving something, it will adjust the duty cycle of the output
  *        in the respective pin.
  */
-static void AppTaskPwm (void *p_arg){
-    OS_ERR      err;
-    uint16_t volatile compare;
-    UART_PACKET volatile *packet;
-    OS_MSG_SIZE msg_size;
-    const uint8_t *pwm_pin = (uint8_t *) p_arg;
 
-    APP_TRACE_INFO ("AppTaskPwm Loop...\n");
-    while (DEF_ON){
-        packet = (UART_PACKET volatile *)OSTaskQPend (0,
-                                                      OS_OPT_PEND_BLOCKING,
-                                                      &msg_size,
-                                                      NULL,
-                                                      &err);
-        if (err != OS_ERR_NONE && err != OS_ERR_TIMEOUT)
-            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");
-       
-        // Configure different Tasks for the same code
-        APP_TRACE_INFO ("===============================================================\n");
-        switch (*pwm_pin){
-            case 1:       // P1.1 -> AKA LED1
-                compare = (uint16_t)((100 - packet->duty) * 11.71);
-                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
-                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
-                break;
-            case 2:       // P1.0 -> AKA LED2
-                compare = (uint16_t)((100 - packet->duty) * 11.71);
-                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_D, compare);
-                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_D);
-                break;
-            case 3:       // P5.1
-                compare = (uint16_t)((100 - packet->duty) * 24);
-                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_A, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);
-                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_A);
-                break;
-            case 4:       // P5.7
-                compare = (uint16_t)((100 - packet->duty) * 24);
-                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_B, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);
-                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_B);
-                break;
-            default:
-                    APP_TRACE_DBG ("eu aqui\n");
-                SendNack();
-        }
+static void AppTaskPwm (void *p_arg){}
+/*    OS_ERR      err;*/
+/*    uint16_t volatile compare;*/
+/*    UART_PACKET volatile *packet;*/
+/*    OS_MSG_SIZE msg_size;*/
+/*    const uint8_t *pwm_pin = (uint8_t *) p_arg;*/
 
-        packet->isAvailable = true;
-    }
-}
+/*    APP_TRACE_INFO ("AppTaskPwm Loop...\n");*/
+/*    while (DEF_ON){*/
+/*        packet = (UART_PACKET volatile *)OSTaskQPend (0,*/
+/*                                                      OS_OPT_PEND_BLOCKING,*/
+/*                                                      &msg_size,*/
+/*                                                      NULL,*/
+/*                                                      &err);*/
+/*        if (err != OS_ERR_NONE && err != OS_ERR_TIMEOUT)*/
+/*            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");*/
+/*       */
+/*        // Configure different Tasks for the same code*/
+/*        APP_TRACE_INFO ("===============================================================\n");*/
+/*        switch (*pwm_pin){*/
+/*            case 1:       // P1.1 -> AKA LED1*/
+/*                compare = (uint16_t)((100 - packet->duty) * 11.71);*/
+/*                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);*/
+/*                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);*/
+/*                break;*/
+/*            case 2:       // P1.0 -> AKA LED2*/
+/*                compare = (uint16_t)((100 - packet->duty) * 11.71);*/
+/*                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_D, compare);*/
+/*                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_D);*/
+/*                break;*/
+/*            case 3:       // P5.1*/
+/*                compare = (uint16_t)((100 - packet->duty) * 24);*/
+/*                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_A, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);*/
+/*                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_A);*/
+/*                break;*/
+/*            case 4:       // P5.7*/
+/*                compare = (uint16_t)((100 - packet->duty) * 24);*/
+/*                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_B, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);*/
+/*                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_B);*/
+/*                break;*/
+/*            default:*/
+/*                    APP_TRACE_DBG ("eu aqui\n");*/
+/*                SendNack();*/
+/*        }*/
+
+/*        packet->isAvailable = true;*/
+/*    }*/
+/*}*/
 /************************************************************************ EOF */
