@@ -462,7 +462,7 @@ QTabBar::tab:only-one {
        <rect>
         <x>210</x>
         <y>10</y>
-        <width>171</width>
+        <width>170</width>
         <height>25</height>
        </rect>
       </property>
@@ -470,6 +470,104 @@ QTabBar::tab:only-one {
        <bool>false</bool>
       </property>
       <property name="frame">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="fontSizeBox">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>40</y>
+        <width>55</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>55</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>55</width>
+        <height>25</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
+    border: 1.5px solid gray;
+    border-radius: 5px;
+    min-width: 3em;
+     border-top-right-radius: 3px; /* same radius as the QComboBox */
+     border-bottom-right-radius: 3px;
+}
+</string>
+      </property>
+      <property name="inputMethodHints">
+       <set>Qt::ImhFormattedNumbersOnly</set>
+      </property>
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="underlineButton">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>40</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/underline.png</normaloff>img/underline.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="italicButton">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>40</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/italic.png</normaloff>img/italic.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="magnifierButton">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>70</y>
+        <width>31</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/magnifier.png</normaloff>img/magnifier.png</iconset>
+      </property>
+      <property name="checkable">
        <bool>true</bool>
       </property>
      </widget>
@@ -909,7 +1007,7 @@ background-color: rgb(255, 255, 255);
      <x>0</x>
      <y>0</y>
      <width>410</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -917,6 +1015,7 @@ background-color: rgb(255, 255, 255);
      <string>Fi&amp;le</string>
     </property>
     <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
@@ -973,6 +1072,11 @@ background-color: rgb(255, 255, 255);
   <action name="actionPreferences">
    <property name="text">
     <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open ...</string>
    </property>
   </action>
  </widget>
