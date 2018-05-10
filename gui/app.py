@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 07
+# -- Last update: 2018 Mai 10
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -140,7 +140,7 @@ class AppWindow(QMainWindow):
         self.ui.penButton.toggled.connect(self.togglePen)          # pen
 
         # Thread for permanent communication with XMC4500
-        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit)
+        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit, self.ui.pauseButton)
 
         # Connect thread signals
         self.terminalThread.finished.connect(self.prepFini)
@@ -213,7 +213,7 @@ class AppWindow(QMainWindow):
         the directional buttons will drive the plotter, and if in auto mode,
         the image on canvas will be translated in G-CODE and sent to XMC4500.
         '''
-        if isChecked:
+        if isChecked and not self.terminalThread.isRunning():
             if self.port.isOpen():
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
                     self.terminalThread.start(QThread.HighestPriority)
@@ -232,7 +232,9 @@ class AppWindow(QMainWindow):
             self.terminalThread.requestInterruption()
 
     def pauseIt(self):
-        pass
+        if not self.terminalThread.isRunning():
+            self.ui.statusbar.showMessage(self.ui.statusbar.tr("Nothing's being plotted ..."), TIMEOUT_STATUS)
+            self.ui.stopButton.setChecked(True)
 
     def slowItDown(self):
         '''
@@ -250,6 +252,7 @@ class AppWindow(QMainWindow):
         '''
         Everything that should be done before starting terminalThread
         '''
+        print("thread started")
         self.terminalThread.mode = "AUTO"
         self.drawingProgress.setVisible(True)
         self.terminalThread.timer.start()
@@ -258,7 +261,8 @@ class AppWindow(QMainWindow):
         '''
         Everything that should be done right before finishing terminalThread
         '''
-        self.ui.statusbar.showMessage("Thread Finished", TIMEOUT_STATUS)
+        print("thread finished")
+        self.ui.statusbar.showMessage("Plotting finished or interrupted", TIMEOUT_STATUS)
         self.terminalThread.timer.stop()
         self.drawingProgress.setValue(0)
         self.drawingProgress.setVisible(False)

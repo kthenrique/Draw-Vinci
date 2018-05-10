@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 07
+# -- Last update: 2018 Mai 10
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
@@ -26,13 +26,14 @@ class Terminal(QThread):
 
     updateTerm = pyqtSignal(str) # when the terminal should be written
 
-    def __init__(self, drawingProgress, termEdit):
+    def __init__(self, drawingProgress, termEdit, pauseButton):
         super().__init__()
         self.setTerminationEnabled(True)
         self.setObjectName("DrawVinci")
         self.drawingProgress = drawingProgress
         self.termEdit  = termEdit
         self.statusbar = self.drawingProgress.parentWidget()
+        self.pauseButton = pauseButton
 
         # Connect signals
         self.updateTerm.connect(self.updateTermEdit)
@@ -41,6 +42,7 @@ class Terminal(QThread):
         self.timer = QTimer()
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.updateProgress)
+        self.counter = 0
 
         self.flag = False
 
@@ -49,15 +51,21 @@ class Terminal(QThread):
 
     @pyqtSlot()
     def run(self):
-        while self.drawingProgress.value() != 10:
+        while self.drawingProgress.value() <= 100:
+            self.drawingProgress.setValue(self.counter)
             if self.isInterruptionRequested():
                 print("thread interrupted")
                 break
+            while self.pauseButton.isChecked():
+                print("thread paused")
+                self.sleep(5)
         self.exit()
 
     def updateProgress(self):
-        print(self.drawingProgress.value() + 1)
-        self.drawingProgress.setValue(self.drawingProgress.value() + 1)
+        if self.pauseButton.isChecked():
+            pass
+        else:
+            self.counter = self.counter + 1
 
     def updateTermEdit(self, text):
         self.termEdit.append(text)
