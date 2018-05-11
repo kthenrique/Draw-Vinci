@@ -554,6 +554,7 @@ class Ui_MainWindow(object):
         self.menuAbout.setTitle(_translate("MainWindow", "Help"))
         self.actionNew.setText(_translate("MainWindow", "&New"))
         self.actionSave.setText(_translate("MainWindow", "&Save"))
+        self.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.actionSave_As.setText(_translate("MainWindow", "Sa&ve As ..."))
         self.actionQuit.setText(_translate("MainWindow", "&Quit"))
         self.actionLicense.setText(_translate("MainWindow", "&License"))

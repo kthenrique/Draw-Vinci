@@ -156,6 +156,8 @@ class AppWindow(QMainWindow):
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
 
         self.isPlotting = False
+        self.isSaved    = False
+        self.path       = None
 
         self.show()
 
@@ -324,25 +326,41 @@ class AppWindow(QMainWindow):
         pass
 
     def saveFile(self):
-        path = QFileDialog.getSaveFileName(self, 'Save File', '', "SVG files (*.svg)")
+        if self.isSaved:
+            generator = QSvgGenerator()
+            generator.setFileName(str(self.path))
+            generator.setSize(QSize(self.scene.width(), self.scene.height()))
+            generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
+            generator.setTitle("Title for SVG file")
+            generator.setDescription("Description for SVG file");
 
-        if not path:
-            print(path)
-            print("Smth went wrong")
-            return
+            painter = QPainter()
+            painter.begin(generator)
+            self.scene.render(painter)
+            painter.end()
+        else:
+            path = QFileDialog.getSaveFileName(self, 'Save File', '', "SVG files (*.svg)")
 
-        generator = QSvgGenerator()
-        generator.setFileName(str(path[0]))
-        generator.setSize(QSize(self.scene.width(), self.scene.height()))
-        generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
-        generator.setTitle("Title for SVG file")
-        generator.setDescription("Description for SVG file");
+            if not path:
+                print(path)
+                print("Smth went wrong")
+                return
 
-        painter = QPainter()
-        painter.begin(generator)
-        self.scene.render(painter)
-        painter.end()
-        self.artworkLabel.setText(str(path[0]).split('/')[-1]) # need improvement here: doesn't work for window =(
+            self.path = str(path[0])
+
+            generator = QSvgGenerator()
+            generator.setFileName(self.path)
+            generator.setSize(QSize(self.scene.width(), self.scene.height()))
+            generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
+            generator.setTitle("Title for SVG file")
+            generator.setDescription("Description for SVG file");
+
+            painter = QPainter()
+            painter.begin(generator)
+            self.scene.render(painter)
+            painter.end()
+            self.artworkLabel.setText(str(path[0]).split('/')[-1]) # need improvement here: doesn't work for window =(
+            self.isSaved = True
 
     def saveFileAs(self):
         pass
