@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 10
+# -- Last update: 2018 Mai 11
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -149,6 +149,8 @@ class AppWindow(QMainWindow):
         # Connect finishing of thread with toggling of stopButton
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
 
+        self.isPlotting = False
+
         self.show()
 
     def updateConnection(self, device):
@@ -161,6 +163,7 @@ class AppWindow(QMainWindow):
                         </span></p></body></html>')
                 self.ui.statusbar.showMessage(self.ui.statusbar.tr("ERROR: {0:2d} - vide docs!".format(self.port.error())), TIMEOUT_STATUS)
                 self.ui.stopButton.setChecked(True)
+                self.isPlotting = False
 
     def refreshPorts(self):
         '''
@@ -215,9 +218,12 @@ class AppWindow(QMainWindow):
         '''
         if isChecked and not self.terminalThread.isRunning():
             if self.port.isOpen():
+                self.ui.autoButton.setEnabled(False)
+                self.ui.manualButton.setEnabled(False)
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
                     self.terminalThread.start(QThread.HighestPriority)
-                else:                                              # MANUAL MODE
+                elif not self.isPlotting:                          # MANUAL MODE
+                    self.isPlotting = True
                     self.sendSingleMsg("#G91$")                      # set relative positioning
             else:
                 self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
@@ -227,12 +233,14 @@ class AppWindow(QMainWindow):
         '''
         Interrupt terminal thread when it is running
         '''
+        self.ui.autoButton.setEnabled(True)
+        self.ui.manualButton.setEnabled(True)
         if self.terminalThread.isRunning():
             print("trying to interrupt thread")
             self.terminalThread.requestInterruption()
 
     def pauseIt(self):
-        if not self.terminalThread.isRunning():
+        if self.ui.autoButton.isChecked() and not self.terminalThread.isRunning():
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Nothing's being plotted ..."), TIMEOUT_STATUS)
             self.ui.stopButton.setChecked(True)
 
@@ -253,7 +261,6 @@ class AppWindow(QMainWindow):
         Everything that should be done before starting terminalThread
         '''
         print("thread started")
-        self.terminalThread.mode = "AUTO"
         self.drawingProgress.setVisible(True)
         self.terminalThread.timer.start()
 
@@ -263,6 +270,7 @@ class AppWindow(QMainWindow):
         '''
         print("thread finished")
         self.ui.statusbar.showMessage("Plotting finished or interrupted", TIMEOUT_STATUS)
+        self.isPlotting = False
         self.terminalThread.timer.stop()
         self.drawingProgress.setValue(0)
         self.drawingProgress.setVisible(False)
