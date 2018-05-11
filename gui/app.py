@@ -12,11 +12,12 @@
 
 import sys
 from PyQt5.Qt import Qt                              # Some relevant constants
-from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread, QSize
+from PyQt5.QtGui import QIntValidator, QPainter
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
-        QProgressBar)
+        QProgressBar, QFileDialog)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
+from PyQt5.QtSvg import QSvgGenerator
 
 from pyudev import Context, Monitor
 from pyudev.pyqt5 import MonitorObserver
@@ -122,7 +123,12 @@ class AppWindow(QMainWindow):
         self.ui.canvas.show()
 
         # Menus Initialisation
-        self.ui.actionQuit.triggered.connect(self.close) # Quit
+        self.ui.actionNew.triggered.connect(self.newFile)         # New
+        self.ui.actionOpen.triggered.connect(self.openFile)       # Open
+        self.ui.actionSave.triggered.connect(self.saveFile)       # Save
+        self.ui.actionSave_As.triggered.connect(self.saveFileAs)  # Save as
+        self.ui.actionAbout.triggered.connect(self.about)         # About
+        self.ui.actionQuit.triggered.connect(self.close)          # Quit
 
         # Control Buttons Initialisation
         self.ui.connectButton.clicked.connect(self.connectPort)    # connect
@@ -307,6 +313,42 @@ class AppWindow(QMainWindow):
                 self.sendSingleMsg('#G1:PENUP$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
+
+    def newFile(self):
+        pass
+
+    def openFile(self):
+        pass
+
+    def newFile(self):
+        pass
+
+    def saveFile(self):
+        path = QFileDialog.getSaveFileName(self, 'Save File', '', "SVG files (*.svg)")
+
+        if not path:
+            print(path)
+            print("Smth went wrong")
+            return
+
+        generator = QSvgGenerator()
+        generator.setFileName(str(path[0]))
+        generator.setSize(QSize(self.scene.width(), self.scene.height()))
+        generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
+        generator.setTitle("Title for SVG file")
+        generator.setDescription("Description for SVG file");
+
+        painter = QPainter()
+        painter.begin(generator)
+        self.scene.render(painter)
+        painter.end()
+        self.artworkLabel.setText(str(path[0]).split('/')[-1]) # need improvement here: doesn't work for window =(
+
+    def saveFileAs(self):
+        pass
+
+    def about(self):
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
