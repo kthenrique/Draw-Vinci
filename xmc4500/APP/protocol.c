@@ -36,7 +36,7 @@ bool scrutinise(char *str, volatile COORDINATES *packet){
             packet->z_axis = 0;
             packet->pos_mode = 0;
         }
-        else if (strncmp((const char *)token_ptr,(const char *)"G01",3) == 0){
+        else if (strncmp((const char *)token_ptr,(const char *)"G1",3) == 0){
 
         }
         else if (strncmp((const char *)token_ptr,(const char *)"G90",3) == 0){;
