@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 11
+# -- Last update: 2018 Mai 13
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -23,6 +23,7 @@ from pyudev import Context, Monitor
 from pyudev.pyqt5 import MonitorObserver
 
 from draw_vinci import Ui_MainWindow
+from parser import parser
 from canvas import MainScene
 from terminal import Terminal
 from constants import TIMEOUT_STATUS, FONT_SIZES
@@ -158,6 +159,8 @@ class AppWindow(QMainWindow):
         self.isPlotting = False
         self.isSaved    = False
         self.path       = None
+
+        self.parser     = parser()
 
         self.show()
 
@@ -320,7 +323,16 @@ class AppWindow(QMainWindow):
         pass
 
     def openFile(self):
-        pass
+        path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)") 
+        if not path:
+            return
+
+        self.path = str(path[0])
+        self.scene.clear()
+
+        parsed = self.parser.getElements(self.path)
+        for element in parsed:
+            self.scene.addItem(element)
 
     def newFile(self):
         pass

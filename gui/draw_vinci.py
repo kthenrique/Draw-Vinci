@@ -561,4 +561,5 @@ class Ui_MainWindow(object):
         self.actionAbout.setText(_translate("MainWindow", "&About"))
         self.actionPreferences.setText(_translate("MainWindow", "&Preferences"))
         self.actionOpen.setText(_translate("MainWindow", "Open ..."))
+        self.actionOpen.setShortcut(_translate("MainWindow", "Ctrl+O"))
 

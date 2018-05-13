@@ -136,8 +136,6 @@ class MainScene(QGraphicsScene):
         if self.index == 6:               # polygon
             self.isDrawing = False
             self.tools[self.index].clear()
-        if self.index == 7:               # select
-            self.view.fitInView(self.item)
 
     def mouseMoveEvent(self, e):
         if self.isDrawing:
