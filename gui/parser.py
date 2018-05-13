@@ -13,7 +13,9 @@
 # ----------------------------------------------------------------------------
 
 from PyQt5.QtCore import QFile, QIODevice
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
+        QGraphicsLineItem, QGraphicsPolygonItem)
+from PyQt5.QtGui import QPolygonF
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
 
@@ -37,11 +39,13 @@ class parser():
         print(gList.length())
         for index in range(0, gList.length()):
             gNode = gList.item(index)                            # DomNode
+
             # rectangles
             rect = gNode.firstChildElement('rect')               # DomElement
             if not rect.hasAttributes():
-                print("not a rect")
+                pass
             else:
+                print("rectangle")
                 newCanvasRect = QGraphicsRectItem()
                 x = float(rect.attribute('x'))
                 y = float(rect.attribute('y'))
@@ -52,10 +56,11 @@ class parser():
                 listOfItems.append(newCanvasRect)
 
             # ellipses
-            elli = gNode.firstChildElement('ellipse')               # DomElement
+            elli = gNode.firstChildElement('ellipse')
             if not elli.hasAttributes():
-                print("not a rect")
+                pass
             else:
+                print("ellipse")
                 newCanvasElli = QGraphicsEllipseItem()
                 cx = float(elli.attribute('cx'))
                 cy = float(elli.attribute('cy'))
@@ -67,6 +72,44 @@ class parser():
 
                 newCanvasElli.setRect(x, y, width, height)
                 listOfItems.append(newCanvasElli)
+
+            # polyline
+            lin = gNode.firstChildElement('polyline')
+            if not lin.hasAttributes():
+                pass
+            else:
+                print("line")
+                newCanvasLin = QGraphicsLineItem()
+                points = (lin.attribute('points'))
+                points = points.split()
+                coord1 = points[0].split(',')
+                coord2 = points[1].split(',')
+                x1 = float(coord1[0])
+                y1 = float(coord1[1])
+                x2 = float(coord2[0])
+                y2 = float(coord2[1])
+
+                newCanvasLin.setLine(x1, y1, x2, y2)
+                listOfItems.append(newCanvasLin)
+
+            # polygons
+            poly = gNode.firstChildElement('polygon')
+            if not poly.hasAttributes():
+                pass
+            else:
+                print("polygon")
+                newPoly       = QPolygonF()
+                newCanvasPoly = QGraphicsPolygonItem()
+
+                points = (poly.attribute('points'))
+                points = points.split()
+                for point in points:
+                    coord = point.split(',')
+                    newPoly.append(float(coord[0]), float(coord[1]))
+
+
+                newCanvasPoly.setPolygon(newPoly)
+                listOfItems.append(newCanvasPoly)
 
         file_.close()
         return listOfItems
