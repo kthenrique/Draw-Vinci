@@ -39,6 +39,10 @@
 
 #include <protocol.h>
 
+#include "xmc4500_spi_lib.h"
+#include "mcp3004_drv.h"
+#include "mcp23s08_drv.h"
+
 #if SEMI_HOSTING
 #include <debug_lib.h>
 #endif
@@ -53,15 +57,25 @@
 #define MAX_MSG_LENGTH         8
 #define NUM_MSG                32
 
+#define ENDPOINT_1      113
+#define ENDPOINT_2      49
+#define ENDPOINT_3      81
+#define ENDPOINT_4      97
+
+#define D5 P1_15
+#define D6 P1_13
+#define D7 P1_14
+#define D8 P1_12
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
-static  OS_TCB   AppTaskPwm1_TCB; // Led1
+static  OS_TCB   AppTaskPwm1_TCB;
+static  OS_TCB   AppTaskEndpoints_TCB;
 
 static  CPU_STK  AppTaskStart_Stk  [APP_CFG_TASK_START_STK_SIZE];
 static  CPU_STK  AppTaskCom_Stk    [APP_CFG_TASK_COM_STK_SIZE];
 static  CPU_STK  AppTaskPwm1_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
-
+static  CPU_STK  AppTaskEndpoints_Stk[APP_CFG_TASK_ENDPOINTS_STK_SIZE];
 // Memory Block
 OS_MEM      Mem_Partition;
 CPU_CHAR    MyPartitionStorage[NUM_MSG][MAX_MSG_LENGTH]; // +1 to ensure the UART_ISR gets first error at post
@@ -73,6 +87,7 @@ OS_Q        UART_QUEUE;
 static void AppTaskStart (void *p_arg);
 static void AppTaskCom   (void *p_arg);
 static void AppTaskPwm   (void *p_arg);
+static void AppTaskEndpoints(void *p_arg);
 
 /*********************************************************************** MAIN */
 /**
@@ -229,6 +244,22 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm1 \n");
 
+    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
+                  (CPU_CHAR   *) "TaskEndpoints",
+                  (OS_TASK_PTR ) AppTaskEndpoints,
+                  (void       *) 0,
+                  (OS_PRIO     ) APP_CFG_TASK_ENDPOINTS_PRIO,
+                  (CPU_STK    *) &AppTaskEndpoints_Stk[0],
+                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE / 10u,
+                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE,
+                  (OS_MSG_QTY  ) 0u,
+                  (OS_TICK     ) 0u,
+                  (void       *) 0,
+                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                  (OS_ERR     *) &err);
+    if (err != OS_ERR_NONE)
+        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
+    
     APP_TRACE_DBG ("Deleting AppTaskStart ...\n");
     do {
         OSTaskDel((OS_TCB *)0, &err); // SCHEDULING POINT
@@ -415,7 +446,7 @@ static void AppTaskCom (void *p_arg){
  *        in the respective pin.
  */
 
-static void AppTaskPwm (void *p_arg){}
+static void AppTaskEndpoints (void *p_arg){}
 /*    OS_ERR      err;*/
 /*    uint16_t volatile compare;*/
 /*    UART_PACKET volatile *packet;*/
@@ -463,4 +494,90 @@ static void AppTaskPwm (void *p_arg){}
 /*        packet->isAvailable = true;*/
 /*    }*/
 /*}*/
+
+static void AppTaskPwm (void *p_arg){
+    uint8_t reg_val = 0;
+    XMC_GPIO_CONFIG_t gpio_config;
+    OS_ERR err;
+    
+    if(_init_spi()!=SPI_OK)
+    {
+        /*Error should never get here*/
+    }
+    
+    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+
+    XMC_GPIO_Init(D5, &gpio_config);
+    XMC_GPIO_SetOutputHigh(D5);
+
+    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+
+    XMC_GPIO_Init(D6, &gpio_config);
+    XMC_GPIO_SetOutputHigh(D6);
+
+    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+
+    XMC_GPIO_Init(D7, &gpio_config);
+    XMC_GPIO_SetOutputHigh(D7);
+
+    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+
+    XMC_GPIO_Init(D8, &gpio_config);
+    XMC_GPIO_SetOutputHigh(D8);
+
+    _mcp23s08_reset();
+    
+    _mcp23s08_reset_ss(MCP23S08_SS);
+    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);
+    _mcp23s08_set_ss(MCP23S08_SS);
+    
+    while(DEF_ON){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        reg_val = _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0,MCP23S08_RD);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        if(reg_val == ENDPOINT_1)
+        {
+            XMC_GPIO_SetOutputHigh(D5);
+            XMC_GPIO_SetOutputLow(D6);
+            XMC_GPIO_SetOutputHigh(D7);
+            XMC_GPIO_SetOutputHigh(D8);
+        }
+        if(reg_val == ENDPOINT_2)
+        {
+            XMC_GPIO_SetOutputLow(D5);
+            XMC_GPIO_SetOutputHigh(D6);
+            XMC_GPIO_SetOutputHigh(D7);
+            XMC_GPIO_SetOutputHigh(D8);
+        }
+        if(reg_val == ENDPOINT_3)
+        {
+            XMC_GPIO_SetOutputHigh(D5);
+            XMC_GPIO_SetOutputHigh(D6);
+            XMC_GPIO_SetOutputLow(D7);
+            XMC_GPIO_SetOutputHigh(D8);
+        }
+        if(reg_val == ENDPOINT_4)
+        {
+            XMC_GPIO_SetOutputHigh(D5);
+            XMC_GPIO_SetOutputHigh(D6);
+            XMC_GPIO_SetOutputHigh(D7);
+            XMC_GPIO_SetOutputLow(D8);
+        }
+        OSTimeDlyHMSM(0,
+                      0,
+                      0,
+                      10,
+                      OS_OPT_TIME_HMSM_STRICT,
+                      &err);
+    }
+}
 /************************************************************************ EOF */
