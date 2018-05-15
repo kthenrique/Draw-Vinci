@@ -49,7 +49,7 @@ class parser():
                 newCanvasRect = QGraphicsRectItem()
                 x = float(rect.attribute('x'))
                 y = float(rect.attribute('y'))
-                widht = float(rect.attribute('width'))
+                width = float(rect.attribute('width'))
                 height = float(rect.attribute('height'))
 
                 newCanvasRect.setRect(x, y, width, height)

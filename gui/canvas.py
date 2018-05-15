@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 11
+# -- Last update: 2018 Mai 15
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ class MainScene(QGraphicsScene):
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
         self.statusbar = self.toolLabel.parentWidget()
-        self.textTools  = None
+        self.textTools = None
         self.view      = None
 
         self.toolsButtonGroup.buttonClicked.connect(self.setIconTool)
