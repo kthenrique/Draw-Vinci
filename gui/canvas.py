@@ -227,6 +227,7 @@ class MainScene(QGraphicsScene):
                 # Cleaning in case smth was being drawn
                 self.isDrawing = False
                 self.isTyping  = False
+                self.tools[1]  = QPainterPath()
                 self.tools[6].clear()
             except:
                 self.statusbar.showMessage("There is no item in Canvas", TIMEOUT_STATUS)

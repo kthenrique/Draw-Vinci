@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 13
+# -- Last update: 2018 Mai 15
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -14,8 +14,8 @@
 
 from PyQt5.QtCore import QFile, QIODevice
 from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
-        QGraphicsLineItem, QGraphicsPolygonItem)
-from PyQt5.QtGui import QPolygonF
+        QGraphicsLineItem, QGraphicsPolygonItem, QGraphicsPathItem)
+from PyQt5.QtGui import QPolygonF, QPainterPath
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
 
@@ -110,6 +110,48 @@ class parser():
 
                 newCanvasPoly.setPolygon(newPoly)
                 listOfItems.append(newCanvasPoly)
+
+            # path
+            pat = gNode.firstChildElement('path')
+            if not pat.hasAttributes():
+                pass
+            else:
+                print("path")
+                newPat       = QPainterPath()
+                newCanvasPat = QGraphicsPathItem()
+
+                paths = (pat.attribute('d'))
+                paths = paths.split()
+                for path in paths:
+                    path = path.upper()
+                    coord = path[1:]
+                    coord = coord.split(',')
+                    if path[0]   == 'M':        # moveTo
+                        newPat.moveTo(float(coord[0]), float(coord[1]))
+                    elif path[0] == 'L':        # lineTo
+                        newPat.lineTo(float(coord[0]), float(coord[1]))
+                    elif path[0] == 'H':        # horizontal lineTo
+                        pass
+                    elif path[0] == 'V':        # vertical lineTo
+                        pass
+                    elif path[0] == 'C':        # curveto
+                        pass
+                    elif path[0] == 'S':        # smooth curveto
+                        pass
+                    elif path[0] == 'Q':        # quadratic Bézier curve
+                        pass
+                    elif path[0] == 'T':        # smooth quadratic Bézier curveto
+                        pass
+                    elif path[0] == 'A':        # elliptical arc
+                        pass
+                    elif path[0] == 'Z':        # closePath
+                        newPat.closeSubpath()
+                        pass
+                    else:
+                        print('Strange Command at path tag in SVG file')
+
+                newCanvasPat.setPath(newPat)
+                listOfItems.append(newCanvasPat)
 
         file_.close()
         return listOfItems
