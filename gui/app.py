@@ -235,7 +235,7 @@ class AppWindow(QMainWindow):
                     self.terminalThread.start(QThread.HighestPriority)
                 elif not self.isPlotting:                          # MANUAL MODE
                     self.isPlotting = True
-                    self.sendSingleMsg("#G91$")                      # set relative positioning
+                    self.sendSingleMsg("#G91:$")                      # set relative positioning
             else:
                 self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
                 self.ui.stopButton.setChecked(True)
@@ -288,13 +288,13 @@ class AppWindow(QMainWindow):
 
     def goUp(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:Y10:$')
+            self.sendSingleMsg('#Y50:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goDown(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:Y-10:$')
+            self.sendSingleMsg('#Y-50:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
