@@ -1,12 +1,12 @@
 /**
  * @file xmc_acmp.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -37,7 +37,7 @@
  * --------------
  *
  * 2014-12-10:
- *     - Initial <br>
+ *     - Initial version
  * 2015-02-20:
  *     - Removed unused declarations<br> 
  * 2015-05-08:
@@ -56,7 +56,9 @@
  * 2015-06-20: 
  *     - Removed version macros and declaration of GetDriverVersion API 
  * 2015-06-26: 
- *     - API help documentation modified.   
+ *     - API help documentation modified.
+ * 2015-09-02: 
+ *     - API help documentation modified for XMC1400 device support.   
  * @endcond 
  *
  */
@@ -74,7 +76,7 @@
  * @addtogroup ACMP
  * @brief Analog Comparator(ACMP) low level driver for XMC1 family of microcontrollers. <br>
  *
- * The ACMP module consists of 3 analog comparators. Each analog comparator has two inputs, INP and INN. 
+ * The ACMP module consists of minimum of 3 analog comparators. Each analog comparator has two inputs, INP and INN. 
  * Input INP is compared with input INN in the pad voltage domain.
  * It generates a digital comparator output signal. The digital comparator output signal is shifted down from VDDP 
  * power supply voltage level to VDDC core voltage level. The ACMP module provides the following functionalities.\n
@@ -82,7 +84,7 @@
  * -# Operates in low power mode
  * -# Provides Inverted ouput option\n
 
- * \par The ACMP low level driver funtionalities\n
+ * \par The ACMP low level driver funtionalities
  * <OL>
  * <LI>Initializes an instance of analog comparator module with the @ref XMC_ACMP_CONFIG_t configuration structure 
  * using the API XMC_ACMP_Init().</LI>
@@ -176,6 +178,9 @@ typedef enum XMC_ACMP_INP_SOURCE
   #pragma warning 586
 #endif
 
+/**
+ * ACMP module
+ */
 typedef struct {
   __IO uint32_t  ORCCTRL;
   __I  uint32_t  RESERVED[726];
@@ -195,7 +200,7 @@ typedef struct XMC_ACMP_CONFIG
       uint32_t filter_disable   : 1; /**< Comparator filter option for removing glitches. By default this option
                                           is selected in ANACMP register. Setting this option disables the filter */
       uint32_t                  : 1;
-      uint32_t output_invert    : 1; /**< Option to invert the comparator output. Use XMC_@ref ACMP_COMP_OUT_t type*/
+      uint32_t output_invert    : 1; /**< Option to invert the comparator output. Use XMC_@ref XMC_ACMP_COMP_OUT_t type*/
       uint32_t hysteresis       : 2; /**< Hysteresis voltage to reduce noise sensitivity. Select the voltage levels
                                           from the values defined in @ref XMC_ACMP_HYSTERESIS_t. */
       uint32_t                  : 26;
@@ -225,6 +230,7 @@ typedef struct XMC_ACMP_CONFIG
  *                 Range:<BR> 0 - ACMP0<BR>
  *                            1 - ACMP1<BR>
  *                            2 - ACMP2<BR>
+ *                            3 - ACMP3 - Only applicable for XMC1400 devices <BR> 
  *
  * @param config Pointer to configuration data. Refer data structure @ref XMC_ACMP_CONFIG_t for settings.
  * @return
@@ -245,6 +251,7 @@ void XMC_ACMP_Init(XMC_ACMP_t *const peripheral, uint32_t instance, const XMC_AC
  *                 Range:<BR> 0 - ACMP0<BR>
  *                            1 - ACMP1<BR>
  *                            2 - ACMP2<BR>
+ *                            3 - ACMP3 - Only applicable for XMC1400 devices <BR>
  * @return
  *    None<BR>
  *
@@ -273,6 +280,7 @@ __STATIC_INLINE void XMC_ACMP_EnableComparator(XMC_ACMP_t *const peripheral, uin
  *                 Range:<BR> 0 - ACMP0<BR>
  *                            1 - ACMP1<BR>
  *                            2 - ACMP2<BR>
+ *                            3 - ACMP3 - Only applicable for XMC1400 devices <BR> 
  * @return
  *    None<BR>
  * \par<b>Description:</b><br>
@@ -334,6 +342,7 @@ __STATIC_INLINE void XMC_ACMP_DisableReferenceDivider(void)
  * @param instance ACMP instance number. <BR>
  *                 Range:<BR> 0 - ACMP0<BR>
  *                            2 - ACMP2<BR>
+ *                            3 - ACMP3 - Only applicable for XMC1400 devices <BR> 
  * @param source ACMP input source selection options.<BR>
  *                 Range:<BR> XMC_ACMP_INP_SOURCE_STANDARD_PORT  - Input is connected to port<BR>
  *                            XMC_ACMP_INP_SOURCE_ACMP1_INP_PORT - Input is connected to port and ACMP1 INP <BR> 

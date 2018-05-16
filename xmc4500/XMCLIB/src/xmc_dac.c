@@ -1,12 +1,12 @@
 /**
  * @file xmc_dac.c
- * @date 2015-06-19 
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -57,7 +57,6 @@
  *******************************************************************************/
 
 #include <xmc_dac.h>
-
 #include <xmc_scu.h>
 
 /* DAC peripheral is not available on XMC1X devices. */
@@ -80,7 +79,7 @@ void XMC_DAC_Enable(XMC_DAC_t *const dac)
 {
   XMC_UNUSED_ARG(dac);
   
-#if(UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DAC);
 #endif
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DAC);
@@ -92,7 +91,7 @@ void XMC_DAC_Disable(XMC_DAC_t *const dac)
   XMC_UNUSED_ARG(dac);
 
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DAC);
-#if(UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DAC);
 #endif
 }

@@ -1,12 +1,12 @@
 /**
  * @file xmc_usbd.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -927,7 +927,7 @@ void XMC_USBD_IRQHandler(const XMC_USBD_t *const obj)
  **/
 void XMC_USBD_Enable(void) 
 {
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USB0);
 #endif
   /* Reset and power up */
@@ -942,11 +942,10 @@ void XMC_USBD_Disable(void)
 {
   /* Clear Reset and power up */
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_USB0);
-  XMC_SCU_POWER_DisableUsb();
-	
-	#if(UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_USB0);
 #endif
+  XMC_SCU_POWER_DisableUsb();
 }
 
 /**

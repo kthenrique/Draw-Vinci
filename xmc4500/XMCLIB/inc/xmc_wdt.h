@@ -1,12 +1,12 @@
 /**
  * @file xmc_wdt.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -43,6 +43,8 @@
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API <br>
  *
+ * 2015-08-06:
+ *     - Bug fix in XMC_WDT_SetDebugMode() API, Wrong register is being configured.<br>
  * @endcond
  */
 
@@ -53,8 +55,8 @@
  * HEADER FILES
  ********************************************************************************************************************/
 
-#include <xmc_common.h>
-#include <xmc_scu.h>
+#include "xmc_common.h"
+#include "xmc_scu.h"
 /**
  * @addtogroup XMClib XMC Peripheral Library
  * @{
@@ -318,7 +320,7 @@ __STATIC_INLINE void XMC_WDT_SetServicePulseWidth(uint8_t service_pulse_width)
  */
 __STATIC_INLINE void XMC_WDT_SetDebugMode(const XMC_WDT_DEBUG_MODE_t debug_mode)
 {
-  WDT->WDTCLR = (WDT->WDTCLR & (uint32_t)~WDT_CTR_DSP_Msk) | (uint32_t)debug_mode;
+  WDT->CTR = (WDT->CTR & (uint32_t)~WDT_CTR_DSP_Msk) | (uint32_t)debug_mode;
 }
 
 /**

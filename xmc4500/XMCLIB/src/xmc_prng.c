@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_prng.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -47,7 +47,7 @@
  * @endcond
  */
  
-#include <xmc_prng.h>
+#include "xmc_prng.h"
 
 #if defined (PRNG)
 
@@ -102,15 +102,6 @@ XMC_PRNG_INIT_STATUS_t XMC_PRNG_Init(const XMC_PRNG_INIT_t *prng)
   }
 
   return status;
-}
-
-/*
- * De-initialize the PRNG peripheral 
- */
-void XMC_PRNG_DeInit(void)
-{
-  PRNG->CTRL = (uint16_t)0UL;
-  PRNG->WORD = (uint16_t)0UL;
 }
 
 #endif /* #if defined (PRNG) */

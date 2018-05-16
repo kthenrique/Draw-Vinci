@@ -1,12 +1,12 @@
 /**
  * @file xmc_fce.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -51,7 +51,9 @@
 #include <xmc_fce.h>
 
 #if defined (FCE)
-/**********************************************************************************************************************
+#include <xmc_scu.h>
+
+/*******************************************************************************
  * API IMPLEMENTATION
  *********************************************************************************************************************/
 
@@ -71,13 +73,24 @@ XMC_FCE_STATUS_t XMC_FCE_Init(const XMC_FCE_t *const engine)
 void XMC_FCE_Disable(void)
 {
   FCE->CLC |= (uint32_t)FCE_CLC_DISR_Msk;
+  
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_FCE);
+
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_FCE);
+#endif
+
 }
 
 /* Enable FCE */
 void XMC_FCE_Enable(void)
 {
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_FCE);
+#endif
+
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_FCE);
+
   FCE->CLC &= (uint32_t)~FCE_CLC_DISR_Msk;
 }
 
@@ -187,7 +200,7 @@ void XMC_FCE_TriggerMismatch(const XMC_FCE_t *const engine, XMC_FCE_CTR_TEST_t t
 }
 
 /* Change endianness of 16-bit input buffer */
-void CRC_LittleEndian16bit(uint8_t* inbuffer, uint16_t* outbuffer, uint16_t length)
+void XMC_FCE_LittleEndian16bit(uint8_t* inbuffer, uint16_t* outbuffer, uint16_t length)
 {
   uint16_t counter = 0U;
   uint16_t bytecounter = 0U;
@@ -214,7 +227,7 @@ void CRC_LittleEndian16bit(uint8_t* inbuffer, uint16_t* outbuffer, uint16_t leng
 }
 
 /* Change endianness of 32-bit input buffer */
-void CRC_LittleEndian32bit(uint8_t* inbuffer, uint32_t* outbuffer, uint16_t length)
+void XMC_FCE_LittleEndian32bit(uint8_t* inbuffer, uint32_t* outbuffer, uint16_t length)
 {
   uint16_t counter = 0U;
   uint16_t bytecounter = 0U;

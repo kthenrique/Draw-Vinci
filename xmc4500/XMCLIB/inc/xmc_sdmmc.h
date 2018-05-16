@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_sdmmc.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -38,11 +38,19 @@
  * --------------
  *
  * 2015-02-20:
- *     - Initial <br>
- *     - Documentation updates <br>
+ *     - Initial version
+ *     - Documentation updates
  *
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API <br>
+ *
+ * 2016-01-16:
+ *     - Added the following APIs to the XMC_SDMMC low level driver <br>
+ *         1) XMC_SDMMC_EnableDelayCmdDatLines <br>
+ *         2) XMC_SDMMC_DisableDelayCmdDatLines <br>
+ *         3) XMC_SDMMC_SetDelay <br>
+ *         4) XMC_SDMMC_EnableHighSpeed <br>
+ *         5) XMC_SDMMC_DisableHighSpeed <br>
  *
  * @endcond
  */
@@ -54,7 +62,7 @@
  * HEADER FILES
  *******************************************************************************/
  
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined (SDMMC)
 
@@ -177,6 +185,14 @@
 #define XMC_SDMMC_CHECK_DATA_TRANSFER_DIR(d)\
   ((d == XMC_SDMMC_DATA_TRANSFER_HOST_TO_CARD)   ||\
    (d == XMC_SDMMC_DATA_TRANSFER_CARD_TO_HOST))
+
+/*
+ * Min and max number of delay elements <br>
+ *
+ * This macro is used in the LLD for assertion checks (XMC_ASSERT).
+ */
+#define XMC_SDMMC_MIN_DELAY_ELEMENTS (0U)
+#define XMC_SDMMC_MAX_DELAY_ELEMENTS (15U)
 
 /*******************************************************************************
  * ENUMS
@@ -1445,7 +1461,7 @@ __STATIC_INLINE void XMC_SDMMC_SetDataTransferWidth(XMC_SDMMC_t *const sdmmc, XM
  * \par
  * Use the function to set the data transfer direction: host to card OR card to host. It
  * is typically used to configure block operations (read/write) on the SD card. For
- * example, ::XMC_SDMMC_DATA_TRANSFER_HOST_TO_CARD must be used for a write block operation.
+ * example, XMC_SDMMC_DATA_TRANSFER_HOST_TO_CARD must be used for a write block operation.
  */
 __STATIC_INLINE void XMC_SDMMC_SetDataTransferDirection(XMC_SDMMC_t *const sdmmc,
                                                         XMC_SDMMC_DATA_TRANSFER_DIR_t dir)
@@ -1455,6 +1471,94 @@ __STATIC_INLINE void XMC_SDMMC_SetDataTransferDirection(XMC_SDMMC_t *const sdmmc
 
   sdmmc->TRANSFER_MODE = (uint16_t)((sdmmc->TRANSFER_MODE & (uint16_t)~SDMMC_TRANSFER_MODE_TX_DIR_SELECT_Msk) |
 	                                (uint16_t)((uint16_t)dir << SDMMC_TRANSFER_MODE_TX_DIR_SELECT_Pos));
+}
+
+/**
+ * @param None
+ * @return None
+ *
+ * \par<b>Description: </b><br>
+ * Enable delay on the command/data out lines <br>
+ *
+ * \par
+ * Use the function to enable delay on the command/data out lines. Invoke this function
+ * before selecting the number of delay elements.
+ */
+__STATIC_INLINE void XMC_SDMMC_EnableDelayCmdDatLines(void)
+{
+  SCU_GENERAL->SDMMCDEL |= (uint32_t)SCU_GENERAL_SDMMCDEL_TAPEN_Msk;
+}
+
+/**
+ * @param None
+ * @return None
+ *
+ * \par<b>Description: </b><br>
+ * Disable delay on the command/data out lines <br>
+ *
+ * \par
+ * Use the function to disable delay on the command/data out lines.
+ */
+__STATIC_INLINE void XMC_SDMMC_DisableDelayCmdDatLines(void)
+{
+  SCU_GENERAL->SDMMCDEL &= (uint32_t)~SCU_GENERAL_SDMMCDEL_TAPEN_Msk;
+}
+
+/**
+ * @param tapdel Number of delay elements to select
+ * @return None
+ *
+ * \par<b>Description: </b><br>
+ * Set number of delay elements on the command/data out lines <br>
+ *
+ * \par
+ * Use the function to set the number of delay elements on the command/data out lines.
+ * The function writes the delay value to the SDMMC delay control register (SDMMCDEL)
+ * within the realm of the SCU peripheral. A delay of tapdel + 1 is considered as the
+ * final selected number of delay elements.
+ */
+__STATIC_INLINE void XMC_SDMMC_SetDelay(uint8_t tapdel)
+{
+  SCU_GENERAL->SDMMCDEL = (uint32_t)((SCU_GENERAL->SDMMCDEL & (uint32_t)~SCU_GENERAL_SDMMCDEL_TAPDEL_Msk) |
+	                                (uint32_t)(tapdel << SCU_GENERAL_SDMMCDEL_TAPDEL_Pos));
+}
+
+/**
+ * @param None
+ * @return None
+ *
+ * \par<b>Description: </b><br>
+ * High speed enable <br>
+ *
+ * \par
+ * Use the function to enable high speed operation. The default is a normal speed operation.
+ * Once enabled, the host controller outputs command and data lines at the rising edge of the
+ * SD clock (up to 50 MHz for SD).
+ */
+__STATIC_INLINE void XMC_SDMMC_EnableHighSpeed(XMC_SDMMC_t *const sdmmc)
+{
+  XMC_ASSERT("XMC_SDMMC_EnableHighSpeed: Invalid module pointer", XMC_SDMMC_CHECK_MODULE_PTR(sdmmc));
+
+  sdmmc->HOST_CTRL |= (uint8_t)SDMMC_HOST_CTRL_HIGH_SPEED_EN_Msk;
+}
+
+/**
+ * @param None
+ * @return None
+ *
+ * \par<b>Description: </b><br>
+ * High speed disable <br>
+ *
+ * \par
+ * Use the function to disable high speed operation. The host controller will switch back
+ * to a normal speed mode. In this mode, the host controller outputs command and data lines
+ * at 25 MHz for SD.
+ */
+__STATIC_INLINE void XMC_SDMMC_DisableHighSpeed(XMC_SDMMC_t *const sdmmc)
+{
+  XMC_ASSERT("XMC_SDMMC_DisableHighSpeed: Invalid module pointer", XMC_SDMMC_CHECK_MODULE_PTR(sdmmc));
+
+  sdmmc->HOST_CTRL &= (uint8_t)~SDMMC_HOST_CTRL_HIGH_SPEED_EN_Msk;
 }
 
 #ifdef __cplusplus

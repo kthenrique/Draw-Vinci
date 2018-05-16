@@ -1,12 +1,12 @@
 /**
  * @file xmc4_eru.c
- * @date 2015-02-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -41,10 +41,10 @@
  *
  * @endcond
  */
-#include <xmc_eru.h>
-#include <xmc_scu.h>
+#include "xmc_eru.h"
 
 #if UC_FAMILY == XMC4
+#include "xmc_scu.h"
 
 /*********************************************************************************************************************
  * API IMPLEMENTATION
@@ -55,9 +55,9 @@ void XMC_ERU_Enable(XMC_ERU_t *const eru)
 #if defined(XMC_ERU1)
   if (eru == XMC_ERU1)
   {
-    #if (UC_SERIES != XMC45) 
-      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_ERU1);
-    #endif
+#if defined(CLOCK_GATING_SUPPORTED)
+    XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_ERU1);
+#endif
     XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_ERU1);
   }
 #else
@@ -72,7 +72,7 @@ void XMC_ERU_Disable(XMC_ERU_t *const eru)
   if (eru == XMC_ERU1)
   {
     XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_ERU1);
-    #if (UC_SERIES != XMC45) 
+#if defined(CLOCK_GATING_SUPPORTED)
       XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_ERU1);
     #endif
   }

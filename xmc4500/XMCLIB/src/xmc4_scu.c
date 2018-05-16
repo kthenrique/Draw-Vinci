@@ -1,12 +1,12 @@
 /**
  * @file xmc4_scu.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -48,6 +48,16 @@
  *     - XMC_SCU_INTERRUPT_TriggerEvent,XMC_SCU_INTERUPT_GetEventStatus,
  *     - XMC_SCU_INTERRUPT_ClearEventStatus are added
  *     - Added Weak implementation for OSCHP_GetFrequency()
+ *
+ * 2015-11-30:
+ *     - Documentation improved <br>
+ *     - Following API functionalities are improved
+ *       XMC_SCU_CLOCK_GatePeripheralClock, XMC_SCU_CLOCK_UngatePeripheralClock, XMC_SCU_CLOCK_IsPeripheralClockGated
+ *       XMC_SCU_RESET_AssertPeripheralReset, XMC_SCU_RESET_DeassertPeripheralReset, XMC_SCU_RESET_IsPeripheralResetAsserted
+ * 2015-12-08:
+ *     - XMC_SCU_GetTemperature renamed to XMC_SCU_GetTemperatureMeasurement
+ <br>
+ *
  * @endcond 
  *
  */
@@ -85,23 +95,25 @@
 /*********************************************************************************************************************
  * MACROS
  ********************************************************************************************************************/
-/* MHOR */
-#define OSCHP_FREQUENCY (12000000U)
-
-#define FOSCREF   (2500000UL)
-#define FREQ_1MHZ (1000000UL)
+#define FOSCREF   (2500000UL)    /**< Oscillator reference frequency (fOSCREF) monitored by Oscillator watchdog  */
+#define FREQ_1MHZ (1000000UL)    /**< Used during calculation. */
 
 #ifndef OFI_FREQUENCY
-#define OFI_FREQUENCY (24000000UL)
+#define OFI_FREQUENCY (24000000UL)    /**< Fast internal backup clock source. */
 #endif
 
 #ifndef OSI_FREQUENCY
-#define OSI_FREQUENCY (32768UL)
+#define OSI_FREQUENCY (32768UL)    /**< Internal slow clock source. */
+#endif
+
+#ifndef OSCHP_FREQUENCY
+#define OSCHP_FREQUENCY (12000000U)    /**< External crystal High Precision Oscillator. */
 #endif
 
 #define XMC_SCU_PLL_PLLSTAT_OSC_USABLE  (SCU_PLL_PLLSTAT_PLLHV_Msk | \
                                          SCU_PLL_PLLSTAT_PLLLV_Msk | \
-                                         SCU_PLL_PLLSTAT_PLLSP_Msk)
+                                         SCU_PLL_PLLSTAT_PLLSP_Msk)  /**< Used to verify the OSC frequency is
+                                                                          usable or not.*/
 
 #define XMC_SCU_ORC_ADC_START_GROUP    (0UL)    /**< The ADC group whose channel input is compared by Out of Range  
                                                      Comparator (ORC) to serves the purpose of overvoltage monitoring
@@ -132,29 +144,33 @@
                                                                                       within specified ADC start and 
                                                                                       end channel number or not. */
 
-#define XMC_SCU_INTERRUPT_EVENT_MAX            (32U)
+#define XMC_SCU_INTERRUPT_EVENT_MAX            (32U)      /**< Maximum supported SCU events. */
 
 /*********************************************************************************************************************
  * LOCAL DATA
  ********************************************************************************************************************/
-XMC_SCU_INTERRUPT_EVENT_HANDLER_t event_handler_list[XMC_SCU_INTERRUPT_EVENT_MAX];
+XMC_SCU_INTERRUPT_EVENT_HANDLER_t event_handler_list[XMC_SCU_INTERRUPT_EVENT_MAX]; /**< For registering callback
+                                                                                        functions on SCU event
+                                                                                        occurrence. */
 
 /*********************************************************************************************************************
  * LOCAL ROUTINES
  ********************************************************************************************************************/
  #if defined(UC_ID)
+/* This is a non-weak function, which retrieves high precision external oscillator frequency. */
 __WEAK uint32_t OSCHP_GetFrequency(void)
 {
-  return OSCHP_FREQUENCY;
+  return (OSCHP_FREQUENCY);
 }
 #endif
 
+/* This is a local function used to generate the delay until register get updated with new configured value.  */
 static void XMC_SCU_lDelay(uint32_t cycles);
 
 /*********************************************************************************************************************
  * API IMPLEMENTATION
  ********************************************************************************************************************/
-
+/* This is a local function used to generate the delay until register get updated with new configured value.  */
 void XMC_SCU_lDelay(uint32_t delay)
 {
   uint32_t i;
@@ -189,7 +205,7 @@ void XMC_SCU_INTERRUPT_TriggerEvent(const XMC_SCU_INTERRUPT_EVENT_t event)
 /* API to retrieve the SCU event status */
 XMC_SCU_INTERRUPT_EVENT_t XMC_SCU_INTERUPT_GetEventStatus(void)
 {
-  return SCU_INTERRUPT->SRRAW;
+  return (SCU_INTERRUPT->SRRAW);
 }
 
 /* API to clear the SCU event status */
@@ -249,22 +265,25 @@ void XMC_SCU_CalibrateTemperatureSensor(uint32_t offset, uint32_t gain)
                         (uint32_t)(0x4UL << SCU_GENERAL_DTSCON_REFTRIM_Pos) |
                         (uint32_t)(0x8UL << SCU_GENERAL_DTSCON_BGTRIM_Pos));
 }
-
+/* API to enable die temperature measurement by powering the DTS module. */
 void XMC_SCU_EnableTemperatureSensor(void)
 {
   SCU_GENERAL->DTSCON &= (uint32_t)~(SCU_GENERAL_DTSCON_PWD_Msk);
 }
 
+/* API to disable die temperature measurement by powering the DTS module off. */
 void XMC_SCU_DisableTemperatureSensor(void)
 {
   SCU_GENERAL->DTSCON |= (uint32_t)SCU_GENERAL_DTSCON_PWD_Msk;
 }
 
+/* API to provide the die temperature sensor power status. */
 bool XMC_SCU_IsTemperatureSensorEnabled(void)
 {
   return ((SCU_GENERAL->DTSCON & SCU_GENERAL_DTSCON_PWD_Msk) == 0U);
 }
 
+/* API to check if the die temperature sensor is ready to start a measurement. */
 bool XMC_SCU_IsTemperatureSensorReady(void)
 {
   return ((SCU_GENERAL->DTSSTAT & SCU_GENERAL_DTSSTAT_RDY_Msk) != 0U);
@@ -291,7 +310,7 @@ XMC_SCU_STATUS_t XMC_SCU_StartTemperatureMeasurement(void)
 }
 
 /* API to retrieve the temperature measured */
-uint32_t XMC_SCU_GetTemperature(void)
+uint32_t XMC_SCU_GetTemperatureMeasurement(void)
 {
   uint32_t temperature;
 
@@ -314,8 +333,8 @@ bool XMC_SCU_IsTemperatureSensorBusy(void)
 }
 
 
+#if defined(SCU_GENERAL_DTEMPLIM_LOWER_Msk) && defined(SCU_GENERAL_DTEMPLIM_UPPER_Msk)
 /* API to determine if device temperature has gone past the ceiling */
-#if (UC_SERIES != XMC45)
 bool XMC_SCU_HighTemperature(void)
 {
   bool ret_val;
@@ -340,14 +359,14 @@ bool XMC_SCU_HighTemperature(void)
     
     if(dtempalarm)
     {
-	    ret_val = true;
+      ret_val = true;
     }
     else
     {
-	    ret_val = false;
+      ret_val = false;
     }
   }
-  return ret_val; 
+  return (ret_val);
 }
 
 /* API to program raw values of temperature limits into the DTS */
@@ -385,15 +404,15 @@ bool XMC_SCU_LowTemperature(void)
     
     if(dtempalarm)
     {
-	    ret_val = true;
+      ret_val = true;
     }
     else
     {
-	    ret_val = false;
+      ret_val = false;
     }
   }
   
-  return ret_val; 
+  return (ret_val);
 }
 #endif  
 
@@ -451,21 +470,21 @@ void XMC_SCU_CLOCK_Init(const XMC_SCU_CLOCK_CONFIG_t *const config)
   XMC_ASSERT("", config->fperipheral_clkdiv != 0);
   XMC_ASSERT("", ((config->syspll_config.p_div != 0) &&
                   (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL)) ||
-		          (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR));
+                  (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR));
   XMC_ASSERT("", ((config->syspll_config.n_div != 0) &&
                   (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL)) ||
-		          (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR));
+                  (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR));
   XMC_ASSERT("", (config->syspll_config.k_div != 0) &&
-		         ((config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL) ||
+                 ((config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL) ||
                   (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR)));
   XMC_ASSERT("", ((config->fsys_clksrc == XMC_SCU_CLOCK_SYSCLKSRC_PLL) ||
-		          (config->fsys_clksrc == XMC_SCU_CLOCK_SYSCLKSRC_OFI)) &&
-    		      ((config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL) ||
+                 (config->fsys_clksrc == XMC_SCU_CLOCK_SYSCLKSRC_OFI)) &&
+                 ((config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_NORMAL) ||
                   (config->syspll_config.mode == XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR)));
   XMC_ASSERT("", ((config->fstdby_clksrc == XMC_SCU_HIB_STDBYCLKSRC_OSCULP) && (config->enable_osculp == true)) ||
-		          (config->fstdby_clksrc != XMC_SCU_HIB_STDBYCLKSRC_OSCULP));
+                 (config->fstdby_clksrc != XMC_SCU_HIB_STDBYCLKSRC_OSCULP));
   XMC_ASSERT("", ((config->syspll_config.clksrc == XMC_SCU_CLOCK_SYSPLLCLKSRC_OSCHP) &&
-		         (config->enable_oschp == true)) || (config->syspll_config.clksrc != XMC_SCU_CLOCK_SYSPLLCLKSRC_OSCHP));
+                 (config->enable_oschp == true)) || (config->syspll_config.clksrc != XMC_SCU_CLOCK_SYSPLLCLKSRC_OSCHP));
 
   XMC_SCU_CLOCK_SetSystemClockSource(XMC_SCU_CLOCK_SYSCLKSRC_OFI);
 
@@ -526,7 +545,7 @@ void XMC_SCU_TRAP_Disable(const uint32_t trap)
 /* API to determine if a trap source has generated event */
 uint32_t XMC_SCU_TRAP_GetStatus(void)
 {
-  return SCU_TRAP->TRAPRAW;
+  return (SCU_TRAP->TRAPRAW);
 }
 
 /* API to manually trigger a trap event */
@@ -550,24 +569,28 @@ void XMC_SCU_PARITY_ClearStatus(const uint32_t memory)
 /* API to determine if the specified parity error has occured or not */
 uint32_t XMC_SCU_PARITY_GetStatus(void)
 {
-  return SCU_PARITY->PEFLAG;
+  return (SCU_PARITY->PEFLAG);
 } 
 
+/* API to enable parity error checking for the selected on-chip RAM type */
 void XMC_SCU_PARITY_Enable(const uint32_t memory)
 {
   SCU_PARITY->PEEN |= (uint32_t)memory; 
 }
 
+/* API to disable parity error checking for the selected on-chip RAM type */
 void XMC_SCU_PARITY_Disable(const uint32_t memory)
 {
   SCU_PARITY->PEEN &= (uint32_t)~memory; 
 }
 
+/* API to enable trap assertion for the parity error source */
 void XMC_SCU_PARITY_EnableTrapGeneration(const uint32_t memory)
 {
   SCU_PARITY->PETE |= (uint32_t)memory; 
 }
 
+/* API to disable the assertion of trap for the parity error source */
 void XMC_SCU_PARITY_DisableTrapGeneration(const uint32_t memory)
 {
   SCU_PARITY->PETE &= (uint32_t)~memory; 
@@ -590,18 +613,8 @@ void XMC_SCU_RESET_AssertPeripheralReset(const XMC_SCU_PERIPHERAL_RESET_t periph
 {
   uint32_t index = (uint32_t)((((uint32_t)peripheral) & 0xf0000000UL) >> 28UL);
   uint32_t mask = (((uint32_t)peripheral) & ((uint32_t)~0xf0000000UL));
-#if UC_SERIES == XMC45
-  static __O uint32_t *const set_peripheral_reset[] = {&(SCU_RESET->PRSET0),
-                                                       &(SCU_RESET->PRSET1),
-                                                       &(SCU_RESET->PRSET2),
-                                                       &(SCU_RESET->PRSET3)};
-#else
-   static __O uint32_t *const set_peripheral_reset[] = {&(SCU_RESET->PRSET0),
-                                                        &(SCU_RESET->PRSET1),
-                                                        &(SCU_RESET->PRSET2)};
-#endif
 
-  *set_peripheral_reset[index] |= (uint32_t)mask;
+  *(uint32_t *)(&(SCU_RESET->PRSET0) + (index * 3U)) |= (uint32_t)mask;
 }
 
 /* API to manually de-assert a reset request */
@@ -609,18 +622,8 @@ void XMC_SCU_RESET_DeassertPeripheralReset(const XMC_SCU_PERIPHERAL_RESET_t peri
 {
   uint32_t index = (uint32_t)((((uint32_t)peripheral) & 0xf0000000UL) >> 28UL);
   uint32_t mask = (((uint32_t)peripheral) & ((uint32_t)~0xf0000000UL));
-#if UC_SERIES == XMC45
-  static __O uint32_t *const clear_peripheral_reset[] = {&(SCU_RESET->PRCLR0),
-                                                         &(SCU_RESET->PRCLR1),
-                                                         &(SCU_RESET->PRCLR2),
-                                                         &(SCU_RESET->PRCLR3)};
-#else
-  static __O uint32_t *const clear_peripheral_reset[] = {&(SCU_RESET->PRCLR0),
-                                                         &(SCU_RESET->PRCLR1),
-                                                         &(SCU_RESET->PRCLR2)};
-#endif
 
-  *clear_peripheral_reset[index] |= (uint32_t)mask;
+  *(uint32_t *)(&(SCU_RESET->PRCLR0) + (index * 3U)) |= (uint32_t)mask;
 }
 
 /* Find out if the peripheral reset is asserted */
@@ -628,18 +631,8 @@ bool XMC_SCU_RESET_IsPeripheralResetAsserted(const XMC_SCU_PERIPHERAL_RESET_t pe
 {
   uint32_t index = (uint32_t)((((uint32_t)peripheral) & 0xf0000000UL) >> 28UL);
   uint32_t mask = (((uint32_t)peripheral) & ((uint32_t)~0xf0000000UL));
-#if UC_SERIES == XMC45
-  static __I uint32_t *const clear_peripheral_reset[] = {&(SCU_RESET->PRSTAT0),
-                                                         &(SCU_RESET->PRSTAT1),
-                                                         &(SCU_RESET->PRSTAT2),
-                                                         &(SCU_RESET->PRSTAT3)};
-#else
-  static __I uint32_t *const clear_peripheral_reset[] = {&(SCU_RESET->PRSTAT0),
-                                                         &(SCU_RESET->PRSTAT1),
-                                                         &(SCU_RESET->PRSTAT2)};
-#endif
 
-  return (bool)(*clear_peripheral_reset[index] & mask);
+  return ((*(uint32_t *)(&(SCU_RESET->PRSTAT0) + (index * 3U)) & mask) != 0U);
 }
 
 /*
@@ -668,7 +661,7 @@ uint32_t XMC_SCU_CLOCK_GetSystemPllClockFrequency(void)
     clock_frequency = (clock_frequency * n_div) / (p_div * k2_div);
   }
 
-  return clock_frequency;  
+  return (clock_frequency);
 }
 
 /**
@@ -688,7 +681,7 @@ uint32_t XMC_SCU_CLOCK_GetSystemPllClockSourceFrequency(void)
     clock_frequency = OFI_FREQUENCY;
   }
   
-  return clock_frequency;
+  return (clock_frequency);
 }
 
 /*
@@ -708,16 +701,19 @@ uint32_t XMC_SCU_CLOCK_GetUsbPllClockFrequency(void)
     p_div = (uint32_t)((((SCU_PLL->USBPLLCON) & SCU_PLL_USBPLLCON_PDIV_Msk) >> SCU_PLL_USBPLLCON_PDIV_Pos) + 1UL);
     clock_frequency = (uint32_t)((clock_frequency * n_div)/ (uint32_t)(p_div * 2UL));
   }
-  return clock_frequency;  
+  return (clock_frequency);
 }
 
+/*
+ * API to retrieve frequency of CCU clock frequency
+ */
 uint32_t XMC_SCU_CLOCK_GetCcuClockFrequency(void)
 {
   uint32_t frequency = 0UL;
   frequency = XMC_SCU_CLOCK_GetSystemClockFrequency();
   
   return (uint32_t)(frequency >> ((uint32_t)((SCU_CLK->CCUCLKCR & SCU_CLK_CCUCLKCR_CCUDIV_Msk) >>
-		                                     SCU_CLK_CCUCLKCR_CCUDIV_Pos)));
+                                              SCU_CLK_CCUCLKCR_CCUDIV_Pos)));
 }
 
 /*
@@ -743,20 +739,40 @@ uint32_t XMC_SCU_CLOCK_GetUsbClockFrequency(void)
   }
 
   return (uint32_t)(frequency / (((SCU_CLK->USBCLKCR & SCU_CLK_USBCLKCR_USBDIV_Msk) >>
-		                           SCU_CLK_USBCLKCR_USBDIV_Pos) + 1UL));
+                                   SCU_CLK_USBCLKCR_USBDIV_Pos) + 1UL));
 }
 
-#if(UC_SERIES == XMC45)
+#if defined(EBU)
 /*
  * API to retrieve EBU clock frequency
  */
 uint32_t XMC_SCU_CLOCK_GetEbuClockFrequency(void)
 {
-  uint32_t frequency = 0UL;
-  frequency = XMC_SCU_CLOCK_GetSystemPllClockFrequency();
+  uint32_t frequency = XMC_SCU_CLOCK_GetSystemPllClockFrequency();
   
   return (uint32_t)((frequency /(((SCU_CLK->EBUCLKCR & SCU_CLK_EBUCLKCR_EBUDIV_Msk) >>
-		                           SCU_CLK_EBUCLKCR_EBUDIV_Pos) + 1UL)));
+                                   SCU_CLK_EBUCLKCR_EBUDIV_Pos) + 1UL)));
+}
+#endif
+
+#if defined(ECAT0)
+/*
+ * API to retrieve ECAT clock frequency
+ */
+uint32_t XMC_SCU_CLOCK_GetECATClockFrequency(void)
+{
+  uint32_t frequency;
+
+  if ((SCU_CLK->ECATCLKCR & SCU_CLK_ECATCLKCR_ECATSEL_Msk) != 0U)
+  {
+    frequency =  XMC_SCU_CLOCK_GetSystemPllClockFrequency();
+  }
+  else
+  {
+    frequency =  XMC_SCU_CLOCK_GetUsbPllClockFrequency();
+  }
+
+  return (uint32_t)((frequency / (XMC_SCU_CLOCK_GetECATClockDivider() + 1UL)));
 }
 #endif
 
@@ -788,7 +804,7 @@ uint32_t XMC_SCU_CLOCK_GetWdtClockFrequency(void)
   }
 
   return (uint32_t)((frequency / (((SCU_CLK->WDTCLKCR & SCU_CLK_WDTCLKCR_WDTDIV_Msk) >>
-		                            SCU_CLK_WDTCLKCR_WDTDIV_Pos) + 1UL)));
+                                    SCU_CLK_WDTCLKCR_WDTDIV_Pos) + 1UL)));
 }
 
 /**
@@ -906,7 +922,7 @@ void XMC_SCU_HIB_SetStandbyClockSource(const XMC_SCU_HIB_STDBYCLKSRC_t source)
 void XMC_SCU_CLOCK_SetSystemClockDivider(const uint32_t divider)
 {
   XMC_ASSERT("XMC_SCU_CLOCK_SetSystemClockDivider:Wrong clock divider value",
-		      (divider <= (SCU_CLK_SYSCLKCR_SYSDIV_Msk + 1UL)) );
+              (divider <= (SCU_CLK_SYSCLKCR_SYSDIV_Msk + 1UL)) );
 
   SCU_CLK->SYSCLKCR = (SCU_CLK->SYSCLKCR & ((uint32_t)~SCU_CLK_SYSCLKCR_SYSDIV_Msk)) |
                       ((uint32_t)(((uint32_t)(divider - 1UL)) << SCU_CLK_SYSCLKCR_SYSDIV_Pos));
@@ -943,7 +959,7 @@ void XMC_SCU_CLOCK_SetPeripheralClockDivider(const uint32_t divider)
 void XMC_SCU_CLOCK_SetUsbClockDivider(const uint32_t divider)
 {
   XMC_ASSERT("XMC_SCU_CLOCK_SetSdmmcClockDivider:Wrong clock divider value",
-		      (divider <= (SCU_CLK_USBCLKCR_USBDIV_Msk + 1UL)) );
+              (divider <= (SCU_CLK_USBCLKCR_USBDIV_Msk + 1UL)) );
 
   SCU_CLK->USBCLKCR = (SCU_CLK->USBCLKCR & ((uint32_t)~SCU_CLK_USBCLKCR_USBDIV_Msk)) |
                       (uint32_t)((uint32_t)(divider - 1UL) << SCU_CLK_USBCLKCR_USBDIV_Pos); 
@@ -954,7 +970,7 @@ void XMC_SCU_CLOCK_SetUsbClockDivider(const uint32_t divider)
 void XMC_SCU_CLOCK_SetEbuClockDivider(const uint32_t divider)
 {
   XMC_ASSERT("XMC_SCU_CLOCK_SetEbuClockDivider:Wrong clock divider value",
-		      (divider <= (SCU_CLK_EBUCLKCR_EBUDIV_Msk + 1UL) ) );
+              (divider <= (SCU_CLK_EBUCLKCR_EBUDIV_Msk + 1UL) ) );
 
   SCU_CLK->EBUCLKCR = (SCU_CLK->EBUCLKCR & ((uint32_t)~SCU_CLK_EBUCLKCR_EBUDIV_Msk)) |
                       (uint32_t)(((uint32_t)(divider - 1UL)) << SCU_CLK_EBUCLKCR_EBUDIV_Pos);
@@ -965,7 +981,7 @@ void XMC_SCU_CLOCK_SetEbuClockDivider(const uint32_t divider)
 void XMC_SCU_CLOCK_SetWdtClockDivider(const uint32_t divider)
 {
   XMC_ASSERT("XMC_SCU_CLOCK_SetWdtClockDivider:Wrong clock divider value",
-		      (divider <= (SCU_CLK_WDTCLKCR_WDTDIV_Msk + 1UL) ) );
+              (divider <= (SCU_CLK_WDTCLKCR_WDTDIV_Msk + 1UL) ) );
 
   SCU_CLK->WDTCLKCR = (SCU_CLK->WDTCLKCR & ((uint32_t)~SCU_CLK_WDTCLKCR_WDTDIV_Msk)) |
                       (uint32_t)(((uint32_t)(divider - 1UL)) << SCU_CLK_WDTCLKCR_WDTDIV_Pos);
@@ -975,11 +991,20 @@ void XMC_SCU_CLOCK_SetWdtClockDivider(const uint32_t divider)
 void XMC_SCU_CLOCK_SetExternalOutputClockDivider(const uint32_t divider)
 {
   XMC_ASSERT("XMC_SCU_CLOCK_SetExternalOutputClockDivider:Wrong clock divider value",
-		      (divider <= (SCU_CLK_EXTCLKCR_ECKDIV_Msk + 1UL) ) );
+              (divider <= (SCU_CLK_EXTCLKCR_ECKDIV_Msk + 1UL) ) );
 
   SCU_CLK->EXTCLKCR = (SCU_CLK->EXTCLKCR & ((uint32_t)~SCU_CLK_EXTCLKCR_ECKDIV_Msk)) |
                       (uint32_t)(((uint32_t)(divider - 1UL)) << SCU_CLK_EXTCLKCR_ECKDIV_Pos);
 }
+
+#if defined(ECAT0)
+/* API to configure the ECAT clock by setting the clock divider for the ECAT clock source */
+void XMC_SCU_CLOCK_SetECATClockDivider(const uint32_t divider)
+{
+  SCU_CLK->ECATCLKCR = (SCU_CLK->ECATCLKCR & ~SCU_CLK_ECATCLKCR_ECADIV_Msk) |
+                       (uint32_t)(((uint32_t)(divider - 1UL)) << SCU_CLK_ECATCLKCR_ECADIV_Pos);
+}
+#endif
 
 /* API to enable a given module clock */
 void XMC_SCU_CLOCK_EnableClock(const XMC_SCU_CLOCK_t clock)
@@ -999,15 +1024,14 @@ bool XMC_SCU_CLOCK_IsClockEnabled(const XMC_SCU_CLOCK_t clock)
   return (bool)(SCU_CLK->CLKSTAT & ((uint32_t)clock));
 }
 
-#if(UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
+/* API to gate a given module clock */
 void XMC_SCU_CLOCK_GatePeripheralClock(const XMC_SCU_PERIPHERAL_CLOCK_t peripheral)
 {
   uint32_t index = (peripheral & 0xf0000000UL) >> 28UL;
   uint32_t mask = (peripheral & (uint32_t)~0xf0000000UL);
-  static __O uint32_t *const set_peripheral_gate[] = {&(SCU_CLK->CGATSET0),
-                                                      &(SCU_CLK->CGATSET1),
-                                                      &(SCU_CLK->CGATSET2)};
-  *set_peripheral_gate[index] |= (uint32_t)mask;
+
+  *(uint32_t *)((&(SCU_CLK->CGATSET0)) + (index * 3U)) |= (uint32_t)mask;
 }
 
 /* API to ungate a given module clock */
@@ -1015,10 +1039,8 @@ void XMC_SCU_CLOCK_UngatePeripheralClock(const XMC_SCU_PERIPHERAL_CLOCK_t periph
 {
   uint32_t index = (uint32_t)((peripheral & 0xf0000000UL) >> 28UL);
   uint32_t mask = (peripheral & (uint32_t)~0xf0000000UL);
-  static __O uint32_t *const clear_peripheral_gate[] = {&(SCU_CLK->CGATCLR0),
-                                                        &(SCU_CLK->CGATCLR1),
-                                                        &(SCU_CLK->CGATCLR2)};
-  *clear_peripheral_gate[index] |= (uint32_t)mask;
+
+  *(uint32_t *)(&(SCU_CLK->CGATCLR0) + (index * 3U)) |= (uint32_t)mask;
 }
 
 /* API to ungate a given module clock */
@@ -1026,18 +1048,18 @@ bool XMC_SCU_CLOCK_IsPeripheralClockGated(const XMC_SCU_PERIPHERAL_CLOCK_t perip
 {
   uint32_t index = ((peripheral & 0xf0000000UL) >> 28UL);
   uint32_t mask = (peripheral & (uint32_t)~0xf0000000UL);
-  static __I uint32_t *const clear_peripheral_gate[] = {&(SCU_CLK->CGATSTAT0),
-                                                        &(SCU_CLK->CGATSTAT1),
-                                                        &(SCU_CLK->CGATSTAT2)};
-  return (bool)(*clear_peripheral_gate[index] & mask);
+
+  return ((*(uint32_t *)(&(SCU_CLK->CGATSTAT0) + (index * 3U)) & mask) != 0U);
 }
 #endif
 
+/* API to enable USB PLL for USB clock */
 void XMC_SCU_CLOCK_EnableUsbPll(void)
 {
   SCU_PLL->USBPLLCON &= (uint32_t)~(SCU_PLL_USBPLLCON_VCOPWD_Msk | SCU_PLL_USBPLLCON_PLLPWD_Msk);
 }
 
+/* API to disable USB PLL for USB clock */
 void XMC_SCU_CLOCK_DisableUsbPll(void)
 {
   SCU_PLL->USBPLLCON |= (uint32_t)(SCU_PLL_USBPLLCON_VCOPWD_Msk | SCU_PLL_USBPLLCON_PLLPWD_Msk);
@@ -1072,12 +1094,14 @@ void XMC_SCU_CLOCK_StartUsbPll(uint32_t pdiv, uint32_t ndiv)
 
 }
 
+/* API to disable USB PLL operation */
 void XMC_SCU_CLOCK_StopUsbPll(void)
 {
   SCU_PLL->USBPLLCON = (uint32_t)(SCU_PLL_USBPLLCON_VCOPWD_Msk | SCU_PLL_USBPLLCON_PLLPWD_Msk |
-		                          SCU_PLL_USBPLLCON_VCOBYP_Msk);
+                                  SCU_PLL_USBPLLCON_VCOBYP_Msk);
 }
 
+/* API to onfigure the calibration mode for internal oscillator */
 void XMC_SCU_CLOCK_SetBackupClockCalibrationMode(XMC_SCU_CLOCK_FOFI_CALIBRATION_MODE_t mode)
 {
   /* Enable factory calibration based trimming */
@@ -1099,21 +1123,24 @@ void XMC_SCU_CLOCK_SetBackupClockCalibrationMode(XMC_SCU_CLOCK_FOFI_CALIBRATION_
 /* API to enable USB Phy and comparator */
 void XMC_SCU_POWER_EnableUsb(void)
 {
+#if defined(USB_OTG_SUPPORTED)
+  SCU_POWER->PWRSET |= (uint32_t)(SCU_POWER_PWRSET_USBOTGEN_Msk | SCU_POWER_PWRSET_USBPHYPDQ_Msk);
+#else
   SCU_POWER->PWRSET |= (uint32_t)SCU_POWER_PWRSET_USBPHYPDQ_Msk;
-#if ((UC_SERIES == XMC45) || (UC_SERIES == XMC44))
-  SCU_POWER->PWRSET |= (uint32_t)SCU_POWER_PWRSET_USBOTGEN_Msk;
-#endif  
+#endif
 }
 
 /* API to power down USB Phy and comparator */
 void XMC_SCU_POWER_DisableUsb(void)
 {
-  SCU_POWER->PWRCLR |= (uint32_t)SCU_POWER_PWRSET_USBPHYPDQ_Msk;
-#if ((UC_SERIES == XMC45) || (UC_SERIES == XMC44))
-  SCU_POWER->PWRCLR |= (uint32_t)SCU_POWER_PWRSET_USBOTGEN_Msk;
-#endif  
+#if defined(USB_OTG_SUPPORTED)
+  SCU_POWER->PWRCLR |= (uint32_t)(SCU_POWER_PWRCLR_USBOTGEN_Msk | SCU_POWER_PWRSET_USBPHYPDQ_Msk);
+#else
+  SCU_POWER->PWRCLR |= (uint32_t)SCU_POWER_PWRCLR_USBPHYPDQ_Msk;
+#endif    
 }
 
+/* API to check USB PLL is locked or not */
 bool XMC_SCU_CLOCK_IsUsbPllLocked(void)
 {
   return (bool)((SCU_PLL->USBPLLSTAT & SCU_PLL_USBPLLSTAT_VCOLOCK_Msk) != 0UL);
@@ -1150,6 +1177,7 @@ void XMC_SCU_HIB_DisableHibernateDomain(void)
   SCU_RESET->RSTSET |= (uint32_t)SCU_RESET_RSTSET_HIBRS_Msk;
 }
 
+/* API to check the hibernation domain is enabled or not */
 bool XMC_SCU_HIB_IsHibernateDomainEnabled(void)
 {
   return ((bool)(SCU_POWER->PWRSTAT & SCU_POWER_PWRSTAT_HIBEN_Msk) && 
@@ -1218,13 +1246,13 @@ void XMC_SCU_CLOCK_DisableLowPowerOscillator(void)
   }
 }
 
-/* API to configure High Precision High Speed oscillator */
+/* API to enable High Precision High Speed oscillator */
 void XMC_SCU_CLOCK_EnableHighPerformanceOscillator(void)
 {
   SCU_PLL->PLLCON0 &= (uint32_t)~SCU_PLL_PLLCON0_PLLPWD_Msk;
 
   SCU_OSC->OSCHPCTRL = (uint32_t)((SCU_OSC->OSCHPCTRL & ~(SCU_OSC_OSCHPCTRL_MODE_Msk | SCU_OSC_OSCHPCTRL_OSCVAL_Msk)) |
-		                          (((OSCHP_GetFrequency() / FOSCREF) - 1UL) << SCU_OSC_OSCHPCTRL_OSCVAL_Pos));
+                                  (((OSCHP_GetFrequency() / FOSCREF) - 1UL) << SCU_OSC_OSCHPCTRL_OSCVAL_Pos));
 
   /* restart OSC Watchdog */
   SCU_PLL->PLLCON0 &= (uint32_t)~SCU_PLL_PLLCON0_OSCRES_Msk;
@@ -1235,21 +1263,25 @@ void XMC_SCU_CLOCK_EnableHighPerformanceOscillator(void)
   }
 }
 
+/* API to disable High Precision High Speed oscillator */
 void XMC_SCU_CLOCK_DisableHighPerformanceOscillator(void)
 {
   SCU_OSC->OSCHPCTRL |= (uint32_t)SCU_OSC_OSCHPCTRL_MODE_Msk;
 }
 
+/* API to enable main PLL */
 void XMC_SCU_CLOCK_EnableSystemPll(void)
 {
   SCU_PLL->PLLCON0 &= (uint32_t)~(SCU_PLL_PLLCON0_VCOPWD_Msk | SCU_PLL_PLLCON0_PLLPWD_Msk);
 }
 
+/* API to disable main PLL */
 void XMC_SCU_CLOCK_DisableSystemPll(void)
 {
   SCU_PLL->PLLCON0 |= (uint32_t)(SCU_PLL_PLLCON0_VCOPWD_Msk | SCU_PLL_PLLCON0_PLLPWD_Msk);
 }
 
+/* API to configure main PLL */
 void XMC_SCU_CLOCK_StartSystemPll(XMC_SCU_CLOCK_SYSPLLCLKSRC_t source,
                                   XMC_SCU_CLOCK_SYSPLL_MODE_t mode,
                                   uint32_t pdiv,
@@ -1284,7 +1316,7 @@ void XMC_SCU_CLOCK_StartSystemPll(XMC_SCU_CLOCK_SYSPLLCLKSRC_t source,
 
     /* Setup divider settings for main PLL */
     SCU_PLL->PLLCON1 = (uint32_t)((SCU_PLL->PLLCON1 & ~(SCU_PLL_PLLCON1_NDIV_Msk | SCU_PLL_PLLCON1_K2DIV_Msk |
-    		                       SCU_PLL_PLLCON1_PDIV_Msk)) | ((ndiv - 1UL) << SCU_PLL_PLLCON1_NDIV_Pos) |
+                                   SCU_PLL_PLLCON1_PDIV_Msk)) | ((ndiv - 1UL) << SCU_PLL_PLLCON1_NDIV_Pos) |
                                    ((kdiv_temp - 1UL) << SCU_PLL_PLLCON1_K2DIV_Pos) |
                                    ((pdiv - 1UL)<< SCU_PLL_PLLCON1_PDIV_Pos));
 
@@ -1338,11 +1370,13 @@ void XMC_SCU_CLOCK_StartSystemPll(XMC_SCU_CLOCK_SYSPLLCLKSRC_t source,
   }
 }
 
+/* API to stop main PLL operation */
 void XMC_SCU_CLOCK_StopSystemPll(void)
 {
   SCU_PLL->PLLCON0 |= (uint32_t)SCU_PLL_PLLCON0_PLLPWD_Msk;
 }
 
+/* API to step up/down the main PLL frequency */
 void XMC_SCU_CLOCK_StepSystemPllFrequency(uint32_t kdiv)
 {
   SCU_PLL->PLLCON1 = (uint32_t)((SCU_PLL->PLLCON1 & ~SCU_PLL_PLLCON1_K2DIV_Msk) |
@@ -1351,16 +1385,17 @@ void XMC_SCU_CLOCK_StepSystemPllFrequency(uint32_t kdiv)
   XMC_SCU_lDelay(50U);
 }
 
+/* API to check main PLL is locked or not */
 bool XMC_SCU_CLOCK_IsSystemPllLocked(void)
 {
   return (bool)((SCU_PLL->PLLSTAT & SCU_PLL_PLLSTAT_VCOLOCK_Msk) != 0UL);
 }
 
 /*
- *
+ * API to assign the event handler function to be executed on occurrence of the selected event.
  */
 XMC_SCU_STATUS_t XMC_SCU_INTERRUPT_SetEventHandler(const XMC_SCU_INTERRUPT_EVENT_t event,
-		                                           const XMC_SCU_INTERRUPT_EVENT_HANDLER_t handler)
+                                                   const XMC_SCU_INTERRUPT_EVENT_HANDLER_t handler)
 {
   uint32_t index;
   XMC_SCU_STATUS_t status;
@@ -1381,11 +1416,11 @@ XMC_SCU_STATUS_t XMC_SCU_INTERRUPT_SetEventHandler(const XMC_SCU_INTERRUPT_EVENT
     status = XMC_SCU_STATUS_OK;      
   }
   
-  return status;
+  return (status);
 }
 
 /*
- *
+ * API to execute callback functions for multiple events.
  */
 void XMC_SCU_IRQHandler(uint32_t sr_num)
 {

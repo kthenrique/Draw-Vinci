@@ -1,12 +1,12 @@
 /**
  * @file xmc_dac.h
- * @date 2015-06-19 
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -51,6 +51,9 @@
  *
  * 2015-06-19:
  *     - Removed version macros and declaration of GetDriverVersion API
+ *
+ * 2015-08-31:
+ *     - Help document updated
  * @endcond 
  *
  */
@@ -122,8 +125,39 @@
 #define XMC_DAC_PATTERN_SINE      {0U, 6U, 12U, 17U, 22U, 26U, 29U, 30U, 31U} /**< First quarter Sine waveform samples */
 #define XMC_DAC_PATTERN_RECTANGLE {31U, 31U, 31U, 31U, 31U, 31U, 31U, 31U, 31U} /**< First quarter Rectangle waveform samples */
 
-#define XMC_DAC_IS_DAC_VALID(PTR)  ( ((PTR) == XMC_DAC0))  /*< Pointer validation for DAC module */
-#define XMC_DAC_IS_CHANNEL_VALID(CH)  (((CH) == 0U) || ((CH) == 1U)) /*< CH validation */
+#define XMC_DAC_IS_DAC_VALID(PTR)            ((PTR) == XMC_DAC0)
+#define XMC_DAC_IS_CHANNEL_VALID(CH)         (CH < XMC_DAC_NO_CHANNELS)
+#define XMC_DAC_IS_TRIGGER_VALID(TRIGGER)    ((TRIGGER == XMC_DAC_CH_TRIGGER_INTERNAL) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_CCU80_SR1) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_CCU40_SR1) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_CCU41_SR1) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_P2_9) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_P2_8) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_U0C0_DX1INS) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_EXTERNAL_U1C0_DX1INS) ||\
+                                              (TRIGGER == XMC_DAC_CH_TRIGGER_SOFTWARE))
+#define XMC_DAC_IS_MODE_VALID(MODE)          ((MODE == XMC_DAC_CH_MODE_IDLE) ||\
+                                              (MODE == XMC_DAC_CH_MODE_SINGLE) ||\
+                                              (MODE == XMC_DAC_CH_MODE_DATA) ||\
+                                              (MODE == XMC_DAC_CH_MODE_PATTERN) ||\
+                                              (MODE == XMC_DAC_CH_MODE_NOISE) ||\
+                                              (MODE == XMC_DAC_CH_MODE_RAMP))
+#define XMC_DAC_IS_OUTPUT_SCALE_VALID(SCALE) ((SCALE == XMC_DAC_CH_OUTPUT_SCALE_NONE) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_2) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_4) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_8) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_16) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_32) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_64) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_MUL_128) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_2) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_4) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_8) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_16) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_32) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_64) ||\
+                                              (SCALE == XMC_DAC_CH_OUTPUT_SCALE_DIV_128))
+                                            
 
 /*******************************************************************************
  * ENUMS
@@ -397,6 +431,8 @@ bool XMC_DAC_IsEnabled(const XMC_DAC_t *const dac);
  */
 __STATIC_INLINE void XMC_DAC_EnableSimultaneousDataMode(XMC_DAC_t *const dac)
 {
+  XMC_ASSERT("XMC_DAC_EnableSimultaneousDataMode: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  
   dac->DACCFG[0].high |= DAC_DAC0CFG1_DATMOD_Msk;
 }
 
@@ -418,6 +454,8 @@ __STATIC_INLINE void XMC_DAC_EnableSimultaneousDataMode(XMC_DAC_t *const dac)
  */
 __STATIC_INLINE void XMC_DAC_DisableSimultaneousDataMode(XMC_DAC_t *const dac)
 {
+  XMC_ASSERT("XMC_DAC_DisableSimultaneousDataMode: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  
   dac->DACCFG[0].high &= ~DAC_DAC0CFG1_DATMOD_Msk;
 }
 
@@ -441,6 +479,8 @@ __STATIC_INLINE void XMC_DAC_DisableSimultaneousDataMode(XMC_DAC_t *const dac)
  */
 __STATIC_INLINE void XMC_DAC_SimultaneousWrite(XMC_DAC_t *const dac, const uint16_t data0, const uint16_t data1)
 {
+  XMC_ASSERT("XMC_DAC_SimultaneousWrite: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  
   dac->DAC01DATA = (data0 << DAC_DAC01DATA_DATA0_Pos) | (data1 << DAC_DAC01DATA_DATA1_Pos);
 }
 
@@ -480,6 +520,9 @@ void XMC_DAC_CH_Init(XMC_DAC_t *const dac, const uint8_t channel, const XMC_DAC_
  */
 __STATIC_INLINE void XMC_DAC_CH_EnableOutput(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_EnableOutput: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_EnableOutput: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACCFG[channel].high |= DAC_DAC0CFG1_ANAEN_Msk;
 }
 
@@ -501,6 +544,9 @@ __STATIC_INLINE void XMC_DAC_CH_EnableOutput(XMC_DAC_t *const dac, const uint8_t
  */
 __STATIC_INLINE void XMC_DAC_CH_DisableOutput(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_DisableOutput: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_DisableOutput: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACCFG[channel].high &= ~DAC_DAC0CFG1_ANAEN_Msk;
 }
 
@@ -524,6 +570,9 @@ __STATIC_INLINE void XMC_DAC_CH_DisableOutput(XMC_DAC_t *const dac, const uint8_
  */
 __STATIC_INLINE bool XMC_DAC_CH_IsOutputEnabled(const XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_IsOutputEnabled: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_IsOutputEnabled: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   return (bool)(dac->DACCFG[channel].high & DAC_DAC0CFG1_ANAEN_Msk);
 }
 
@@ -553,6 +602,9 @@ __STATIC_INLINE bool XMC_DAC_CH_IsOutputEnabled(const XMC_DAC_t *const dac, cons
  */
 __STATIC_INLINE void XMC_DAC_CH_Write(XMC_DAC_t *const dac, const uint8_t channel, const uint16_t data)
 {
+  XMC_ASSERT("XMC_DAC_CH_Write: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_Write: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACDATA[channel] = data;
 }
 
@@ -714,6 +766,9 @@ void XMC_DAC_CH_SetPattern(XMC_DAC_t *const dac, const uint8_t channel, const ui
 __STATIC_INLINE void XMC_DAC_CH_EnablePatternSignOutput(XMC_DAC_t *const dac,
                                                      const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_EnablePatternSignOutput: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_EnablePatternSignOutput: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACCFG[channel].low |= DAC_DAC0CFG0_SIGNEN_Msk;
 }
 
@@ -739,6 +794,9 @@ __STATIC_INLINE void XMC_DAC_CH_EnablePatternSignOutput(XMC_DAC_t *const dac,
 __STATIC_INLINE void XMC_DAC_CH_DisablePatternSignOutput(XMC_DAC_t *const dac,
                                                      const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_DisablePatternSignOutput: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_DisablePatternSignOutput: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACCFG[channel].low &= ~DAC_DAC0CFG0_SIGNEN_Msk;
 }
 
@@ -764,6 +822,9 @@ __STATIC_INLINE void XMC_DAC_CH_DisablePatternSignOutput(XMC_DAC_t *const dac,
  */
 __STATIC_INLINE void XMC_DAC_CH_SetRampStart(XMC_DAC_t *const dac, const uint8_t channel, const uint16_t start)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetRampStart: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetRampStart: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   dac->DACDATA[channel] = start;
 }
 
@@ -786,6 +847,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetRampStart(XMC_DAC_t *const dac, const uint8_t
  */
 __STATIC_INLINE uint16_t XMC_DAC_CH_GetRampStart(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_GetRampStart: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_GetRampStart: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  
   return (uint16_t)(dac->DACDATA[channel]);
 }
 
@@ -811,6 +875,9 @@ __STATIC_INLINE uint16_t XMC_DAC_CH_GetRampStart(XMC_DAC_t *const dac, const uin
  */
 __STATIC_INLINE void XMC_DAC_CH_SetRampStop(XMC_DAC_t *const dac, const uint8_t channel, const uint16_t stop)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetRampStop: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetRampStop: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DAC01DATA = (dac->DAC01DATA & ~(DAC_DAC01DATA_DATA0_Msk << (channel * DAC_DAC01DATA_DATA1_Pos))) |
                (stop << (channel * DAC_DAC01DATA_DATA1_Pos));
 }
@@ -834,6 +901,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetRampStop(XMC_DAC_t *const dac, const uint8_t 
  */
 __STATIC_INLINE uint16_t XMC_DAC_CH_GetRampStop(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_GetRampStop: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_GetRampStop: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+
   return((dac->DAC01DATA >> (channel * DAC_DAC01DATA_DATA1_Pos)) & DAC_DAC01DATA_DATA0_Msk);
 }
 
@@ -853,6 +923,10 @@ __STATIC_INLINE uint16_t XMC_DAC_CH_GetRampStop(XMC_DAC_t *const dac, const uint
  */
 __STATIC_INLINE void XMC_DAC_CH_SetTrigger(XMC_DAC_t *const dac, const uint8_t channel, const XMC_DAC_CH_TRIGGER_t trigger)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetTrigger: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetTrigger: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  XMC_ASSERT("XMC_DAC_CH_SetTrigger: trigger parameter not valid\n", XMC_DAC_IS_TRIGGER_VALID(trigger));
+
   dac->DACCFG[channel].high = (dac->DACCFG[channel].high & ~(DAC_DAC0CFG1_TRIGSEL_Msk | DAC_DAC0CFG1_TRIGMOD_Msk)) |
                               trigger;
 }
@@ -930,6 +1004,9 @@ __STATIC_INLINE XMC_DAC_CH_STATUS_t XMC_DAC_CH_SetPatternFrequency(XMC_DAC_t *co
                                                                    const uint8_t channel,
                                                                    const uint32_t frequency)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetPatternFrequency: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetPatternFrequency: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+
   return XMC_DAC_CH_SetFrequency(dac, channel, frequency * XMC_DAC_SAMPLES_PER_PERIOD);
 }
 
@@ -947,6 +1024,10 @@ __STATIC_INLINE XMC_DAC_CH_STATUS_t XMC_DAC_CH_SetPatternFrequency(XMC_DAC_t *co
  */
 __STATIC_INLINE void XMC_DAC_CH_SetMode(XMC_DAC_t *const dac, const uint8_t channel, const XMC_DAC_CH_MODE_t mode)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetMode: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetMode: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  XMC_ASSERT("XMC_DAC_CH_SetMode: trigger parameter not valid\n", XMC_DAC_IS_MODE_VALID(mode));
+    
   dac->DACCFG[channel].low = (dac->DACCFG[channel].low & ~DAC_DAC0CFG0_MODE_Msk) |
                              mode;
 }
@@ -970,6 +1051,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetMode(XMC_DAC_t *const dac, const uint8_t chan
  */
 __STATIC_INLINE void XMC_DAC_CH_SetSignedDataType(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetSignedDataType: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetSignedDataType: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low |= (DAC_DAC0CFG0_SIGN_Msk);
 }
 
@@ -992,6 +1076,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetSignedDataType(XMC_DAC_t *const dac, const ui
  */
 __STATIC_INLINE void XMC_DAC_CH_SetUnsignedDataType(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetUnsignedDataType: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetUnsignedDataType: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low &= ~(DAC_DAC0CFG0_SIGN_Msk);
 }
 
@@ -1015,6 +1102,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetUnsignedDataType(XMC_DAC_t *const dac, const 
  */
 __STATIC_INLINE void XMC_DAC_CH_SoftwareTrigger(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_SoftwareTrigger: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SoftwareTrigger: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].high |= DAC_DAC0CFG1_SWTRIG_Msk;
 }
 
@@ -1037,6 +1127,9 @@ __STATIC_INLINE void XMC_DAC_CH_SoftwareTrigger(XMC_DAC_t *const dac, const uint
  */
 __STATIC_INLINE void XMC_DAC_CH_EnableEvent(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_EnableEvent: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_EnableEvent: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low |= DAC_DAC0CFG0_SREN_Msk;
 }
 
@@ -1055,6 +1148,9 @@ __STATIC_INLINE void XMC_DAC_CH_EnableEvent(XMC_DAC_t *const dac, const uint8_t 
  */
 __STATIC_INLINE void XMC_DAC_CH_DisableEvent(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_DisableEvent: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_DisableEvent: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low &= ~DAC_DAC0CFG0_SREN_Msk;
 }
 
@@ -1082,6 +1178,9 @@ __STATIC_INLINE void XMC_DAC_CH_DisableEvent(XMC_DAC_t *const dac, const uint8_t
  */
 __STATIC_INLINE void XMC_DAC_CH_SetOutputOffset(XMC_DAC_t *const dac, const uint8_t channel, const uint8_t offset)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetOutputOffset: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetOutputOffset: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].high = (dac->DACCFG[channel].high & ~DAC_DAC0CFG1_OFFS_Msk) |
                               offset << DAC_DAC0CFG1_OFFS_Pos;
 }
@@ -1106,6 +1205,10 @@ __STATIC_INLINE void XMC_DAC_CH_SetOutputOffset(XMC_DAC_t *const dac, const uint
  */
 __STATIC_INLINE void XMC_DAC_CH_SetOutputScale(XMC_DAC_t *const dac, const uint8_t channel, const XMC_DAC_CH_OUTPUT_SCALE_t scale)
 {
+  XMC_ASSERT("XMC_DAC_CH_SetOutputScale: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_SetOutputScale: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+  XMC_ASSERT("XMC_DAC_CH_SetOutputScale: scale parameter not valid\n", XMC_DAC_IS_OUTPUT_SCALE_VALID(scale));
+
   dac->DACCFG[channel].high = (dac->DACCFG[channel].high & ~(DAC_DAC0CFG1_MULDIV_Msk | DAC_DAC0CFG1_SCALE_Msk)) |
                               scale;
 }
@@ -1127,6 +1230,9 @@ __STATIC_INLINE void XMC_DAC_CH_SetOutputScale(XMC_DAC_t *const dac, const uint8
  */
 __STATIC_INLINE XMC_DAC_CH_OUTPUT_SCALE_t XMC_DAC_CH_GetOutputScale(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_GetOutputScale: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_GetOutputScale: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   return (XMC_DAC_CH_OUTPUT_SCALE_t)(dac->DACCFG[channel].high & (DAC_DAC0CFG1_MULDIV_Msk | DAC_DAC0CFG1_SCALE_Msk));
 }
 
@@ -1143,7 +1249,7 @@ __STATIC_INLINE XMC_DAC_CH_OUTPUT_SCALE_t XMC_DAC_CH_GetOutputScale(XMC_DAC_t *c
  * Negation in enabled by setting \a NEGATE bit of \a DAC0CFG0 register (for channel 0) / \a DAC1CFG0 register (for channel 1).
  *
  * \par<b>Note:</b><br>
- * Negation feature is applicable only for XMC44 devices. For rest of the devices calling this API doesn't have any effect.
+ * Negation feature is not applicable for XMC45 devices. Calling this API in XMC45 devices doesn't have any effect.
  *
  * \par<b>Related APIs:</b><BR>
  * XMC_DAC_CH_DisableOutputNegation(), XMC_DAC_CH_StartRampMode()\n\n\n
@@ -1151,6 +1257,9 @@ __STATIC_INLINE XMC_DAC_CH_OUTPUT_SCALE_t XMC_DAC_CH_GetOutputScale(XMC_DAC_t *c
  */
 __STATIC_INLINE void XMC_DAC_CH_EnableOutputNegation(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_EnableOutputNegation: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_EnableOutputNegation: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low |= XMC_DAC_DACCFG_NEGATE_Msk;
 }
 
@@ -1165,7 +1274,7 @@ __STATIC_INLINE void XMC_DAC_CH_EnableOutputNegation(XMC_DAC_t *const dac, const
  * Negation is disabled by clearing \a NEGATE bit of \a DAC0CFG0 register (for channel 0) / \a DAC1CFG0 register (for channel 1).
  *
  * \par<b>Note:</b><br>
- * Negation feature is applicable only for XMC44 devices. For rest of the devices calling this API doesn't have any effect.
+ * Negation feature is not applicable for XMC45 devices. Calling this API in XMC45 devices doesn't have any effect.
  *
  * \par<b>Related APIs:</b><BR>
  * XMC_DAC_CH_EnableOutputNegation()\n\n\n
@@ -1173,6 +1282,9 @@ __STATIC_INLINE void XMC_DAC_CH_EnableOutputNegation(XMC_DAC_t *const dac, const
  */
 __STATIC_INLINE void XMC_DAC_CH_DisableOutputNegation(XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_DisableOutputNegation: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_DisableOutputNegation: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   dac->DACCFG[channel].low &= ~XMC_DAC_DACCFG_NEGATE_Msk;
 }
 
@@ -1196,6 +1308,9 @@ __STATIC_INLINE void XMC_DAC_CH_DisableOutputNegation(XMC_DAC_t *const dac, cons
  */
 __STATIC_INLINE bool XMC_DAC_CH_IsFifoFull(const XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_IsFifoFull: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_IsFifoFull: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   return (bool)(dac->DACCFG[channel].low & DAC_DAC0CFG0_FIFOFUL_Msk);
 }
 
@@ -1219,6 +1334,9 @@ __STATIC_INLINE bool XMC_DAC_CH_IsFifoFull(const XMC_DAC_t *const dac, const uin
  */
 __STATIC_INLINE bool XMC_DAC_CH_IsFifoEmpty(const XMC_DAC_t *const dac, const uint8_t channel)
 {
+  XMC_ASSERT("XMC_DAC_CH_IsFifoEmpty: dac parameter not valid\n", XMC_DAC_IS_DAC_VALID(dac));
+  XMC_ASSERT("XMC_DAC_CH_IsFifoEmpty: channel parameter not valid\n", XMC_DAC_IS_CHANNEL_VALID(channel));
+    
   return (bool)(dac->DACCFG[channel].low & DAC_DAC0CFG0_FIFOEMP_Msk);
 }
 

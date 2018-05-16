@@ -1,12 +1,12 @@
 /**
  * @file xmc_wdt.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -48,32 +48,40 @@
 /*********************************************************************************************************************
  * HEADER FILES
  ********************************************************************************************************************/
-#include <xmc_wdt.h>
+#include "xmc_wdt.h"
+#include "xmc_scu.h"
 
 /*********************************************************************************************************************
  * API IMPLEMENTATION
   ********************************************************************************************************************/
+
 /* Enables watchdog clock and releases watchdog reset. */
 void XMC_WDT_Enable(void)
 {
-#if (UC_SERIES != XMC45)
+#if UC_FAMILY == XMC4
+  XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_WDT);
+#endif
+
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_WDT);
 #endif
-#if (UC_FAMILY == XMC4)
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_WDT);
-  XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_WDT);
 #endif  
 }
 
 /* Disables watchdog clock and resets watchdog. */
 void XMC_WDT_Disable(void)
 {
-#if (UC_FAMILY == XMC4)
-  XMC_SCU_CLOCK_DisableClock(XMC_SCU_CLOCK_WDT);
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_WDT);
 #endif  
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_WDT); 
+#endif
+
+#if UC_FAMILY == XMC4
+  XMC_SCU_CLOCK_DisableClock(XMC_SCU_CLOCK_WDT);
 #endif
 }
 /* Initializes and configures watchdog with configuration data pointed by \a config. */

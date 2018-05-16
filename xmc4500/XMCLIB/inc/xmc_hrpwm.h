@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_hrpwm.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -75,9 +75,9 @@ extern "C" {
  * HEADER FILES
  **********************************************************************************************************************/
 #include <xmc_common.h>
-#include <xmc_hrpwm_map.h>
 
 #if defined(HRPWM0)
+#include <xmc_hrpwm_map.h>
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -868,11 +868,7 @@ typedef struct XMC_HRPWM_CSG_CONFIG
 } XMC_HRPWM_CSG_CONFIG_t;
 
 /***********************************************************************************************************************
- * API PROTOTYPES - General
- **********************************************************************************************************************/
-
-/***********************************************************************************************************************
- * API PROTOTYPES - HRPWM
+ * API PROTOTYPES 
  **********************************************************************************************************************/
 /**
  * @param hrpwm Constant pointer to XMC_HRPWM_t, pointing to the HRPWM module base address

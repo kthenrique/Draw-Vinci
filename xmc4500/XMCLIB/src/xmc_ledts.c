@@ -1,12 +1,12 @@
 /**
  * @file xmc_ledts.c
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -58,6 +58,7 @@
 #include <xmc_ledts.h>
 
 #if defined(LEDTS0)
+#include "xmc_scu.h"
 
 /*********************************************************************************************************************
  * MACROS
@@ -92,25 +93,40 @@ XMC_LEDTS_STATUS_t XMC_LEDTS_InitGlobal(XMC_LEDTS_t *const ledts, const XMC_LEDT
   XMC_ASSERT("XMC_LEDTS_InitGlobal:Wrong Module Pointer", XMC_LEDTS_CHECK_KERNEL_PTR(ledts));
   XMC_ASSERT("XMC_LEDTS_InitGlobal:Null Pointer", (config != (XMC_LEDTS_GLOBAL_CONFIG_t *)NULL));
 
-#if(UC_SERIES == XMC12)
-
-  if(ledts == XMC_LEDTS0)
+  switch ((uint32_t)ledts)
   {
-    XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS0);
-  }
-  else
-  {
-    XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS1);
-  }
-
-#elif(UC_SERIES == XMC45)
-  XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_LEDTS0);
-
-#elif(UC_SERIES !=  XMC45)
-  XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS0);
-  XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_LEDTS0);
-
+    case (uint32_t)XMC_LEDTS0:
+#if defined(CLOCK_GATING_SUPPORTED)
+      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS0);
 #endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_LEDTS0);
+#endif
+      break;
+
+#if defined(LEDTS1)
+    case (uint32_t)XMC_LEDTS1:
+#if defined(CLOCK_GATING_SUPPORTED)
+      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS1);
+#endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_LEDTS1);
+#endif
+      break;
+#endif
+
+#if defined(LEDTS2)
+    case (uint32_t)XMC_LEDTS2:
+#if defined(CLOCK_GATING_SUPPORTED)
+      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_LEDTS2);
+#endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_LEDTS2);
+#endif
+      break;
+#endif
+      
+  }
 
   if((ledts->GLOBCTL & LEDTS_GLOBCTL_CLK_PS_Msk) != XMC_LEDTS_CLOCK_NOT_RUNNING)
   {

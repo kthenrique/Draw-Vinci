@@ -1,12 +1,12 @@
 /**
  * @file xmc_eth_mac_map.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -57,7 +57,7 @@ typedef enum XMC_ETH_MAC_PORT_CTRL_MODE
 /**
  * ETH MAC receive data 0 line
  */ 
-typedef enum XMC_ETH_MAC_IF_RXD0
+typedef enum XMC_ETH_MAC_PORT_CTRL_RXD0
 {
   XMC_ETH_MAC_PORT_CTRL_RXD0_P2_2  = 0U, /**< RXD0A receive data line */
   XMC_ETH_MAC_PORT_CTRL_RXD0_P0_2  = 1U, /**< RXD0B receive data line */

@@ -1,12 +1,12 @@
 /**
  * @file xmc_bccu.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -118,39 +118,28 @@
  * -# Allows configuring dimming curve. XMC_BCCU_DIM_ConfigDimCurve()
  * 
  * <b> Recommended programming sequence: </b>
- * <OL>
- * <LI> Set output passive and active levels using XMC_BCCU_ConcurrentSetOutputPassiveLevel() or 
- * XMC_BCCU_SetOutputPassiveLevel() </LI>
- * <LI> Initializes global features using XMC_BCCU_GlobalInit() </LI>
- * <LI> Initializes channel features using XMC_BCCU_CH_Init() </LI>
- * <LI> Initializes dimming engine using XMC_BCCU_DIM_Init() </LI>
- * <LI> Enable channels using XMC_BCCU_ConcurrentEnableChannels() or XMC_BCCU_EnableChannel() </LI>
- * <LI> Enable dimming engines using XMC_BCCU_ConcurrentEnableDimmingEngine() or XMC_BCCU_EnableDimmingEngine() </LI>
- * <LI> Configure channel linear walk prescaler using XMC_BCCU_CH_SetLinearWalkPrescaler()</LI>
- * <LI> Configure dimming divider using XMC_BCCU_DIM_SetDimDivider() </LI>
- * <LI> Set target intensities of channels using XMC_BCCU_CH_SetTargetIntensity() </LI>
- * <LI> Set target dim levels of dimming engines using XMC_BCCU_DIM_SetTargetDimmingLevel() </LI>
- * <LI> Start linear walk of the channels using XMC_BCCU_ConcurrentStartLinearWalk() or XMC_BCCU_StartLinearWalk() </LI>
- * <LI> Start dimming of the dimming engines using XMC_BCCU_ConcurrentStartDimming() or XMC_BCCU_StartDimming() </LI>
- * <LI> Know the status of linear walk completion using XMC_BCCU_IsLinearWalkComplete() </LI>
- * <LI> Know the status of dimming completion XMC_BCCU_IsDimmingFinished() </LI>
+ * -# Set output passive and active levels using XMC_BCCU_ConcurrentSetOutputPassiveLevel() or XMC_BCCU_SetOutputPassiveLevel()
+ * -# Initializes global features using XMC_BCCU_GlobalInit()
+ * -# Initializes channel features using XMC_BCCU_CH_Init()
+ * -# Initializes dimming engine using XMC_BCCU_DIM_Init()
+ * -# Enable channels using XMC_BCCU_ConcurrentEnableChannels() or XMC_BCCU_EnableChannel()
+ * -# Enable dimming engines using XMC_BCCU_ConcurrentEnableDimmingEngine() or XMC_BCCU_EnableDimmingEngine()
+ * -# Configure channel linear walk prescaler using XMC_BCCU_CH_SetLinearWalkPrescaler()
+ * -# Configure dimming divider using XMC_BCCU_DIM_SetDimDivider()
+ * -# Set target intensities of channels using XMC_BCCU_CH_SetTargetIntensity()
+ * -# Set target dim levels of dimming engines using XMC_BCCU_DIM_SetTargetDimmingLevel()
+ * -# Start linear walk of the channels using XMC_BCCU_ConcurrentStartLinearWalk() or XMC_BCCU_StartLinearWalk()
+ * -# Start dimming of the dimming engines using XMC_BCCU_ConcurrentStartDimming() or XMC_BCCU_StartDimming()
+ * -# Check the status of linear walk completion using XMC_BCCU_IsLinearWalkComplete()
+ * -# Check the status of dimming completion XMC_BCCU_IsDimmingFinished()
  * @{
  */
 
-/*********************************************************************************************************************
- * DEVICE SPECIFIC MACROS
- ********************************************************************************************************************/
 #if defined (BCCU0)
 
 /*********************************************************************************************************************
  * MACROS
  ********************************************************************************************************************/
-#define XMC_BCCU_NO_OF_CHANNELS    (9U) /**< Total number of channels available @ BCCU module */
-#define XMC_BCCU_CHANNEL_MASK      ((0x1 << XMC_BCCU_NO_OF_CHANNELS)-1) /* Maximum possible value for multiple channels;
-used only for \n xmc_assert() */
-#define XMC_BCCU_NO_OF_DIM_ENGINE  (3U) /**< Total number of dimming engines available @ BCCU module */
-#define XMC_BCCU_DIM_ENGINE_MASK   (((0x1 << XMC_BCCU_NO_OF_DIM_ENGINE)-1)) /* Maximum possible value for dimming engine; 
-used \n only for xmc_assert() */
 
 /*********************************************************************************************************************
  * ENUMS
@@ -516,7 +505,7 @@ typedef struct XMC_BCCU_DIM_CONFIG
   #pragma warning restore
 #endif
 /*********************************************************************************************************************
- * API Prototypes
+ * API PROTOTYPES
  ********************************************************************************************************************/
 #ifdef __cplusplus
 extern "C" {

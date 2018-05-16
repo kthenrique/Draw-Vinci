@@ -1,12 +1,12 @@
 /**
  * @file xmc_ledts.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -57,7 +57,7 @@
 #include <xmc_common.h>
 
 #if defined(LEDTS0)
-#include <xmc_scu.h>
+#include "xmc_scu.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -117,13 +117,30 @@
  * MACROS
  ********************************************************************************************************************/
 
-#if (defined(LEDTS0) && defined(LEDTS1))
-#define XMC_LEDTS_NUM_KERNELS          (2U)      /**< Number of XMC_LEDTS kernels on XMC1X devices */
-#define XMC_LEDTS_CHECK_KERNEL_PTR(PTR)  ( ((PTR)== XMC_LEDTS0) || ((PTR)== XMC_LEDTS1) )
+#if defined(LEDTS0)
+#define XMC_LEDTS0 ((XMC_LEDTS_GLOBAL_t *) LEDTS0)     /**< Typedef for LEDTS kernel0*/
+#define XMC_LEDTS_CHECK_LEDTS0(PTR) (PTR == XMC_LEDTS0)
 #else
-#define XMC_LEDTS_NUM_KERNELS          (1U)      /**< Number of XMC_LEDTS kernels on XMC4X devices */
-#define XMC_LEDTS_CHECK_KERNEL_PTR(PTR)  ( (PTR)== XMC_LEDTS0 )
+#define XMC_LEDTS_CHECK_LEDTS0(PTR) 0
 #endif
+
+#if defined(LEDTS1)
+#define XMC_LEDTS1 ((XMC_LEDTS_GLOBAL_t *) LEDTS1)     /**< Typedef for LEDTS kernel1*/
+#define XMC_LEDTS_CHECK_LEDTS1(PTR) (PTR == XMC_LEDTS1)
+#else
+#define XMC_LEDTS_CHECK_LEDTS1(PTR) 0
+#endif
+
+#if defined(LEDTS2)
+#define XMC_LEDTS2 ((XMC_LEDTS_GLOBAL_t *) LEDTS2)     /**< Typedef for LEDTS kernel2*/
+#define XMC_LEDTS_CHECK_LEDTS2(PTR) (PTR == XMC_LEDTS2)
+#else
+#define XMC_LEDTS_CHECK_LEDTS2(PTR) 0
+#endif
+
+#define XMC_LEDTS_CHECK_KERNEL_PTR(PTR)  (XMC_LEDTS_CHECK_LEDTS0(PTR) || \
+                                          XMC_LEDTS_CHECK_LEDTS1(PTR) || \
+                                          XMC_LEDTS_CHECK_LEDTS2(PTR))
 
 /**
  * Defines LEDTS module structure. This holds data and configuration registers of LEDTS modules. Use type
@@ -638,7 +655,7 @@ XMC_LEDTS_STATUS_t XMC_LEDTS_InitGlobal(XMC_LEDTS_t *const ledts, const XMC_LEDT
 
 /**
  *
- * @param ledts   Constant pointer to LEDTS module structure. Refer @ref XMC_LEDTS_GLOBAL_t_t data structure.<BR>
+ * @param ledts   Constant pointer to LEDTS module structure. Refer @ref XMC_LEDTS_GLOBAL_t data structure.<BR>
  * @param config  Pointer to constant LEDTS LED configuration structure. Refer @ref XMC_LEDTS_LED_CONFIG_t
  *                data structure.<BR>
  *

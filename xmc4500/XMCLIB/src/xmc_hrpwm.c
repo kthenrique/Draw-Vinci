@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_hrpwm.c
- * @date 2015-07-14
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -83,9 +83,9 @@
  **********************************************************************************************************************/
 #include <xmc_hrpwm.h>
 
+#if defined(HRPWM0)
 #include <xmc_scu.h>
 
-#if defined(HRPWM0)
 /***********************************************************************************************************************
  * MACROS
  **********************************************************************************************************************/
@@ -127,7 +127,7 @@ void XMC_HRPWM_lDelay(void)
 
   for (i = 0U; i <= XMC_HRPWM_DELAY_CNT; i++)  /* Wait more than 2 microseconds */
   {
-    ; /* For MISRA */
+    __NOP();
   }
 }
 

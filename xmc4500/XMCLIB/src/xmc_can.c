@@ -1,12 +1,12 @@
 /**
  * @file xmc_can.c
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -46,17 +46,24 @@
  *
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API
- *      
+ *
+ * 2015-09-01:
+ *     - Removed  fCANB clock support <br>
+ *
+ * 2015-09-08:
+ *     - Fixed bug in XMC_CAN_Init() <br>
+ *
  * @endcond
  *
- */
+ */ 
 
 /*******************************************************************************
  * HEADER FILES
  *******************************************************************************/
-#include <xmc_can.h>
+#include "xmc_can.h"
 
 #if defined(CAN)
+#include "xmc_scu.h"
 
 __STATIC_INLINE uint32_t max(uint32_t a, uint32_t b)
 {
@@ -212,19 +219,23 @@ void XMC_CAN_Disable(XMC_CAN_t *const obj)
 {
   /* Disable CAN Module */
   obj->CLC = CAN_CLC_DISR_Msk;
-  /* Reset assert for CAN peripheral */
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_MCAN);
+#endif
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_MCAN);
+#endif
 }
 
 /* Enable XMC_CAN Peripheral */
 void XMC_CAN_Enable(XMC_CAN_t *const obj)
 {
-#if(UC_SERIES != XMC45)
-  /* Ungate the can module clock */
+#if defined(CLOCK_GATING_SUPPORTED)
   XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_MCAN);
 #endif
-  /* Reset deassert for CAN peripheral */
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_MCAN);
+#endif
   /* Enable CAN Module */
   obj->CLC &= ~(uint32_t)CAN_CLC_DISR_Msk;
   while (obj->CLC & CAN_CLC_DISS_Msk)
@@ -232,7 +243,87 @@ void XMC_CAN_Enable(XMC_CAN_t *const obj)
     /*Do nothing*/
   };
 }
+#if defined(MULTICAN_PLUS)
+uint32_t XMC_CAN_GetBaudrateClockFrequency(XMC_CAN_t *const obj)
+{
+  uint32_t frequency;
 
+  switch(XMC_CAN_GetBaudrateClockSource(obj))
+  {
+#if UC_FAMILY == XMC4
+    case XMC_CAN_CANCLKSRC_FPERI:
+         frequency = XMC_SCU_CLOCK_GetPeripheralClockFrequency();
+         break;
+#else
+    case XMC_CAN_CANCLKSRC_MCLK:
+           frequency = XMC_SCU_CLOCK_GetPeripheralClockFrequency();
+           break;
+#endif
+    case XMC_CAN_CANCLKSRC_FOHP:
+         frequency = OSCHP_GetFrequency();
+         break;
+
+    default:
+         frequency = 0;
+         break;
+  }
+
+  return frequency;
+}
+
+void XMC_CAN_Init(XMC_CAN_t *const obj, XMC_CAN_CANCLKSRC_t clksrc, uint32_t can_frequency)
+{
+  uint32_t  step_n, step_f;
+  bool normal_divider;
+  uint32_t freq_n, freq_f;
+  uint32_t step;
+  uint32_t can_frequency_khz;
+  uint32_t peripheral_frequency_khz;
+  XMC_CAN_DM_t can_divider_mode;
+
+  uint32_t peripheral_frequency;
+  /*Enabling the module*/
+  XMC_CAN_Enable(obj);
+
+  XMC_CAN_SetBaudrateClockSource(obj, clksrc);
+
+  peripheral_frequency = XMC_CAN_GetBaudrateClockFrequency(obj);
+
+  XMC_ASSERT("XMC_CAN_Init: frequency not supported", can_frequency <= peripheral_frequency);
+
+  /* Normal divider mode */
+  step_n = (uint32_t)min(max(0U, (1024U - (peripheral_frequency / can_frequency))), 1023U);
+  freq_n = (uint32_t) (peripheral_frequency / (1024U - step_n));
+
+  /* Fractional divider mode */
+  can_frequency_khz = (uint32_t) (can_frequency >> 6);
+  peripheral_frequency_khz = (uint32_t)(peripheral_frequency >> 6);
+
+  step_f = (uint32_t)(min( (((1024U * can_frequency_khz) / peripheral_frequency_khz) ), 1023U ));
+  freq_f = (uint32_t)((peripheral_frequency_khz * step_f) / 1024U);
+  freq_f = freq_f << 6;
+
+  normal_divider  = (uint32_t)(can_frequency - freq_n) <= (can_frequency - freq_f);
+
+  step   = (normal_divider != 0U) ? step_n : step_f;
+  can_divider_mode = (normal_divider != 0U) ? XMC_CAN_DM_NORMAL : XMC_CAN_DM_FRACTIONAL;
+
+  obj->FDR &= (uint32_t) ~(CAN_FDR_DM_Msk | CAN_FDR_STEP_Msk);
+  obj->FDR |= ((uint32_t)can_divider_mode << CAN_FDR_DM_Pos) | ((uint32_t)step << CAN_FDR_STEP_Pos);
+
+}
+
+void XMC_CAN_SetBaudrateClockSource(XMC_CAN_t *const obj,const XMC_CAN_CANCLKSRC_t source)
+{
+  obj->MCR = (obj->MCR & ~CAN_MCR_CLKSEL_Msk) | source ;
+}
+
+XMC_CAN_CANCLKSRC_t XMC_CAN_GetBaudrateClockSource(XMC_CAN_t *const obj)
+{
+  return ((XMC_CAN_CANCLKSRC_t)((obj->MCR & CAN_MCR_CLKSEL_Msk) >> CAN_MCR_CLKSEL_Pos));
+}
+
+#else
 /* Initialization of XMC_CAN GLOBAL Object */
 void XMC_CAN_Init(XMC_CAN_t *const obj, uint32_t can_frequency)
 {
@@ -271,7 +362,7 @@ void XMC_CAN_Init(XMC_CAN_t *const obj, uint32_t can_frequency)
   obj->FDR &= (uint32_t) ~(CAN_FDR_DM_Msk | CAN_FDR_STEP_Msk);
   obj->FDR |= ((uint32_t)can_divider_mode << CAN_FDR_DM_Pos) | ((uint32_t)step << CAN_FDR_STEP_Pos);
 }
-
+#endif
 
 /* Sets the Identifier of the MO */
 void XMC_CAN_MO_SetIdentifier(XMC_CAN_MO_t *const can_mo, const uint32_t can_identifier)
@@ -337,7 +428,6 @@ void XMC_CAN_MO_SetAcceptanceMask(XMC_CAN_MO_t *const can_mo,const uint32_t can_
   }
   can_mo->can_id_mask = can_id_mask;
 }
-
 
 /* Initialization of XMC_CAN MO Object */
 void XMC_CAN_MO_Config(const XMC_CAN_MO_t *const can_mo)

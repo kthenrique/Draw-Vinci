@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_eth_mac.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -59,34 +59,34 @@
  * of Real Time Ethernet protocols.
  *
  * The XMC_ETH_MAC low level driver provides functions to configure and initialize
- * the SDMMC hardware peripheral.
+ * the ETH_MAC hardware peripheral.
  * @{
  */
 
 #ifndef XMC_ETH_MAC_H
 #define XMC_ETH_MAC_H
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined (ETH0)
 
-#include <xmc_eth_mac_map.h>
+#include "xmc_eth_mac_map.h"
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * MACROS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 #define XMC_ETH_MAC_BUF_SIZE           (1518)     /**< ETH MAC buffer size */
 #define XMC_ETH_MAC_PHY_MAX_RETRIES    (0xffffUL) /**< Maximum retries */
 #define XMC_ETH_WAKEUP_REGISTER_LENGTH (8U)       /**< Remote wakeup frame reg length */
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 /**
  * Ethernet MAC status return values
@@ -205,9 +205,9 @@ typedef enum XMC_ETH_MAC_TIMESTAMP_CONFIG
   XMC_ETH_MAC_TIMESTAMP_CONFIG_ENABLE_MAC_ADDRESS_FILTER = ETH_TIMESTAMP_CONTROL_TSENMACADDR_Msk /**< MAC address filter */
 } XMC_ETH_MAC_TIMESTAMP_CONFIG_t;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * DATA STRUCTURES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 /* Anonymous structure/union guard start */
 #if defined (__CC_ARM)
@@ -229,8 +229,8 @@ typedef union XMC_ETH_MAC_PORT_CTRL
     uint32_t rxd2: 2;     /**< Receive data bit 2 (only MII) (::XMC_ETH_MAC_PORT_CTRL_RXD2_t) */
     uint32_t rxd3: 2;     /**< Receive data bit 3 (only MII) (::XMC_ETH_MAC_PORT_CTRL_RXD3_t) */
     uint32_t clk_rmii: 2; /**< RMII: Continuous 50 MHz reference clock.
-	                           MII: Receive clock, 25 MHz for 100Mbit/s, 2.5 MHz for 10Mbit/s
-							   (::XMC_ETH_MAC_PORT_CTRL_CLK_RMII_t) */
+                               MII: Receive clock, 25 MHz for 100Mbit/s, 2.5 MHz for 10Mbit/s
+                               (::XMC_ETH_MAC_PORT_CTRL_CLK_RMII_t) */
     uint32_t crs_dv: 2;   /**< RMII: carrier sense/RX_Data valid. MII: RX_Data valid (::XMC_ETH_MAC_PORT_CTRL_CRS_DV_t) */
     uint32_t crs: 2;      /**< Carrier sense for only MII (::XMC_ETH_MAC_PORT_CTRL_CRS_t) */
     uint32_t rxer: 2;     /**< Receive error (::XMC_ETH_MAC_PORT_CTRL_RXER_t) */
@@ -295,9 +295,9 @@ typedef struct XMC_ETH_MAC
 #pragma warning restore
 #endif
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -367,7 +367,7 @@ void XMC_ETH_MAC_Enable(XMC_ETH_MAC_t *const eth_mac);
 void XMC_ETH_MAC_Disable(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return bool
  *
  * \par<b>Description: </b><br>
@@ -380,7 +380,7 @@ void XMC_ETH_MAC_Disable(XMC_ETH_MAC_t *const eth_mac);
 bool XMC_ETH_MAC_IsEnabled(const XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -398,7 +398,7 @@ __STATIC_INLINE void XMC_ETH_MAC_Reset(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param phy_addr PHY address
  * @param reg_addr Register address
  * @param data The destination to which the read data needs to be copied to
@@ -414,7 +414,7 @@ __STATIC_INLINE void XMC_ETH_MAC_Reset(XMC_ETH_MAC_t *const eth_mac)
 XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_ReadPhy(XMC_ETH_MAC_t *const eth_mac, uint8_t phy_addr, uint8_t reg_addr, uint16_t *data);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param phy_addr PHY address
  * @param reg_addr Register address
  * @param data The data to write
@@ -430,7 +430,7 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_ReadPhy(XMC_ETH_MAC_t *const eth_mac, uint8_t p
 XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_WritePhy(XMC_ETH_MAC_t *const eth_mac, uint8_t phy_addr, uint8_t reg_addr, uint16_t data);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param port_ctrl Port control configuration
  * @return None
  *
@@ -440,6 +440,13 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_WritePhy(XMC_ETH_MAC_t *const eth_mac, uint8_t 
  * \par
  * The function sets the port control by writing the configuration into the
  * CON register.
+ *
+ * \note
+ * MII Mode is only available in:
+ * - XMC4500 LQFP144 and BGA144 packages
+ * - XMC4700 LQFP144 and BGA196 packages
+ * - XMC4800 LQFP144 and BGA196 packages
+ *
  */
 __STATIC_INLINE void XMC_ETH_MAC_SetPortControl(XMC_ETH_MAC_t *const eth_mac, const XMC_ETH_MAC_PORT_CTRL_t port_ctrl)
 {
@@ -447,7 +454,7 @@ __STATIC_INLINE void XMC_ETH_MAC_SetPortControl(XMC_ETH_MAC_t *const eth_mac, co
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return XMC_ETH_MAC_STATUS_t ETH MAC status
  *
  * \par<b>Description: </b><br>
@@ -460,8 +467,8 @@ __STATIC_INLINE void XMC_ETH_MAC_SetPortControl(XMC_ETH_MAC_t *const eth_mac, co
 XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_SetManagmentClockDivider(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
- * @param uint64_t The MAC address to set
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param addr The MAC address to set
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -478,7 +485,7 @@ __STATIC_INLINE void XMC_ETH_MAC_SetAddress(XMC_ETH_MAC_t *const eth_mac, uint64
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return uint64_t The MAC address which has been set
  *
  * \par<b>Description: </b><br>
@@ -493,7 +500,11 @@ __STATIC_INLINE uint64_t XMC_ETH_MAC_GetAddress(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param index Table entry index
+ * @param addr Address value
+ * @param flags Compare control. OR'ed combination of @ref XMC_ETH_MAC_ADDR_FILTER_t or zero. 
+ *
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -505,7 +516,7 @@ __STATIC_INLINE uint64_t XMC_ETH_MAC_GetAddress(XMC_ETH_MAC_t *const eth_mac)
 void XMC_ETH_MAC_SetAddressPerfectFilter(XMC_ETH_MAC_t *const eth_mac, uint8_t index, const uint64_t addr, uint32_t flags);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param hash The hash to be used for filtering
  * @return None
  *
@@ -519,7 +530,7 @@ void XMC_ETH_MAC_SetAddressPerfectFilter(XMC_ETH_MAC_t *const eth_mac, uint8_t i
 void XMC_ETH_MAC_SetAddressHashFilter(XMC_ETH_MAC_t *const eth_mac, const uint64_t hash);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -536,7 +547,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableFrameFilter(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -553,7 +564,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableFrameFilter(XMC_ETH_MAC_t *const eth_mac
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -570,7 +581,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableHashPerfectFilter(XMC_ETH_MAC_t *const et
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -586,7 +597,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnablePerfectFilter(XMC_ETH_MAC_t *const eth_ma
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -605,7 +616,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableSourceAddressFilter(XMC_ETH_MAC_t *const 
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -623,7 +634,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableSourceAddressFilter(XMC_ETH_MAC_t *const
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -641,7 +652,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableSourceAddressInverseFilter(XMC_ETH_MAC_t 
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -658,7 +669,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableSourceAddressInverseFilter(XMC_ETH_MAC_t
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -676,7 +687,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableDestinationAddressInverseFilter(XMC_ETH_M
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -692,7 +703,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableDestinationAddressInverseFilter(XMC_ETH_
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -708,7 +719,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableMulticastHashFilter(XMC_ETH_MAC_t *const 
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -724,7 +735,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableMulticastHashFilter(XMC_ETH_MAC_t *const
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -740,7 +751,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableUnicastHashFilter(XMC_ETH_MAC_t *const et
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -756,7 +767,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableUnicastHashFilter(XMC_ETH_MAC_t *const e
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param frame A pointer to a uint8_t constant, holding the frame to be transmitted
  * @param len Length of the frame to transmit
  * @param flags Additional flags: ored combination of ::XMC_ETH_MAC_TX_FRAME_t or zero.
@@ -776,7 +787,7 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_SendFrame(XMC_ETH_MAC_t *const eth_mac,
                                            uint32_t flags);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param frame A constant pointer to a uint8_t constant, holding the received frame
  * @param len Frame length?
  * @return uint32_t Length of the frame
@@ -791,7 +802,7 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_SendFrame(XMC_ETH_MAC_t *const eth_mac,
 uint32_t XMC_ETH_MAC_ReadFrame(XMC_ETH_MAC_t *const eth_mac, uint8_t *const frame, uint32_t len);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return uint32_t RX frame size
  *
  * \par<b>Description: </b><br>
@@ -803,7 +814,7 @@ uint32_t XMC_ETH_MAC_ReadFrame(XMC_ETH_MAC_t *const eth_mac, uint8_t *const fram
 uint32_t XMC_ETH_MAC_GetRxFrameSize(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -818,7 +829,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableReceptionBroadcastFrames(XMC_ETH_MAC_t *c
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -835,7 +846,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableReceptionBroadcastFrames(XMC_ETH_MAC_t *
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -852,7 +863,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableReceptionMulticastFrames(XMC_ETH_MAC_t *c
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -868,7 +879,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableReceptionMulticastFrames(XMC_ETH_MAC_t *
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -885,7 +896,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnablePromiscuousMode(XMC_ETH_MAC_t *const eth_
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -900,7 +911,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisablePromiscuousMode(XMC_ETH_MAC_t *const eth
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -917,7 +928,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableRxWatchdog(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -932,7 +943,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableRxWatchdog(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -949,7 +960,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableTxJabber(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -964,7 +975,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableTxJabber(XMC_ETH_MAC_t *const eth_mac)
 } 
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -980,7 +991,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableFrameBurst(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -995,7 +1006,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableFrameBurst(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1012,7 +1023,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableJumboFrame(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1027,7 +1038,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableJumboFrame(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1043,7 +1054,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableRxOwn(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1059,7 +1070,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableRxOwn(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1074,7 +1085,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableLoopback(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1089,7 +1100,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableLoopback(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param speed The speed at which the link is set (10M or 100M?)
  * @param duplex Duplex settings (half or full duplex?)
  * @return None
@@ -1104,13 +1115,13 @@ __STATIC_INLINE void XMC_ETH_MAC_SetLink(XMC_ETH_MAC_t *const eth_mac,
                                          XMC_ETH_LINK_SPEED_t speed,
                                          XMC_ETH_LINK_DUPLEX_t duplex)
 {
-  eth_mac->regs->MAC_CONFIGURATION |= (eth_mac->regs->MAC_CONFIGURATION &
-                                       (uint32_t)~(ETH_MAC_CONFIGURATION_DM_Msk | ETH_MAC_CONFIGURATION_FES_Msk)) |
-		                              (uint32_t)speed | (uint32_t)duplex;
+  eth_mac->regs->MAC_CONFIGURATION = (eth_mac->regs->MAC_CONFIGURATION &
+                                      (uint32_t)~(ETH_MAC_CONFIGURATION_DM_Msk | ETH_MAC_CONFIGURATION_FES_Msk)) |
+                                     (uint32_t)speed | (uint32_t)duplex;
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1122,7 +1133,7 @@ __STATIC_INLINE void XMC_ETH_MAC_SetLink(XMC_ETH_MAC_t *const eth_mac,
 void XMC_ETH_MAC_ReturnRxDescriptor(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1134,7 +1145,7 @@ void XMC_ETH_MAC_ReturnRxDescriptor(XMC_ETH_MAC_t *const eth_mac);
 void XMC_ETH_MAC_ReturnTxDescriptor(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return bool true if TX descriptor is owned by DMA, false otherwise
  *
  * \par<b>Description: </b><br>
@@ -1146,7 +1157,7 @@ void XMC_ETH_MAC_ReturnTxDescriptor(XMC_ETH_MAC_t *const eth_mac);
 bool XMC_ETH_MAC_IsTxDescriptorOwnedByDma(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1164,7 +1175,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableRx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1180,7 +1191,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableRx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1198,7 +1209,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnableTx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1214,7 +1225,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableTx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1226,7 +1237,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisableTx(XMC_ETH_MAC_t *const eth_mac)
 void XMC_ETH_MAC_FlushTx(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1238,7 +1249,7 @@ void XMC_ETH_MAC_FlushTx(XMC_ETH_MAC_t *const eth_mac);
 void XMC_ETH_MAC_FlushRx(XMC_ETH_MAC_t *const eth_mac);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1257,7 +1268,7 @@ __STATIC_INLINE void XMC_ETH_MAC_ResumeTx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1276,7 +1287,7 @@ __STATIC_INLINE void XMC_ETH_MAC_ResumeRx(XMC_ETH_MAC_t *const eth_mac)
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param event A valid ETH PMT event (XMC_ETH_MAC_PMT_EVENT_t) or a valid combination
  *              of logically OR'd events
  * @return None
@@ -1293,7 +1304,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnablePowerManagmentEvent(XMC_ETH_MAC_t *const 
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param event A valid ETH PMT event (XMC_ETH_MAC_PMT_EVENT_t) or a valid combination
  *              of logically OR'd events
  * @return None
@@ -1310,7 +1321,8 @@ __STATIC_INLINE void XMC_ETH_MAC_DisablePowerManagmentEvent(XMC_ETH_MAC_t *const
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param filter wake-up filter registers
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1323,7 +1335,7 @@ void XMC_ETH_MAC_SetWakeUpFrameFilter(XMC_ETH_MAC_t *const eth_mac,
                                       const uint32_t (*const filter)[XMC_ETH_WAKEUP_REGISTER_LENGTH]);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return bool true if the received packet is a magic packet, false otherwise
  *
  * \par<b>Description: </b><br>
@@ -1338,7 +1350,7 @@ __STATIC_INLINE bool XMC_ETH_MAC_IsMagicPacketReceived(XMC_ETH_MAC_t *const eth_
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return bool true if the received packet is a wakeup frame, false otherwise
  *
  * \par<b>Description: </b><br>
@@ -1353,7 +1365,7 @@ __STATIC_INLINE bool XMC_ETH_MAC_IsWakeupFrameReceived(XMC_ETH_MAC_t *const eth_
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1368,7 +1380,7 @@ __STATIC_INLINE void XMC_ETH_MAC_EnablePowerDownMode(XMC_ETH_MAC_t *const eth_ma
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1383,7 +1395,7 @@ __STATIC_INLINE void XMC_ETH_MAC_DisablePowerDownMode(XMC_ETH_MAC_t *const eth_m
 }
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
  * @param tag The (16 bit) VLAN tag to set
  * @return None
  *
@@ -1396,8 +1408,8 @@ __STATIC_INLINE void XMC_ETH_MAC_DisablePowerDownMode(XMC_ETH_MAC_t *const eth_m
 void XMC_ETH_MAC_SetVLANTag(XMC_ETH_MAC_t *const eth_mac, uint16_t tag);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
- * @param uint32_t The configuration the PTP should be configured with
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param config The configuration the PTP should be configured with
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1409,8 +1421,8 @@ void XMC_ETH_MAC_SetVLANTag(XMC_ETH_MAC_t *const eth_mac, uint16_t tag);
 void XMC_ETH_MAC_InitPTP(XMC_ETH_MAC_t *const eth_mac, uint32_t config);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
- * @param XMC_ETH_MAC_TIME_t A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param time A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1423,8 +1435,8 @@ void XMC_ETH_MAC_InitPTP(XMC_ETH_MAC_t *const eth_mac, uint32_t config);
 void XMC_ETH_MAC_GetPTPTime(XMC_ETH_MAC_t *const eth_mac, XMC_ETH_MAC_TIME_t *const time);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
- * @param XMC_ETH_MAC_TIME_t A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param time A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1437,8 +1449,8 @@ void XMC_ETH_MAC_GetPTPTime(XMC_ETH_MAC_t *const eth_mac, XMC_ETH_MAC_TIME_t *co
 void XMC_ETH_MAC_UpdatePTPTime(XMC_ETH_MAC_t *const eth_mac, const XMC_ETH_MAC_TIME_t *const time);
 
 /**
- * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
- * @param XMC_ETH_MAC_TIME_t A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
+ * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
+ * @param time A constant pointer to XMC_ETH_MAC_TIME_t, pointing to the PTP time
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -1452,7 +1464,7 @@ void XMC_ETH_MAC_SetPTPAlarm(XMC_ETH_MAC_t *const eth_mac, const XMC_ETH_MAC_TIM
 
 /**
  * @param eth_mac A constant pointer to XMC_ETH_MAC_t, pointing to the ETH MAC base address
- * @param uint32_t Correction factor
+ * @param correction Correction factor
  * @return None
  *
  * \par<b>Description: </b><br>

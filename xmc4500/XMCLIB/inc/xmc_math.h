@@ -1,12 +1,12 @@
 /**
  * @file xmc_math.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -47,6 +47,15 @@
  *     - Removed version macros and declaration of GetDriverVersion API <br>
  *     - Updated copyright and change history section.
  *
+ * 2015-08-25: 
+ *     - XMC_MATH_ClearEvent() API is updated to set the event clear flag bit. <br>
+ *
+ * 2015-09-23: 
+ *     - Added SQRT functions
+ *
+ * 2015-10-08:
+ *     - Return values for sin(), cos(), sinh(), cosh(), arctan() are corrected.
+ *
  * @endcond 
  *
  */
@@ -62,9 +71,9 @@ extern "C" {
  * HEADER FILES
  ********************************************************************************************************************/
 #include <xmc_common.h>
-#include <xmc_scu.h>
 
 #if defined(MATH)
+#include <xmc_scu.h>
 
 /**
  * @addtogroup XMClib
@@ -405,7 +414,7 @@ __STATIC_INLINE void XMC_MATH_SetEvent(const XMC_MATH_EVENT_t event)
  */
 __STATIC_INLINE void XMC_MATH_ClearEvent(const XMC_MATH_EVENT_t event)
 {
-  MATH->EVFCR &= ~((uint32_t) event);
+  MATH->EVFCR |= (uint32_t) event;
 }
 
 /**
@@ -423,7 +432,7 @@ __STATIC_INLINE void XMC_MATH_ClearEvent(const XMC_MATH_EVENT_t event)
  */
 __STATIC_INLINE XMC_MATH_Q0_23_t XMC_MATH_CORDIC_GetCosResult(void)
 {
-  return ((XMC_MATH_Q0_23_t) (MATH->CORRX >> MATH_CORRX_RESULT_Pos));
+  return ((XMC_MATH_Q0_23_t) (((int32_t)MATH->CORRX) >> MATH_CORRX_RESULT_Pos));
 }
 
 /**
@@ -441,7 +450,7 @@ __STATIC_INLINE XMC_MATH_Q0_23_t XMC_MATH_CORDIC_GetCosResult(void)
  */
 __STATIC_INLINE XMC_MATH_Q0_23_t XMC_MATH_CORDIC_GetSinResult(void)
 {
-  return ((XMC_MATH_Q0_23_t) (MATH->CORRY >> MATH_CORRY_RESULT_Pos));
+  return ((XMC_MATH_Q0_23_t) (((int32_t)MATH->CORRY) >> MATH_CORRY_RESULT_Pos));
 }
 
 /**
@@ -477,7 +486,7 @@ __STATIC_INLINE XMC_MATH_Q0_11_t XMC_MATH_CORDIC_GetTanResult(void)
  */
 __STATIC_INLINE XMC_MATH_Q0_23_t XMC_MATH_CORDIC_GetArcTanResult(void)
 {
-  return ((XMC_MATH_Q0_23_t) (MATH->CORRZ >> MATH_CORRZ_RESULT_Pos));
+  return ((XMC_MATH_Q0_23_t) (((int32_t)MATH->CORRZ) >> MATH_CORRZ_RESULT_Pos));
 }
 
 /**
@@ -495,7 +504,7 @@ __STATIC_INLINE XMC_MATH_Q0_23_t XMC_MATH_CORDIC_GetArcTanResult(void)
  */
 __STATIC_INLINE XMC_MATH_Q1_22_t XMC_MATH_CORDIC_GetCoshResult(void)
 {
-  return ((XMC_MATH_Q1_22_t) (MATH->CORRX >> MATH_CORRX_RESULT_Pos));
+  return ((XMC_MATH_Q1_22_t) (((int32_t)MATH->CORRX) >> MATH_CORRX_RESULT_Pos));
 }
 
 /**
@@ -513,7 +522,7 @@ __STATIC_INLINE XMC_MATH_Q1_22_t XMC_MATH_CORDIC_GetCoshResult(void)
  */
 __STATIC_INLINE XMC_MATH_Q1_22_t XMC_MATH_CORDIC_GetSinhResult(void)
 {
-  return ((XMC_MATH_Q1_22_t) (MATH->CORRY >> MATH_CORRY_RESULT_Pos));
+  return ((XMC_MATH_Q1_22_t) (((int32_t)MATH->CORRY) >> MATH_CORRY_RESULT_Pos));
 }
 
 /**
@@ -1035,6 +1044,33 @@ void XMC_MATH_DIV_UnsignedModNB(uint32_t dividend, uint32_t divisor);
  */
 void XMC_MATH_DIV_SignedModNB(int32_t dividend, int32_t divisor);
 
+/**
+ * @param x - Value whose square root is computed
+ *
+ * @return Square root of x <BR>
+ *
+ * \par<b>Description:</b><br>
+ * Computes square root of Q15 number
+ *
+ * \par<b>Note:</b><br>
+ * x > 0
+ *
+ */
+int16_t XMC_MATH_CORDIC_Q15_Sqrt(int16_t x);
+
+/**
+ * @param x - Value whose square root is computed
+ *
+ * @return Square root of x <BR>
+ *
+ * \par<b>Description:</b><br>
+ * Computes square root of Q31 number
+ *
+ * \par<b>Note:</b><br>
+ * x > 0
+ *
+ */
+int32_t XMC_MATH_CORDIC_Q31_Sqrt(int32_t x);
 /**
  * @}
  */

@@ -1,12 +1,12 @@
 /**
  * @file xmc_spi.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -43,10 +43,25 @@
  *     - Documentation improved <br>
  *     - Added XMC_SPI_CH_SetSlaveSelectDelay(), XMC_SPI_CH_TriggerServiceRequest() and 
  *       XMC_SPI_CH_SelectInterruptNodePointer() <br>
- *     - Added XMC_SPI_CH_SetInterwordDelaySCLK()<br>     
+ *     - Added XMC_SPI_CH_SetInterwordDelaySCLK() <br>
  *
  * 2015-06-20:
- *     - Removed version macros and declaration of GetDriverVersion API
+ *     - Removed version macros and declaration of GetDriverVersion API <br>
+ *
+ * 2015-08-24:
+ *     - Added APIs for enabling/disabling delay compensation XMC_SPI_CH_DisableDelayCompensation() and
+ *       XMC_SPI_CH_EnableDelayCompensation() <br>
+ *
+ * 2015-08-27:
+ *     - Added APIs for external input for BRG configuration:XMC_SPI_CH_ConfigExternalInputSignalToBRG() <br>
+ *
+ * 2015-09-01:
+ *     - Modified XMC_SPI_CH_SetInputSource() for avoiding complete DXCR register overwriting. <br>
+ *     - Modified XMC_SPI_CH_EVENT_t enum for supporting XMC_SPI_CH_EnableEvent() and XMC_SPI_CH_DisableEvent()
+ *       for supporting multiple events configuration <br>
+ *
+ * 2015-09-08:
+ *     - Adding API for configuring the receiving clock phase in the slave:XMC_SPI_CH_DataLatchedInTrailingEdge() and XMC_SPI_CH_DataLatchedInLeadingEdge() <br>
  * @endcond 
  *
  */
@@ -57,7 +72,7 @@
 /**********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
-#include <xmc_usic.h>
+#include "xmc_usic.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -170,17 +185,17 @@ typedef enum XMC_SPI_CH_SLAVE_SELECT
  */
 typedef enum XMC_SPI_CH_EVENT
 {
-  XMC_SPI_CH_EVENT_RECEIVE_START       = (int32_t)(0x80000000U | USIC_CH_CCR_RSIEN_Msk), /**< Receive start event */
-  XMC_SPI_CH_EVENT_DATA_LOST           = (int32_t)(0x80000000U | USIC_CH_CCR_DLIEN_Msk), /**< Data lost event */
-  XMC_SPI_CH_EVENT_TRANSMIT_SHIFT      = (int32_t)(0x80000000U | USIC_CH_CCR_TSIEN_Msk), /**< Transmit shift event */
-  XMC_SPI_CH_EVENT_TRANSMIT_BUFFER     = (int32_t)(0x80000000U | USIC_CH_CCR_TBIEN_Msk), /**< Transmit buffer event */
-  XMC_SPI_CH_EVENT_STANDARD_RECEIVE    = (int32_t)(0x80000000U | USIC_CH_CCR_RIEN_Msk),  /**< Receive event */
-  XMC_SPI_CH_EVENT_ALTERNATIVE_RECEIVE = (int32_t)(0x80000000U | USIC_CH_CCR_AIEN_Msk),  /**< Alternate receive event */
-  XMC_SPI_CH_EVENT_BAUD_RATE_GENERATOR = (int32_t)(0x80000000U | USIC_CH_CCR_BRGIEN_Msk), /**< Baudrate generator event */
+  XMC_SPI_CH_EVENT_RECEIVE_START       = USIC_CH_CCR_RSIEN_Msk, /**< Receive start event */
+  XMC_SPI_CH_EVENT_DATA_LOST           = USIC_CH_CCR_DLIEN_Msk, /**< Data lost event */
+  XMC_SPI_CH_EVENT_TRANSMIT_SHIFT      = USIC_CH_CCR_TSIEN_Msk, /**< Transmit shift event */
+  XMC_SPI_CH_EVENT_TRANSMIT_BUFFER     = USIC_CH_CCR_TBIEN_Msk, /**< Transmit buffer event */
+  XMC_SPI_CH_EVENT_STANDARD_RECEIVE    = USIC_CH_CCR_RIEN_Msk,  /**< Receive event */
+  XMC_SPI_CH_EVENT_ALTERNATIVE_RECEIVE = USIC_CH_CCR_AIEN_Msk,  /**< Alternate receive event */
+  XMC_SPI_CH_EVENT_BAUD_RATE_GENERATOR = USIC_CH_CCR_BRGIEN_Msk, /**< Baudrate generator event */
 
-  XMC_SPI_CH_EVENT_PARITY_ERROR = USIC_CH_PCR_SSCMode_PARIEN_Msk,       /**< Parity error event */
-  XMC_SPI_CH_EVENT_MSLS_CHANGE =  USIC_CH_PCR_SSCMode_MSLSIEN_Msk,      /**< Master slave select(MSLS) output transition event*/
-  XMC_SPI_CH_EVENT_DX2TIEN_ACTIVATED = USIC_CH_PCR_SSCMode_DX2TIEN_Msk  /**< Slave select input signal transition event*/
+  XMC_SPI_CH_EVENT_PARITY_ERROR = USIC_CH_PCR_SSCMode_PARIEN_Msk >> 13U,       /**< Parity error event */
+  XMC_SPI_CH_EVENT_MSLS_CHANGE =  USIC_CH_PCR_SSCMode_MSLSIEN_Msk >> 13U,      /**< Master slave select(MSLS) output transition event*/
+  XMC_SPI_CH_EVENT_DX2TIEN_ACTIVATED = USIC_CH_PCR_SSCMode_DX2TIEN_Msk >> 13U  /**< Slave select input signal transition event*/
 } XMC_SPI_CH_EVENT_t;
 
 /**
@@ -624,7 +639,41 @@ __STATIC_INLINE void XMC_SPI_CH_DisableMasterClock(XMC_USIC_CH_t *const channel)
 {
   channel->PCR_SSCMode &= (uint32_t)~USIC_CH_PCR_SSCMode_MCLK_Msk;
 }
+#ifdef USIC_CH_PCR_SSCMode_SLPHSEL_Msk
+/**
+ * @param channel A constant pointer to XMC_USIC_CH_t, pointing to the USIC channel base address.
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Data bits are shifted out with the leading edge of the shift clock signal and latched in with the trailing edge.
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SPI_CH_DataLatchedInLeadingEdge()
+ */
+__STATIC_INLINE void XMC_SPI_CH_DataLatchedInTrailingEdge(XMC_USIC_CH_t *const channel)
+{
+  channel->PCR_SSCMode &= (uint32_t)~USIC_CH_PCR_SSCMode_SLPHSEL_Msk;
+}
 
+/**
+ * @param channel A constant pointer to XMC_USIC_CH_t, pointing to the USIC channel base address.
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * The first data bit is shifted out when the data shift unit receives a low to high transition from the DX2
+ * stage. Subsequent bits are shifted out with the trailing edge of the shift clock signal. Data bits are
+ * always latched in with the leading edge.
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SPI_CH_DataLatchedInTrailingEdge()
+ */
+__STATIC_INLINE void XMC_SPI_CH_DataLatchedInLeadingEdge(XMC_USIC_CH_t *const channel)
+{
+  channel->PCR_SSCMode |= USIC_CH_PCR_SSCMode_SLPHSEL_Msk;
+}
+#endif
 /**
  * @param channel A constant pointer to XMC_USIC_CH_t, pointing to the USIC channel base address.
  *
@@ -928,7 +977,7 @@ __STATIC_INLINE void XMC_SPI_CH_SetInputSource(XMC_USIC_CH_t *const channel,
                                                const XMC_SPI_CH_INPUT_t input,
                                                const uint8_t source)
 {
-  channel->DXCR[input] = USIC_CH_DX0CR_INSW_Msk;
+  channel->DXCR[input] = (uint32_t)(channel->DXCR[input] & (~USIC_CH_DX0CR_DSEN_Msk)) | USIC_CH_DX0CR_INSW_Msk;
   XMC_USIC_CH_SetInputSource(channel, (XMC_USIC_CH_INPUT_t)input, source);
 }
 
@@ -1021,7 +1070,7 @@ __STATIC_INLINE void XMC_SPI_CH_SetInterruptNodePointer(XMC_USIC_CH_t *const cha
 
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_SPI0_CH0, @ref XMC_SPI0_CH1,@ref XMC_SPI1_CH0,@ref XMC_SPI1_CH1,@ref XMC_SPI2_CH0,@ref XMC_SPI2_CH1 @note Availability of SPI1 and SPI2 depends on device selection
  * @param  interrupt_node Interrupt node pointer to be configured. \n
  * 						  \b Range: @ref XMC_SPI_CH_INTERRUPT_NODE_POINTER_TRANSMIT_SHIFT,
  * 						  			@ref XMC_SPI_CH_INTERRUPT_NODE_POINTER_TRANSMIT_BUFFER etc.
@@ -1048,7 +1097,7 @@ __STATIC_INLINE void XMC_SPI_CH_SelectInterruptNodePointer(XMC_USIC_CH_t *const 
 
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				   \b Range: @ref XMC_SPI0_CH0, @ref XMC_SPI0_CH1,@ref XMC_SPI1_CH0,@ref XMC_SPI1_CH1,@ref XMC_SPI2_CH0,@ref XMC_SPI2_CH1 @note Availability of SPI1 and SPI2 depends on device selection
  * @param  service_request_line service request number of the event to be triggered. \n
  * 			\b Range: 0 to 5.
  * @return None
@@ -1064,6 +1113,90 @@ __STATIC_INLINE void XMC_SPI_CH_SelectInterruptNodePointer(XMC_USIC_CH_t *const 
 __STATIC_INLINE void XMC_SPI_CH_TriggerServiceRequest(XMC_USIC_CH_t *const channel, const uint32_t service_request_line)
 {
   XMC_USIC_CH_TriggerServiceRequest(channel, (uint32_t)service_request_line);
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_SPI0_CH0, @ref XMC_SPI0_CH1,@ref XMC_SPI1_CH0,@ref XMC_SPI1_CH1,@ref XMC_SPI2_CH0,@ref XMC_SPI2_CH1 @note Availability of SPI1 and SPI2 depends on device selection
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Enables delay compensation. \n\n
+ *
+ * Delay compensation can be applied to the receive path.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SPI_CH_DisableDelayCompensation()\n\n\n
+ */
+__STATIC_INLINE void XMC_SPI_CH_EnableDelayCompensation(XMC_USIC_CH_t *const channel)
+{
+  XMC_USIC_CH_EnableDelayCompensation(channel);
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_SPI0_CH0, @ref XMC_SPI0_CH1,@ref XMC_SPI1_CH0,@ref XMC_SPI1_CH1,@ref XMC_SPI2_CH0,@ref XMC_SPI2_CH1 @note Availability of SPI1 and SPI2 depends on device selection
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Disables delay compensation.. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SPI_CH_EnableDelayCompensation()\n\n\n
+ */
+__STATIC_INLINE void XMC_SPI_CH_DisableDelayCompensation(XMC_USIC_CH_t *const channel)
+{
+  XMC_USIC_CH_DisableDelayCompensation(channel);
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_SPI0_CH0, @ref XMC_SPI0_CH1,@ref XMC_SPI1_CH0,@ref XMC_SPI1_CH1,@ref XMC_SPI2_CH0,@ref XMC_SPI2_CH1 @note Availability of SPI1 and SPI2 depends on device selection
+ * @param  pdiv Desired divider for the external frequency input. \b Range: minimum value = 1, maximum value = 1024 \n
+ * @param  combination_mode  USIC channel input combination mode \n
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Enables the external frequency input for the Baudrate Generator and configures the divider, oversampling and
+ * the combination mode of the USIC channel. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_SetBRGInputClockSource(), XMC_USIC_CH_SetInputTriggerCombinationMode() \n\n\n
+ */
+__STATIC_INLINE void XMC_SPI_CH_ConfigExternalInputSignalToBRG(XMC_USIC_CH_t *const channel,
+		                                                       const uint16_t pdiv,
+												               const XMC_USIC_CH_INPUT_COMBINATION_MODE_t combination_mode)
+{
+  XMC_USIC_CH_ConfigExternalInputSignalToBRG(channel,pdiv,2U,combination_mode);
+}
+
+/**
+ * @param  channel A constant pointer to XMC_USIC_CH_t, pointing to the USIC channel base address.
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * The SELOx lines (with x = 1-7) can be used as addresses for an external address
+ * decoder to increase the number of external slave devices.
+ */
+__STATIC_INLINE void XMC_SPI_CH_EnableSlaveSelectCodedMode(XMC_USIC_CH_t *const channel)
+{
+  /* Configuration of Protocol Control Register */
+  channel->PCR_SSCMode = (uint32_t)(channel->PCR_SSCMode & (~USIC_CH_PCR_SSCMode_SELCTR_Msk));
+}
+
+/**
+ * @param  channel A constant pointer to XMC_USIC_CH_t, pointing to the USIC channel base address.
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Each SELOx line (with x = 0-7) can be directly connected to an external slave device.
+ */
+__STATIC_INLINE void XMC_SPI_CH_DisableSlaveSelectCodedMode(XMC_USIC_CH_t *const channel)
+{
+  /* Configuration of Protocol Control Register */
+  channel->PCR_SSCMode |= (uint32_t)USIC_CH_PCR_SSCMode_SELCTR_Msk;
 }
 
 #ifdef __cplusplus

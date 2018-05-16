@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_dma.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -58,11 +58,11 @@
  * HEADER FILES
  *******************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined (GPDMA0)
 
-#include <xmc_dma_map.h>
+#include "xmc_dma_map.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -731,7 +731,10 @@ XMC_DMA_CH_STATUS_t XMC_DMA_CH_Init(XMC_DMA_t *const dma, const uint8_t channel,
  * ensure that the GPDMA module itself is enabled before calling this function.
  * See ::XMC_DMA_Enable() for details.
  */
-void XMC_DMA_CH_Enable(XMC_DMA_t *const dma, const uint8_t channel);
+__STATIC_INLINE void XMC_DMA_CH_Enable(XMC_DMA_t *const dma, const uint8_t channel)
+{
+  dma->CHENREG = (uint32_t)(0x101UL << channel);   
+}
 
 /**
  * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
@@ -842,7 +845,7 @@ __STATIC_INLINE void XMC_DMA_CH_SetDestinationAddress(XMC_DMA_t *const dma, cons
 /**
  * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
  * @param channel A DMA channel
- * @param addr block size [1-2048]
+ * @param block_size Transfer size [1-2048]
  * @return None
  *
  * \par<b>Description: </b><br>
@@ -861,7 +864,7 @@ __STATIC_INLINE void XMC_DMA_CH_SetBlockSize(XMC_DMA_t *const dma, const uint8_t
 /**
  * @param dma A constant pointer to XMC_DMA_t, pointing to the GPDMA base address
  * @param channel A DMA channel
- * @param addr linked list pointer
+ * @param ll_ptr linked list pointer
  * @return None
  *
  * \par<b>Description: </b><br>

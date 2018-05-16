@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_prng.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -54,7 +54,7 @@
  * HEADER FILES
  *********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined (PRNG) 
 
@@ -156,18 +156,7 @@ extern "C" {
  */
 XMC_PRNG_INIT_STATUS_t XMC_PRNG_Init(const XMC_PRNG_INIT_t *prng);
 
-/**
- * @return None
- *
- * \par<b>Description: </b><br>
- * De-Initialize the PRNG peripheral <br>
- *
- * \par
- * The function deinitializes the PRNG peripheral. Clears the block size for key loading mode, 
- * disables key loading mode, disables streaming mode.
- * This function programmes the CTRL and WORD registers. 
- */
-void XMC_PRNG_DeInit(void);
+
 
 /**
  * @param block_size Block size of type ::XMC_PRNG_DATA_BLOCK_SIZE_t for read access
@@ -199,7 +188,7 @@ __STATIC_INLINE void XMC_PRNG_SetRandomDataBlockSize(XMC_PRNG_DATA_BLOCK_SIZE_t 
  */
 __STATIC_INLINE uint16_t XMC_PRNG_CheckValidStatus(void)
 {
-  return (PRNG->CHK & (uint16_t)0x01U);
+  return (PRNG->CHK & PRNG_CHK_RDV_Msk);
 }
 
 /**
@@ -276,8 +265,7 @@ __STATIC_INLINE void XMC_PRNG_LoadKeyWords(uint16_t key)
  */
 __STATIC_INLINE uint16_t XMC_PRNG_GetPseudoRandomNumber(void)
 {
-  return (((uint16_t)XMC_PRNG_RDBS_BYTE == (PRNG->CTRL & (uint16_t)PRNG_CTRL_RDBS_Msk)) ?
-          (PRNG->WORD & XMC_PRNG_RDBS_BYTE_READ_MASK) : PRNG->WORD);
+  return PRNG->WORD;
 }
 
 #ifdef __cplusplus

@@ -1,12 +1,12 @@
 /**
  * @file xmc_gpio.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -50,11 +50,11 @@
 #ifndef XMC_GPIO_H
 #define XMC_GPIO_H
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -90,14 +90,15 @@
  *@{
  */
  
-/*******************************************************************************
+/**********************************************************************************************************************
  * MACROS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
-#define PORT_IOCR_PC_Msk PORT0_IOCR0_PC0_Msk 	/**< Port input output control register(Pn_IOCR),
-													 PCx bit field-Mask :0xf8 */
-#define PORT_IOCR_PC_Size 				(8U) 	/**< Port input output control register(Pn_IOCR),
-													 PCx bit field-shift size */
+#define PORT_IOCR_PC_Pos PORT0_IOCR0_PC0_Pos
+#define PORT_IOCR_PC_Msk PORT0_IOCR0_PC0_Msk
+
+#define PORT_IOCR_PC_Size 				(8U)
+											
 
 #define XMC_GPIO_CHECK_OUTPUT_LEVEL(level) ((level == XMC_GPIO_OUTPUT_LEVEL_LOW) || \
                                             (level == XMC_GPIO_OUTPUT_LEVEL_HIGH))
@@ -106,44 +107,9 @@
                                        (hwctrl == XMC_GPIO_HWCTRL_PERIPHERAL1) || \
                                        (hwctrl == XMC_GPIO_HWCTRL_PERIPHERAL2))                                     
                                             
-/*******************************************************************************
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
-
-/**
- * Defines the direction and characteristics of a pin. Use type \a XMC_GPIO_MODE_t for this enum. For the operation
- * with alternate functions, the port pins are directly connected to input or output functions of the on-chip periphery.
- */
-
-typedef enum XMC_GPIO_MODE
-{
-  XMC_GPIO_MODE_INPUT_TRISTATE = 0x00UL, 	/**<  No internal pull device active */
-  XMC_GPIO_MODE_INPUT_PULL_DOWN = 0x08UL, 	/**<  Internal pull-down device active */
-  XMC_GPIO_MODE_INPUT_PULL_UP = 0x10UL, 	/**<  Internal pull-up device active */
-  XMC_GPIO_MODE_INPUT_SAMPLING = 0x18UL, 	/**<  No internal pull device active;Pn_OUTx continuously samples the
-  	  	  	  	  	  	  	  	  	  	  	  	  input value */
-  XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE = 0x20UL, 	/**<  Inverted no internal pull device active */
-  XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN = 0x28UL, 	/**<  Inverted internal pull-down device active */
-  XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP = 0x30UL, 	/**<  Inverted internal pull-up device active */
-  XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING = 0x38UL, 	/**<  Inverted no internal pull device active;Pn_OUTx continuously
-  	  	  	  	  	  	  	  	  	  	  	  	  	  	  samples the input value */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL = 0x80UL, 			/**< Push-pull general-purpose output */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1 = 0x88UL, 	/**<  Push-pull alternate output function 1 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2 = 0x90UL, 	/**<  Push-pull alternate output function 2 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3 = 0x98UL, 	/**<  Push-pull alternate output function 3 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4 = 0xA0UL, 	/**<  Push-pull alternate output function 4 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT5 = 0xA8UL, 	/**<  Push-pull alternate output function 5 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT6 = 0xB0UL, 	/**<  Push-pull alternate output function 6 */
-  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT7 = 0xB8UL, 	/**<  Push-pull alternate output function 7 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN = 0xc0UL, 		/**< Open-drain general-purpose output */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1 = 0xc8UL, 	/**<  Push-pull alternate output function 1 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2 = 0xD0UL, 	/**<  Push-pull alternate output function 2 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3 = 0xD8UL, 	/**<  Push-pull alternate output function 3 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4 = 0xE0UL, 	/**<  Push-pull alternate output function 4 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT5 = 0xE8UL, 	/**<  Push-pull alternate output function 5 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT6 = 0xF0UL, 	/**<  Push-pull alternate output function 6 */
-  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT7 = 0xF8UL 	/**<  Push-pull alternate output function 7 */
-} XMC_GPIO_MODE_t;
+ *********************************************************************************************************************/
 
 
 /**
@@ -165,21 +131,21 @@ typedef enum XMC_GPIO_HWCTRL
   XMC_GPIO_HWCTRL_PERIPHERAL2  = 0x2U  /**<  HWI1/HWO1 control path can override the software configuration */
 } XMC_GPIO_HWCTRL_t;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * DEVICE FAMILY EXTENSIONS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
  #if UC_FAMILY == XMC1
-#include <xmc1_gpio.h>
+#include "xmc1_gpio.h"
 #elif UC_FAMILY == XMC4
-#include <xmc4_gpio.h>
+#include "xmc4_gpio.h"
 #else
-#error "xmc_gpio.h: familiy device not supported"
+#error "xmc_gpio.h: family device not supported"
 #endif
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {

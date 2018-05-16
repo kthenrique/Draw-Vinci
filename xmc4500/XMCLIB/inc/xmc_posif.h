@@ -1,12 +1,12 @@
 /**
  * @file xmc_posif.h
- * @date 2015-07-02
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -117,7 +117,7 @@
 #define XMC_POSIF_INSEL_MAX              (4U) /*< Maximum possible input selector */
 #define XMC_POSIF_HALPS_HALLPAT_Msk      (0x3FUL)
 
-#if ((UC_SERIES == XMC45) || (UC_SERIES == XMC44))
+#if ((UC_SERIES == XMC45) || (UC_SERIES == XMC44) || (UC_SERIES == XMC47) || (UC_SERIES == XMC48) || (UC_SERIES == XMC14))
 #define XMC_POSIF_CHECK_MODULE_PTR(PTR)  ( ((PTR)== POSIF0) || ((PTR)== POSIF1) ) /*< Check for valid module pointer */
 #else
 #define XMC_POSIF_CHECK_MODULE_PTR(PTR)  ( ((PTR)== POSIF0))  /*< Check for valid module pointer */
@@ -722,7 +722,7 @@ __STATIC_INLINE void XMC_POSIF_HSC_SetExpectedPattern(XMC_POSIF_t *const periphe
  */
 __STATIC_INLINE void XMC_POSIF_HSC_SetHallPatterns(XMC_POSIF_t *const peripheral, const uint8_t pattern_mask)
 {
-  peripheral->HALPS = (uint32_t)(pattern_mask & XMC_POSIF_HALPS_HALLPAT_Msk);
+  peripheral->HALPS = (uint32_t)(pattern_mask & (POSIF_HALPS_HCPS_Msk | POSIF_HALPS_HEPS_Msk));
 }
 
 /**

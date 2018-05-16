@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_math.c
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -48,7 +48,13 @@
  *     - Removed version macros and declaration of GetDriverVersion API <br>
  *     - Updated copyright and change history section.
  *
- * @endcond 
+ * 2015-09-23: 
+ *     - Added SQRT functions
+ *
+ * 2015-10-08:
+ *     - Return values for sin(), cos(), sinh(), cosh(), arctan() are corrected.
+ *
+ * @endcond
  *
  */
 
@@ -146,6 +152,7 @@ bool XMC_MATH_GetEventStatus(const XMC_MATH_EVENT_t event)
   return (status);
 }
 
+#ifndef XMC_MATH_DISABLE_DIV_ABI
 /***********************************************************************************************************************
  * API IMPLEMENTATION - aeabi routines
  **********************************************************************************************************************/
@@ -156,9 +163,6 @@ uint32_t __aeabi_uidiv(uint32_t dividend, uint32_t divisor)
   MATH->DVD     = dividend;
   MATH->DVS     = divisor;
 
-  while(MATH->DIVST) /* Wait as divider unit is busy performing requested operation */
-  {
-  }
   return ((uint32_t) MATH->QUOT);
 }
 
@@ -169,9 +173,6 @@ int32_t __aeabi_idiv(int32_t dividend, int32_t divisor)
   MATH->DVD     = dividend;
   MATH->DVS     = divisor;
 
-  while(MATH->DIVST) /* Wait as divider unit is busy performing requested operation */
-  {
-  }
   return ((int32_t) MATH->QUOT);
 }
 
@@ -183,10 +184,6 @@ uint64_t __aeabi_uidivmod(uint32_t dividend, uint32_t divisor)
   MATH->DIVCON  = XMC_MATH_UNSIGNED_DIVISION;
   MATH->DVD     = dividend;
   MATH->DVS     = divisor;
-
-  while(MATH->DIVST) /* Wait as divider unit is busy performing requested operation */
-  {
-  }
 
   remainder = ((uint64_t) MATH->RMD) << 32U;
   return (remainder | MATH->QUOT);
@@ -202,14 +199,11 @@ int64_t __aeabi_idivmod(int32_t dividend, int32_t divisor)
   MATH->DVD     = dividend;
   MATH->DVS     = divisor;
 
-  while(MATH->DIVST) /* Wait as divider unit is busy performing requested operation */
-  {
-  }
-
   remainder = ((uint64_t) MATH->RMD) << 32U;
   result    = (remainder | MATH->QUOT);
   return ((int64_t) result);
 }
+#endif
 
 /***********************************************************************************************************************
  * API IMPLEMENTATION - Blocking functions
@@ -217,29 +211,28 @@ int64_t __aeabi_idivmod(int32_t dividend, int32_t divisor)
 /* This function computes the cosine of a given angle in radians */
 XMC_MATH_Q0_23_t XMC_MATH_CORDIC_Cos(XMC_MATH_Q0_23_t angle_in_radians)
 {
-  uint32_t result;
+  int32_t result;
   MATH->STATC = 0U; /* Clear register */
   MATH->CON   = (uint32_t) XMC_MATH_CORDIC_OPERATING_MODE_CIRCULAR + \
                 (uint32_t) XMC_MATH_CORDIC_ROTVEC_MODE_ROTATION;
   MATH->CORDZ = ((uint32_t) angle_in_radians) << MATH_CORDZ_DATA_Pos;
   MATH->CORDY = 0U;  /* Clear register */
   MATH->CORDX = XMC_MATH_RECIPROC_CIRCULAR_GAIN_IN_Q023 << MATH_CORDX_DATA_Pos;
-
-  result      = MATH->CORRX >> MATH_CORRX_RESULT_Pos;
+  result      = ((int32_t)MATH->CORRX) >> MATH_CORRX_RESULT_Pos;
   return ((XMC_MATH_Q0_23_t) result);
 }
 
 /* This function computes the sine of a given angle in radians */
 XMC_MATH_Q0_23_t XMC_MATH_CORDIC_Sin(XMC_MATH_Q0_23_t angle_in_radians)
 {
-  uint32_t result;
+  int32_t result;
   MATH->STATC = 0U; /* Clear register */
   MATH->CON   = (uint32_t) XMC_MATH_CORDIC_OPERATING_MODE_CIRCULAR + \
                 (uint32_t) XMC_MATH_CORDIC_ROTVEC_MODE_ROTATION;
   MATH->CORDZ = ((uint32_t)angle_in_radians) << MATH_CORDZ_DATA_Pos;
   MATH->CORDY = 0U; /* Clear register */
   MATH->CORDX = XMC_MATH_RECIPROC_CIRCULAR_GAIN_IN_Q023 << MATH_CORDX_DATA_Pos;
-  result      = MATH->CORRY >> MATH_CORRY_RESULT_Pos;
+  result      = ((int32_t)MATH->CORRY) >> MATH_CORRY_RESULT_Pos;
   return ((XMC_MATH_Q0_23_t) result);
 }
 
@@ -269,35 +262,35 @@ XMC_MATH_Q0_23_t XMC_MATH_CORDIC_ArcTan(XMC_MATH_Q8_15_t x, XMC_MATH_Q8_15_t y)
   MATH->CORDZ = 0U; /* Clear register */
   MATH->CORDY = ((uint32_t) y) << MATH_CORDY_DATA_Pos;
   MATH->CORDX = ((uint32_t) x) << MATH_CORDX_DATA_Pos;
-  result      = MATH->CORRZ >> MATH_CORRZ_RESULT_Pos;
+  result      = ((int32_t)MATH->CORRZ) >> MATH_CORRZ_RESULT_Pos;
   return ((XMC_MATH_Q0_23_t) result);
 }
 
 /* This function computes the hyperbolic cosine of a given angle in radians */
 XMC_MATH_Q1_22_t XMC_MATH_CORDIC_Cosh(XMC_MATH_Q0_23_t angle_in_radians)
 {
-  uint32_t result;
+  int32_t result;
   MATH->STATC = 0U; /* Clear register */
   MATH->CON   = (uint32_t) XMC_MATH_CORDIC_OPERATING_MODE_HYPERBOLIC + \
                 (uint32_t) XMC_MATH_CORDIC_ROTVEC_MODE_ROTATION;
   MATH->CORDZ = ((uint32_t) angle_in_radians) << MATH_CORDZ_DATA_Pos;
   MATH->CORDY = 0U; /* Clear register */
   MATH->CORDX = XMC_MATH_RECIPROC_HYPERBOLIC_GAIN_IN_Q1_22 << MATH_CORDX_DATA_Pos;
-  result      = MATH->CORRX >> MATH_CORRX_RESULT_Pos;
+  result      = ((int32_t)MATH->CORRX) >> MATH_CORRX_RESULT_Pos;
   return ((XMC_MATH_Q1_22_t) result);
 }
 
 /* This function computes the hyperbolic sine of a given angle in radians */
 XMC_MATH_Q1_22_t XMC_MATH_CORDIC_Sinh(XMC_MATH_Q0_23_t angle_in_radians)
 {
-  uint32_t result;
+  int32_t result;
   MATH->STATC = 0U; /* Clear register */
   MATH->CON   = (uint32_t) XMC_MATH_CORDIC_OPERATING_MODE_HYPERBOLIC + \
                 (uint32_t) XMC_MATH_CORDIC_ROTVEC_MODE_ROTATION;
   MATH->CORDZ = ((uint32_t)angle_in_radians) << MATH_CORDZ_DATA_Pos;
   MATH->CORDY = 0U; /* Clear register */
   MATH->CORDX = XMC_MATH_RECIPROC_HYPERBOLIC_GAIN_IN_Q1_22 << MATH_CORDX_DATA_Pos;
-  result      = MATH->CORRY >> MATH_CORRY_RESULT_Pos;
+  result      = ((int32_t)MATH->CORRY) >> MATH_CORRY_RESULT_Pos;
   return ((XMC_MATH_Q1_22_t) result);
 }
 
@@ -434,6 +427,37 @@ void XMC_MATH_DIV_SignedModNB(int32_t dividend, int32_t divisor)
   MATH->DIVCON = XMC_MATH_SIGNED_DIVISION;
   MATH->DVD    = dividend;
   MATH->DVS    = divisor;
+}
+
+int16_t XMC_MATH_CORDIC_Q15_Sqrt(int16_t x)
+{
+  int32_t temp;
+  MATH->STATC = 0U; /* Clear register */
+
+  MATH->CON   = (uint32_t)XMC_MATH_CORDIC_OPERATING_MODE_HYPERBOLIC |
+                (uint32_t)XMC_MATH_CORDIC_ROTVEC_MODE_VECTORING;
+
+  temp = (int32_t)x << 15; /* Q30 to handle numbers > 1.0 */
+
+  MATH->CORDY = (temp - 0x10000000U); /* x - 0.25 */
+  MATH->CORDX = (temp + 0x10000000U); /* x + 0.25 */
+
+  return (int16_t)(((MATH->CORRX >> 14) * 39568) >> 16); /* Q16 * Q15 */
+}
+
+int32_t XMC_MATH_CORDIC_Q31_Sqrt(int32_t x)
+{
+  MATH->STATC = 0U; /* Clear register */
+
+  MATH->CON   = (uint32_t)XMC_MATH_CORDIC_OPERATING_MODE_HYPERBOLIC |
+                (uint32_t)XMC_MATH_CORDIC_ROTVEC_MODE_VECTORING;
+
+  x >>= 1;  /* Q30 to handle numbers > 1.0 */
+
+  MATH->CORDY = (x - 0x10000000U); /* x - 0.25 */
+  MATH->CORDX = (x + 0x10000000U); /* x + 0.25 */
+
+  return ((MATH->CORRX >> 14) * 39568); /* Q16 * Q15 */
 }
 
 #endif /* end of #if defined (MATH) */

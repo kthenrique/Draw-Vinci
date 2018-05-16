@@ -1,12 +1,12 @@
 /**
  * @file xmc_posif.c
- * @date 2015-06-19 
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -65,11 +65,30 @@
 
 /* POSIF is not available on XMC1100 and XMC1200 */
 #if defined(POSIF0)
+#include <xmc_scu.h>
 
 /*********************************************************************************************************************
  * MACROS
  ********************************************************************************************************************/
+#define XMC_POSIF_PCONF_INSEL_Msk        (0x3fUL << POSIF_PCONF_INSEL0_Pos) /*< Mask for input pins selection */
+#define XMC_POSIF_INSEL_MAX              (4U) /*< Maximum possible input selector */
 
+/*********************************************************************************************************************
+ * LOCAL ROUTINES
+ ********************************************************************************************************************/
+#ifdef XMC_ASSERT_ENABLE
+__STATIC_INLINE bool XMC_POSIF_IsPeripheralValid(const XMC_POSIF_t *const peripheral)
+{
+  bool tmp;
+
+  tmp = (peripheral == POSIF0);
+#if defined(POSIF1)  
+  tmp |= (peripheral == POSIF1);
+#endif
+
+  return tmp;  
+}
+#endif
 /*********************************************************************************************************************
  * API IMPLEMENTATION
  ********************************************************************************************************************/
@@ -77,71 +96,73 @@
 /* API to enable the POSIF module */
 void XMC_POSIF_Enable(XMC_POSIF_t *const peripheral)
 {
-  XMC_ASSERT("XMC_POSIF_Enable:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+#if UC_FAMILY == XMC4
+   XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_CCU);
+#endif
 
-  if (POSIF0 == peripheral)
+  switch ((uint32_t)peripheral)
   {
-    #if (UC_FAMILY == XMC4)
-      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF0);
-      XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_CCU);
-      #if ((UC_SERIES == XMC44) || (UC_SERIES == XMC42) || (UC_SERIES == XMC41))
-        XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF0);
-      #endif
-    #elif ((UC_SERIES == XMC13))
+    case (uint32_t)POSIF0:
+#if defined(CLOCK_GATING_SUPPORTED)
       XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF0);
-    #endif
-  }
-  else
-  {
-    #if (UC_FAMILY == XMC4)
-      #if ((UC_SERIES == XMC44)|| (UC_SERIES == XMC45))
-        XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF1);
-        XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_CCU);
-      #endif
-      #if ((UC_SERIES == XMC44))
-        XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF1);
-      #endif
+#endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF0);
+#endif
+      break;
+      
+#if defined(POSIF1)
+    case (uint32_t)POSIF1:
+#if defined(CLOCK_GATING_SUPPORTED)
+      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF1);
+#endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF1);
+#endif
+      break;
+#endif
 
-    #endif
-
+    default:
+      XMC_ASSERT("XMC_POSIF_Disable:Invalid module pointer", 0);
+      break;      
   }
 }
 
 /* API to disable the POSIF module */
 void XMC_POSIF_Disable(XMC_POSIF_t *const peripheral)
 {
-  XMC_ASSERT("XMC_POSIF_Disable:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
-
-  if (POSIF0 == peripheral)
+  switch ((uint32_t)peripheral)
   {
-    #if (UC_FAMILY == XMC4)
-    XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF0);
-    XMC_SCU_CLOCK_DisableClock(XMC_SCU_CLOCK_CCU);
-      #if ((UC_SERIES == XMC44) || (UC_SERIES == XMC42) || (UC_SERIES == XMC41))
+    case (uint32_t)POSIF0:
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF0);
+#endif
+#if defined(CLOCK_GATING_SUPPORTED)
       XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF0);
-      #endif
-    #elif ((UC_SERIES == XMC13))
-    XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF0);
-    #endif
-  }
-  else
-  {
-    #if (UC_FAMILY == XMC4)
-      #if ((UC_SERIES == XMC44)|| (UC_SERIES == XMC45))
-        XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF1);
-        XMC_SCU_CLOCK_DisableClock(XMC_SCU_CLOCK_CCU);
-      #endif
-      #if ((UC_SERIES == XMC44))
-        XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF1);
-      #endif
-    #endif
+#endif
+      break;
+      
+#if defined(POSIF1)
+    case (uint32_t)POSIF1:
+#if defined(PERIPHERAL_RESET_SUPPORTED)
+      XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_POSIF1);
+#endif
+#if defined(CLOCK_GATING_SUPPORTED)
+      XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_POSIF1);
+#endif
+      break;
+#endif
+    
+    default:
+      XMC_ASSERT("XMC_POSIF_Disable:Invalid module pointer", 0);
+      break;      
   }
 }
 
 /* API to initialize POSIF global resources */
 void XMC_POSIF_Init(XMC_POSIF_t *const peripheral, const XMC_POSIF_CONFIG_t *const config)
 {
-  XMC_ASSERT("XMC_POSIF_Init:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_Init:Invalid module pointer", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_Init:NULL Pointer", (config != (XMC_POSIF_CONFIG_t *)NULL) );
 
   /* Enable the POSIF module */
@@ -159,7 +180,7 @@ XMC_POSIF_STATUS_t XMC_POSIF_HSC_Init(XMC_POSIF_t *const peripheral, const XMC_P
 {
   XMC_POSIF_STATUS_t retval;
   
-  XMC_ASSERT("XMC_POSIF_HSC_Init:Invalid module pointer\n", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_HSC_Init:Invalid module pointer\n", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_HSC_Init:NULL Pointer\n", (config != (XMC_POSIF_HSC_CONFIG_t *)NULL) );
 
   if (XMC_POSIF_MODE_HALL_SENSOR == (XMC_POSIF_MODE_t)((peripheral->PCONF) & (uint32_t)POSIF_PCONF_FSEL_Msk) )
@@ -180,7 +201,7 @@ XMC_POSIF_STATUS_t XMC_POSIF_QD_Init(XMC_POSIF_t *const peripheral, const XMC_PO
   uint8_t reg;
   XMC_POSIF_STATUS_t retval;
   
-  XMC_ASSERT("XMC_POSIF_QD_Init:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_QD_Init:Invalid module pointer", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_QD_Init:NULL Pointer", (config != (XMC_POSIF_QD_CONFIG_t *)NULL) );
 
   reg = (uint8_t)((peripheral->PCONF) & (uint32_t)POSIF_PCONF_FSEL_Msk);
@@ -206,7 +227,7 @@ XMC_POSIF_STATUS_t XMC_POSIF_MCM_Init(XMC_POSIF_t *const peripheral, const XMC_P
 {
   XMC_POSIF_STATUS_t retval;
 
-  XMC_ASSERT("XMC_POSIF_MCM_Init:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_MCM_Init:Invalid module pointer", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_MCM_Init:NULL Pointer", (config != (XMC_POSIF_MCM_CONFIG_t *)NULL) );
 
   if ((XMC_POSIF_MODE_t)((peripheral->PCONF) & (uint32_t)POSIF_PCONF_FSEL_Msk) != XMC_POSIF_MODE_QD)
@@ -226,7 +247,7 @@ void XMC_POSIF_SelectInputSource (XMC_POSIF_t *const peripheral, const XMC_POSIF
     const XMC_POSIF_INPUT_PORT_t input1, const XMC_POSIF_INPUT_PORT_t input2)
 {
   uint32_t reg;
-  XMC_ASSERT("XMC_POSIF_SelectInputSource:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_SelectInputSource:Invalid module pointer", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_SelectInputSource:Wrong input port input0", (input0 < XMC_POSIF_INSEL_MAX));
   XMC_ASSERT("XMC_POSIF_SelectInputSource:Wrong input port input1", (input1 < XMC_POSIF_INSEL_MAX));
   XMC_ASSERT("XMC_POSIF_SelectInputSource:Wrong input port input2", (input2 < XMC_POSIF_INSEL_MAX));
@@ -242,7 +263,7 @@ void XMC_POSIF_SetInterruptNode(XMC_POSIF_t *const peripheral, const XMC_POSIF_I
 {
   uint32_t reg;
   
-  XMC_ASSERT("XMC_POSIF_SetInterruptNode:Invalid module pointer", XMC_POSIF_CHECK_MODULE_PTR(peripheral));
+  XMC_ASSERT("XMC_POSIF_SetInterruptNode:Invalid module pointer", XMC_POSIF_IsPeripheralValid(peripheral));
   XMC_ASSERT("XMC_POSIF_SetInterruptNode:Wrong IRQ event", (event <= XMC_POSIF_IRQ_EVENT_PCLK) );
   XMC_ASSERT("XMC_POSIF_SetInterruptNode:Wrong SR ID", (sr <= XMC_POSIF_SR_ID_1) );
   

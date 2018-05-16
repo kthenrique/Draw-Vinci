@@ -1,12 +1,12 @@
 /**
  * @file xmc_pau.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -54,7 +54,7 @@
 /*********************************************************************************************************************
  * HEADER FILES
  *********************************************************************************************************************/
-#include <xmc_pau.h>
+#include "xmc_pau.h"
 
 #if defined(PAU)
 

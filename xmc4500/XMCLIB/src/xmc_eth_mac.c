@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_eth_mac.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -38,7 +38,14 @@
  * --------------
  *
  * 2015-06-20:
- *     - Initial <br>
+ *     - Initial
+ *
+ * 2015-09-01:
+ *     - Add clock gating control in enable/disable APIs
+ *     - Add transmit polling if run out of buffers
+ *
+ * 2015-11-30:
+ *     - Fix XMC_ETH_MAC_GetRxFrameSize return value in case of errors
  *
  * @endcond
  */
@@ -330,6 +337,13 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_SendFrame(XMC_ETH_MAC_t *const eth_mac, const u
   {
     /* Transmitter is busy, wait */
     status = XMC_ETH_MAC_STATUS_BUSY;
+    if (eth_mac->regs->STATUS & ETH_STATUS_TU_Msk)
+    {
+      /* Receive buffer unavailable, resume DMA */
+      eth_mac->regs->STATUS = (uint32_t)ETH_STATUS_TU_Msk;
+      eth_mac->regs->TRANSMIT_POLL_DEMAND = 0U;
+    }
+
   }
   else
   {
@@ -434,16 +448,18 @@ uint32_t XMC_ETH_MAC_GetRxFrameSize(XMC_ETH_MAC_t *const eth_mac)
     /* Owned by DMA */
     len = 0U;
   }
-
-  if (((status & ETH_MAC_DMA_RDES0_ES) != 0U) ||
-      ((status & ETH_MAC_DMA_RDES0_FS) == 0U) ||
-      ((status & ETH_MAC_DMA_RDES0_LS) == 0U)) {
+  else if (((status & ETH_MAC_DMA_RDES0_ES) != 0U) ||
+           ((status & ETH_MAC_DMA_RDES0_FS) == 0U) ||
+           ((status & ETH_MAC_DMA_RDES0_LS) == 0U)) 
+  {
     /* Error, this block is invalid */
     len = 0xFFFFFFFFU;
   }
-
-  /* Subtract CRC */
-  len = ((status & ETH_MAC_DMA_RDES0_FL) >> 16U) - 4U;
+  else 
+  {
+    /* Subtract CRC */
+    len = ((status & ETH_MAC_DMA_RDES0_FL) >> 16U) - 4U;
+  }
 
   return len;
 }
@@ -495,6 +511,9 @@ XMC_ETH_MAC_STATUS_t XMC_ETH_MAC_SetManagmentClockDivider(XMC_ETH_MAC_t *const e
 void XMC_ETH_MAC_Enable(XMC_ETH_MAC_t *const eth_mac)
 {
   XMC_SCU_CLOCK_EnableClock(XMC_SCU_CLOCK_ETH);
+#if UC_DEVICE != XMC4500
+  XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_ETH0);
+#endif
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_ETH0);
 }
 
@@ -502,6 +521,9 @@ void XMC_ETH_MAC_Enable(XMC_ETH_MAC_t *const eth_mac)
 void XMC_ETH_MAC_Disable(XMC_ETH_MAC_t *const eth_mac)
 {
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_ETH0);
+#if UC_DEVICE != XMC4500
+  XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_ETH0);
+#endif
   XMC_SCU_CLOCK_DisableClock(XMC_SCU_CLOCK_ETH);
 }
 

@@ -1,12 +1,12 @@
 /**
  * @file xmc_spi.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -44,7 +44,13 @@
  *     - Modified XMC_SPI_CH_SetInterwordDelay() implementation in order to gain accuracy <br>
  *     
  * 2015-06-20:
- *     - Removed GetDriverVersion API
+ *     - Removed GetDriverVersion API <br>
+ *
+ * 2015-09-01:
+ *     - Modified XMC_SPI_CH_EnableEvent() and XMC_SPI_CH_DisableEvent() for supporting multiple events configuration <br>
+ *
+ * 2015-11-04: 
+ *     - Modified the check of XMC_USIC_CH_GetTransmitBufferStatus() in the XMC_SPI_CH_Transmit() flag <br>
  * @endcond 
  *
  */
@@ -57,9 +63,8 @@
  * HEADER FILES
  ********************************************************************************************************************/
 
-#include <xmc_spi.h>
-
 #include <xmc_scu.h>
+#include <xmc_spi.h>
 
 /*********************************************************************************************************************
  * MACROS
@@ -84,10 +89,12 @@ void XMC_SPI_CH_Init(XMC_USIC_CH_t *const channel, const XMC_SPI_CH_CONFIG_t *co
   /* Configuration of USIC Shift Control */
   /* Transmission Mode (TRM) = 1  */
   /* Passive Data Level (PDL) = 1 */
+  /* FHTW: SDIR-Bit (Bit 0 of SCTR) to 1 in order to send MSB first */
   channel->SCTR = USIC_CH_SCTR_PDL_Msk |
                   (0x1UL << USIC_CH_SCTR_TRM_Pos) |
                   (0x3fUL << USIC_CH_SCTR_FLE_Pos)|
-                  (0x7UL << USIC_CH_SCTR_WLE_Pos);
+                  (0x7UL << USIC_CH_SCTR_WLE_Pos) |
+				  (0x1UL << USIC_CH_SCTR_SDIR_Pos);
 
   /* Configuration of USIC Transmit Control/Status Register */
   /* TBUF Data Enable (TDEN) = 1 */
@@ -156,7 +163,7 @@ void XMC_SPI_CH_Transmit(XMC_USIC_CH_t *const channel, const uint16_t data, cons
   /* Check FIFO size */
   if ((channel->TBCTR & USIC_CH_TBCTR_SIZE_Msk) == 0U)
   {
-    while((uint32_t)XMC_USIC_CH_GetTransmitBufferStatus(channel) & (uint32_t)XMC_USIC_CH_TBUF_STATUS_BUSY)
+    while((uint32_t)XMC_USIC_CH_GetTransmitBufferStatus(channel) == (uint32_t)XMC_USIC_CH_TBUF_STATUS_BUSY)
     {
     }
   
@@ -178,6 +185,10 @@ uint16_t XMC_SPI_CH_GetReceivedData(XMC_USIC_CH_t *const channel)
   /* Check FIFO size */
   if ((channel->RBCTR & USIC_CH_RBCTR_SIZE_Msk) == 0U)
   {
+	/*FHTW: check ReceiveBuffer Status added */
+	while(((uint32_t)XMC_USIC_CH_GetReceiveBufferStatus(channel) != (uint32_t)XMC_USIC_CH_RBUF_STATUS_DATA_VALID1)&&((uint32_t)XMC_USIC_CH_GetReceiveBufferStatus(channel) != (uint32_t)XMC_USIC_CH_RBUF_STATUS_DATA_VALID0))
+	{
+	}
     retval = (uint16_t)channel->RBUF;
   }
   else
@@ -263,24 +274,12 @@ XMC_SPI_CH_STATUS_t XMC_SPI_CH_Stop(XMC_USIC_CH_t *const channel)
 
 void XMC_SPI_CH_EnableEvent(XMC_USIC_CH_t *const channel, const uint32_t event)
 {
-  if ((event & 0x80000000U) != 0U)
-  {
-    channel->CCR |= event & 0x7fffffffU;
-  }
-  else
-  {
-    channel->PCR_SSCMode |= event;
-  }
+  channel->CCR |= (event&0x1fc00U);
+  channel->PCR_SSCMode |= ((event << 13U) & 0xe000U);
 }
 
 void XMC_SPI_CH_DisableEvent(XMC_USIC_CH_t *const channel, const uint32_t event)
 {
-  if ((event & 0x80000000U) != 0U)
-  {
-    channel->CCR &= (uint32_t)~(event & 0x7fffffffU);
-  }
-  else
-  {
-    channel->PCR_SSCMode &= (uint32_t)~event;
-  }
+  channel->CCR &= (uint32_t)~(event&0x1fc00U);
+  channel->PCR_SSCMode &= (uint32_t)~((event << 13U) & 0xe000U);
 }

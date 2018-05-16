@@ -1,44 +1,37 @@
 /**
  * @file xmc_dsd.h
- * @date 2015-07-16 
+ * @date 2016-01-12
  *
  * @cond
- **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+*********************************************************************************************************************
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
- * Redistribution and use in source and binary forms, with or without           
- * modification,are permitted provided that the following conditions are met:   
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
+ * following conditions are met:   
  *                                                                              
- *   Redistributions of source code must retain the above copyright notice,      
- *   this list of conditions and the following disclaimer.                        
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following 
+ * disclaimer.                        
  * 
- *   Redistributions in binary form must reproduce the above copyright notice,   
- *   this list of conditions and the following disclaimer in the documentation    
- *   and/or other materials provided with the distribution.                       
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following 
+ * disclaimer in the documentation and/or other materials provided with the distribution.                       
  * 
- *   Neither the name of the copyright holders nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without
- *   specific prior written permission.                                           
+ * Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote 
+ * products derived from this software without specific prior written permission.                                           
  *                                                                              
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"  
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE    
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE   
- * ARE  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   
- * LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF         
- * SUBSTITUTE GOODS OR  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN      
- * CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)       
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE   
- * POSSIBILITY OF SUCH DAMAGE.                                                  
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE  
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR  
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                  
  *                                                                              
- * To improve the quality of the software, users are encouraged to share        
- * modifications, enhancements or bug fixes with Infineon Technologies AG       
- * dave@infineon.com).                                                          
- **********************************************************************************
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes with 
+ * Infineon Technologies AG dave@infineon.com).                                                          
+ *********************************************************************************************************************
  *
  * Change History
  * --------------
@@ -49,8 +42,14 @@
  * 2015-06-19:
  *     - Removed version macros and declaration of GetDriverVersion API <BR>
  *     - Added API XMC_DSD_CH_GetRectifyDelay <BR>
+ *
  * 2015-07-16:
  *     - Renamed API “XMC_DSD_CH_AuxFilter_SetBoudary()” to “XMC_DSD_CH_AuxFilter_SetBoundary()” <BR>
+ *
+ * 2015-09-18:
+ *     - Added APIs "XMC_DSD_SetResultEventFlag()","XMC_DSD_ClearResultEventFlag()"
+ *       "XMC_DSD_SetAlarmEventFlag()" and "XMC_DSD_ClearAlarmEventFlag()" <BR>
+ *     - Support added for XMC4800 microcontroller family <BR>
  * @endcond
  *
  */
@@ -60,14 +59,13 @@
 #define XMC_DSD_H
 
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
+ *********************************************************************************************************************/
 #include <xmc_common.h>
-#include <xmc_scu.h>
-
 
 #if defined(DSD)
+#include <xmc_scu.h>
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -77,10 +75,11 @@
 /**
  * @addtogroup DSD
 * @{
-* @brief Delta Sigma Demodulator (DSD) driver for the XMC4500 and XMC4400 microcontroller family <br>
+* @brief Delta Sigma Demodulator (DSD) driver for the XMC4500, XMC4400 and XMC4800 microcontroller family <br>
  *
  * The DSD unit provides a series of digital input channels accepting data streams from external modulators
- * using the Delta/Sigma (DS) conversion principle. The on-chip demodulator channels convert these inputs to discrete digital values.
+ * using the Delta/Sigma (DS) conversion principle. The on-chip demodulator channels convert these inputs to 
+ * discrete digital values.
  * DSD unit can be used for isolated current/voltage measurement and for sensor interfaces.<br>
  *
  * Driver is divided in six DSD functional blocks -
@@ -100,22 +99,24 @@
  * -# Configuration structure XMC_DSD_CH_TIMESTAMP_CONFIG_t and initialization function XMC_DSD_CH_Timestamp_Init() to configure timestamp
  * -# Configuration structure XMC_DSD_CH_RECTIFY_CONFIG_t and initialization function XMC_DSD_CH_Rectify_Init() to configure rectifier
  */
-
-/*******************************************************************************
+ 
+ /*********************************************************************************************************************
  * MACROS
- *******************************************************************************/
-#define XMC_DSD_MIN_FILTER_START  (4U)
-#define XMC_DSD_MIN_DECIMATION_FACTOR (4U)
-#define XMC_DSD_MAX_DECIMATION_FACTOR (256U)
-#define XMC_DSD_MAX_DECIMATION_FACTOR_AUX (32U)
-
-#define XMC_DSD_CHECK_MODULE_PTR(PTR)  ( ((PTR)== DSD))
-#define XMC_DSD_CHECK_CHANNEL_PTR(PTR) ( ((PTR) == DSD_CH0) || ((PTR) == DSD_CH1) || ((PTR) == DSD_CH2) || ((PTR) == DSD_CH3))
-
-/*******************************************************************************
+ ********************************************************************************************************************/
+ #define XMC_DSD_CHECK_MODULE_PTR(PTR)  ( ((PTR)== DSD))
+ #define XMC_DSD_CHECK_CHANNEL_PTR(PTR) ( ((PTR) == DSD_CH0) || ((PTR) == DSD_CH1) || ((PTR) == DSD_CH2) || ((PTR) == DSD_CH3))
+ 
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
+ *********************************************************************************************************************/
+/**
+ * DSD Channel
+ */
 typedef DSD_CH_TypeDef XMC_DSD_CH_t;
+
+/**
+ * DSD Module
+ */
 typedef DSD_GLOBAL_TypeDef XMC_DSD_t;
 
 
@@ -566,9 +567,9 @@ typedef struct XMC_DSD_CONFIG
 } XMC_DSD_CH_CONFIG_t;
 
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -580,7 +581,7 @@ extern "C" {
  * \par<b>Description</b><br>
  * De-asserts the DSD module from reset.\n
  * Configures \a PRCLR0 register's \a DSDRS bit field.
- * If running on XMC44 device then it will ungate the peripheral clock.
+ * If running on XMC44/XMC48 device then it will ungate the peripheral clock.
  *
  * \par<b>Note</b><br>
  * It is internally called by XMC_DSD_Init().
@@ -597,7 +598,7 @@ void XMC_DSD_Enable(XMC_DSD_t *const dsd);
  * \par<b>Description</b><br>
  * Asserts the DSD module into reset.\n
  * Configures \a PRSET0 register's \a DSDRS bit field.
- * If running on XMC44 device then it will gate the peripheral clock.
+ * If running on XMC44/XMC48 device then it will gate the peripheral clock.
  *
  * \par<b>Related APIs:</b><BR>
  * XMC_DSD_Enable()\n\n\n
@@ -707,6 +708,7 @@ XMC_DSD_STATUS_t XMC_DSD_CH_Init(XMC_DSD_CH_t *const channel, const XMC_DSD_CH_C
  */
 __STATIC_INLINE void XMC_DSD_Start(XMC_DSD_t *const dsd, const uint32_t channel)
 {
+  XMC_ASSERT("XMC_DSD_Start:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   dsd->GLOBRC |= channel;
 }
 
@@ -727,6 +729,7 @@ __STATIC_INLINE void XMC_DSD_Start(XMC_DSD_t *const dsd, const uint32_t channel)
  */
 __STATIC_INLINE void XMC_DSD_Stop(XMC_DSD_t *const dsd, const uint32_t channel)
 {
+  XMC_ASSERT("XMC_DSD_Stop:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   dsd->GLOBRC &= (uint32_t) ~channel;
 }
 
@@ -744,6 +747,7 @@ __STATIC_INLINE void XMC_DSD_Stop(XMC_DSD_t *const dsd, const uint32_t channel)
 __STATIC_INLINE bool XMC_DSD_IsChannelStarted(XMC_DSD_t *const dsd, const XMC_DSD_CH_ID_t channel)
 {
   bool status;
+  XMC_ASSERT("XMC_DSD_IsChannelStarted:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   if (dsd->GLOBRC & (uint32_t)channel)
   {
     status = true;
@@ -767,7 +771,7 @@ __STATIC_INLINE bool XMC_DSD_IsChannelStarted(XMC_DSD_t *const dsd, const XMC_DS
  * \par<b>Related APIs:</b><br>
  * XMC_DSD_CH_GetResult_TS()\n\n\n
  */
-__STATIC_INLINE void XMC_DSD_CH_GetResult(XMC_DSD_CH_t *const channel, int16_t* dsd_Result)
+__STATIC_INLINE void XMC_DSD_CH_GetResult(XMC_DSD_CH_t *const channel, int16_t* dsd_Result) 
 {
   uint16_t result;
   result = (uint16_t)((uint32_t)channel->RESM & DSD_CH_RESM_RESULT_Msk);
@@ -829,8 +833,8 @@ __STATIC_INLINE void XMC_DSD_CH_GetResult_AUX(XMC_DSD_CH_t *const channel, int16
 }
 
 /**
- * @param  channel  Pointer to an instance of DSD module of type @ref XMC_DSD_t
- * @param  init     Pointer to an instance of data structure of type @ref XMC_DSD_GENERATOR_CONFIG_t
+ * @param  dsd  Pointer to an instance of DSD module of type @ref XMC_DSD_t
+ * @param  init Pointer to an instance of data structure of type @ref XMC_DSD_GENERATOR_CONFIG_t
  * @return None
  *
  * \par<b>Description</b><br>
@@ -855,6 +859,8 @@ void XMC_DSD_Generator_Init(XMC_DSD_t *const dsd, const XMC_DSD_GENERATOR_CONFIG
  */
 __STATIC_INLINE void XMC_DSD_Generator_Start(XMC_DSD_t *const dsd, const XMC_DSD_GENERATOR_CONFIG_t *const config)
 {
+  XMC_ASSERT("XMC_DSD_Generator_Start:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
+  XMC_ASSERT("XMC_DSD_Generator_Start:NULL Pointer", (config != (XMC_DSD_GENERATOR_CONFIG_t *)NULL) );
   dsd->CGCFG |= config->mode;
 }
 
@@ -874,6 +880,7 @@ __STATIC_INLINE void XMC_DSD_Generator_Start(XMC_DSD_t *const dsd, const XMC_DSD
  */
 __STATIC_INLINE void XMC_DSD_Generator_Stop(XMC_DSD_t *const dsd)
 {
+  XMC_ASSERT("XMC_DSD_Generator_Stop:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   dsd->CGCFG &= ~((uint32_t)DSD_CGCFG_CGMOD_Msk);
 }
 
@@ -910,6 +917,7 @@ void XMC_DSD_CH_MainFilter_Init(XMC_DSD_CH_t *const channel, const XMC_DSD_CH_FI
 */
 __STATIC_INLINE void XMC_DSD_CH_MainFilter_SetOffset(XMC_DSD_CH_t *const channel, const int16_t offset)
 {
+  XMC_ASSERT("XMC_DSD_CH_MainFilter_SetOffset:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->OFFM = (uint32_t)offset;
 }
 
@@ -925,6 +933,7 @@ __STATIC_INLINE void XMC_DSD_CH_MainFilter_SetOffset(XMC_DSD_CH_t *const channel
 */
 __STATIC_INLINE void XMC_DSD_CH_MainFilter_EnableEvent(XMC_DSD_CH_t *const channel)
 {
+  XMC_ASSERT("XMC_DSD_CH_MainFilter_EnableEvent:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->FCFGC |= (uint32_t)DSD_CH_FCFGC_SRGM_Msk;
 }
 
@@ -939,6 +948,7 @@ __STATIC_INLINE void XMC_DSD_CH_MainFilter_EnableEvent(XMC_DSD_CH_t *const chann
 */
 __STATIC_INLINE void XMC_DSD_CH_MainFilter_DisableEvent(XMC_DSD_CH_t *const channel)
 {
+  XMC_ASSERT("XMC_DSD_CH_MainFilter_DisableEvent:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->FCFGC &= ~((uint32_t)DSD_CH_FCFGC_SRGM_Msk);
 }
 
@@ -982,6 +992,7 @@ __STATIC_INLINE void XMC_DSD_CH_AuxFilter_SetBoundary(
                                                    const int16_t lower_boundary,
                                                    const int16_t upper_boundary)
 {
+  XMC_ASSERT("XMC_DSD_CH_AuxFilter_SetBoundary:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->BOUNDSEL = (((uint32_t)upper_boundary << (uint32_t)DSD_CH_BOUNDSEL_BOUNDARYU_Pos)
                       | ((uint32_t)lower_boundary & (uint32_t)DSD_CH_BOUNDSEL_BOUNDARYL_Msk));
 }
@@ -999,6 +1010,7 @@ __STATIC_INLINE void XMC_DSD_CH_AuxFilter_SetBoundary(
 */
 __STATIC_INLINE void XMC_DSD_CH_AuxFilter_EnableEvent(XMC_DSD_CH_t *const channel, XMC_DSD_CH_AUX_EVENT_t event)
 {
+  XMC_ASSERT("XMC_DSD_CH_AuxFilter_EnableEvent:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->FCFGA &= ~((uint32_t)DSD_CH_FCFGA_ESEL_Msk|(uint32_t)DSD_CH_FCFGA_SRGA_Msk);
   channel->FCFGA |= ((uint32_t)event << DSD_CH_FCFGA_SRGA_Pos);
 }
@@ -1014,6 +1026,7 @@ __STATIC_INLINE void XMC_DSD_CH_AuxFilter_EnableEvent(XMC_DSD_CH_t *const channe
 */
 __STATIC_INLINE void XMC_DSD_CH_AuxFilter_DisableEvent(XMC_DSD_CH_t *const channel)
 {
+  XMC_ASSERT("XMC_DSD_CH_AuxFilter_DisableEvent:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   channel->FCFGA &= ~((uint32_t)DSD_CH_FCFGA_ESEL_Msk|(uint32_t)DSD_CH_FCFGA_SRGA_Msk);
 }
 
@@ -1056,6 +1069,7 @@ void XMC_DSD_CH_Rectify_Init(XMC_DSD_CH_t *const channel, const XMC_DSD_CH_RECTI
 
 /**
  * @param  channel  Pointer to an instance of DSD channel of type @ref XMC_DSD_CH_t
+ * @param  delay    Captured value
  * @return uint8_t
  *
  * \par<b>Description</b><br>
@@ -1067,9 +1081,93 @@ void XMC_DSD_CH_Rectify_Init(XMC_DSD_CH_t *const channel, const XMC_DSD_CH_RECTI
 */
 __STATIC_INLINE void XMC_DSD_CH_GetRectifyDelay(XMC_DSD_CH_t *const channel, uint8_t* delay)
 {
+  XMC_ASSERT("XMC_DSD_CH_GetRectifyDelay:Invalid module pointer", XMC_DSD_CHECK_CHANNEL_PTR(channel));
   *delay = (uint8_t)((channel->CGSYNC & DSD_CH_CGSYNC_SDCAP_Msk ) >> DSD_CH_CGSYNC_SDCAP_Pos);
 }
-
+/**
+ * @param  dsd  Pointer to an instance of DSD module of type @ref XMC_DSD_t
+ * @param  channel_id   Channel number register value of type @ref XMC_DSD_CH_ID_t
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Set the result event flag and trigger the corresponding event.\n
+ * Set bit fields \a RESEVx of register \a EVFLAG.Clearing these bits has no effect.
+ *
+ * \par<b>Note</b><br>
+ * API call for channel-0  : XMC_DSD_SetResultEventFlag(DSD,(uint32_t)XMC_DSD_CH_ID_0);
+ * API call for channel-0 and 1: XMC_DSD_SetResultEventFlag(DSD,(uint32_t)(XMC_DSD_CH_ID_0|XMC_DSD_CH_ID_1));
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_DSD_ClearResultEventFlag()\n\n\n
+ */
+__STATIC_INLINE void XMC_DSD_SetResultEventFlag(XMC_DSD_t *const dsd, const uint32_t channel_id)
+{
+  XMC_ASSERT("XMC_DSD_SetResultEventFlag:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
+  dsd->EVFLAG = channel_id;
+}
+/**
+ * @param  dsd  Pointer to an instance of DSD module of type @ref XMC_DSD_t
+ * @param  channel_id   Channel number register value of type @ref XMC_DSD_CH_ID_t
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Clear the result event flag.\n
+ * Set bit fields \a RESECx of register \a EVFLAGCLR.Clearing these bits has no effect.
+ *
+ * \par<b>Note</b><br>
+ * API call for channel-0      : XMC_DSD_ClearResultEventFlag(DSD,(uint32_t)XMC_DSD_CH_ID_0);
+ * API call for channel-0 and 1: XMC_DSD_ClearResultEventFlag(DSD,(uint32_t)(XMC_DSD_CH_ID_0|XMC_DSD_CH_ID_1));
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_DSD_SetResultEventFlag()\n\n\n
+ */
+__STATIC_INLINE void XMC_DSD_ClearResultEventFlag(XMC_DSD_t *const dsd, const uint32_t channel_id)
+{
+  XMC_ASSERT("XMC_DSD_ClearResultEventFlag:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
+  dsd->EVFLAGCLR = channel_id;
+}
+/**
+ * @param  dsd  Pointer to an instance of DSD module of type @ref XMC_DSD_t
+ * @param  channel_id   Channel number register value of type @ref XMC_DSD_CH_ID_t
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Set the alarm event flag.\n
+ * Set bit fields \a ALEVx of register \a EVFLAG.Clearing these bits has no effect.
+ *
+ * \par<b>Note</b><br>
+ * API call for channel-0  : XMC_DSD_SetAlarmEventFlag(DSD,(uint32_t)XMC_DSD_CH_ID_0);
+ * API call for channel-0 and 1: XMC_DSD_SetAlarmEventFlag(DSD,(uint32_t)(XMC_DSD_CH_ID_0|XMC_DSD_CH_ID_1));
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_DSD_ClearAlarmEventFlag()\n\n\n
+ */
+__STATIC_INLINE void XMC_DSD_SetAlarmEventFlag(XMC_DSD_t *const dsd, const uint32_t channel_id)
+{
+  XMC_ASSERT("XMC_DSD_SetAlarmEventFlag:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
+  dsd->EVFLAG = (channel_id<< DSD_EVFLAGCLR_ALEC0_Pos);
+}
+/**
+ * @param  dsd  Pointer to an instance of DSD module of type @ref XMC_DSD_t
+ * @param  channel_id   Channel number register value of type @ref XMC_DSD_CH_ID_t
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Clear the result event flag.\n
+ * Set bit fields \a ALECx of register \a EVFLAGCLR.Clearing these bits has no effect.
+ *
+ * \par<b>Note</b><br>
+ * API call for channel-0      : XMC_DSD_ClearResultEventFlag(DSD,(uint32_t)XMC_DSD_CH_ID_0);
+ * API call for channel-0 and 1: XMC_DSD_ClearResultEventFlag(DSD,(uint32_t)(XMC_DSD_CH_ID_0|XMC_DSD_CH_ID_1));
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_DSD_SetAlarmEventFlag()\n\n\n
+ */
+__STATIC_INLINE void XMC_DSD_ClearAlarmEventFlag(XMC_DSD_t *const dsd, const uint32_t channel_id)
+{
+  XMC_ASSERT("XMC_DSD_ClearAlarmEventFlag:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
+  dsd->EVFLAGCLR = (channel_id<<DSD_EVFLAGCLR_ALEC0_Pos);
+}
 #ifdef __cplusplus
 }
 #endif

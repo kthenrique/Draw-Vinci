@@ -1,12 +1,12 @@
 /**
  * @file xmc_can.h
- * @date 2015-07-09
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -52,6 +52,11 @@
  * 2015-07-09:
  *     - New API added: XMC_CAN_NODE_Enable. <br>
  *
+ * 2015-09-01:
+ *     - Removed fCANB clock support <br>
+ *
+ * 2015-09-15:
+ *     - Added "xmc_can_map.h" include <br>
  * <b>Details of use for node configuration related APIs</b><br>
  * Please use the XMC_CAN_NODE_SetInitBit() and XMC_CAN_NODE_EnableConfigurationChange() before calling node configuration
  * related APIs.
@@ -85,11 +90,12 @@
 /*********************************************************************************************************************
  * HEADER FILES
  ********************************************************************************************************************/
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined(CAN)
 
-#include <xmc_scu.h>
+#include "xmc_scu.h"
+#include "xmc_can_map.h"
 #include <string.h>
 
 /**
@@ -110,13 +116,13 @@
  * the CAN nodes or to setup a FIFO buffer. The CAN module provides Analyzer mode,Loop-back mode and bit timming for
  * node analysis.
  * 
- * The driver is divided into five sections:\n
- * \par CAN Global features:\n
+ * The driver is divided into five sections:
+ * \par CAN Global features:
  * -# Allows to configure module frequency using function XMC_CAN_Init().
  * -# Allows to configure Module interrupt using configuration structure XMC_CAN_NODE_INTERRUPT_TRIGGER_t and function
  *    XMC_CAN_EventTrigger().
  * 
- * \par CAN_NODE features:\n
+ * \par CAN_NODE features:
  * -# Allows to set baud rate by configuration structure XMC_CAN_NODE_NOMINAL_BIT_TIME_CONFIG_t and Baudrate Configuration
  *    function XMC_CAN_NODE_NominalBitTimeConfigure().
  * -# Allows to configure loop-back mode using fuction XMC_CAN_NODE_EnableLoopBack().
@@ -126,18 +132,18 @@
  * -# Provides bit timming analysis, configuration structure XMC_CAN_NODE_FRAME_COUNTER_t and function
  *    XMC_CAN_NODE_FrameCounterConfigure(). 
  *
- * \par CAN_MO features:\n
+ * \par CAN_MO features:
  * -# Allows message object initialization by configuration structure XMC_CAN_MO_t and function XMC_CAN_MO_Config().
  * -# Allows transfer of message objects using functions XMC_CAN_MO_Transmit() and XMC_CAN_MO_Receive().
  * -# Allows to configure Single Data Transfer and Single Transmit Trial using functions 
  * XMC_CAN_MO_EnableSingleTransmitTrial() and XMC_CAN_MO_EnableSingleTransmitTrial().
  * -# Allows to configure MO events using function XMC_CAN_MO_EnableEvent(). 
  *
- * \par CAN_FIFO features:\n
+ * \par CAN_FIFO features:
  * -# Allows message object FIFO structure by configuration structure XMC_CAN_FIFO_CONFIG_t and functions 
  * XMC_CAN_TXFIFO_ConfigMOBaseObject() , XMC_CAN_RXFIFO_ConfigMOBaseObject() and XMC_CAN_TXFIFO_Transmit().  
  *
- * \par CAN_GATEWAY features:\n
+ * \par CAN_GATEWAY features:
  * -# Provides Gateway mode, configuration structure XMC_CAN_GATEWAY_CONFIG_t and function XMC_CAN_GATEWAY_InitSourceObject(). 
  *
  * @{
@@ -316,7 +322,9 @@ typedef enum XMC_CAN_NODE_STATUS
   XMC_CAN_NODE_STATUS_BUS_OFF= CAN_NODE_NSR_BOFF_Msk,				/**< Bus-off status */
   XMC_CAN_NODE_STATUS_LIST_LENGTH_ERROR = CAN_NODE_NSR_LLE_Msk,     /**< List length error */
   XMC_CAN_NODE_STATUS_LIST_OBJECT_ERROR = CAN_NODE_NSR_LOE_Msk,     /**< List object error */
+#if !defined(MULTICAN_PLUS)
   XMC_CAN_NODE_STATUS_SUSPENDED_ACK = CAN_NODE_NSR_SUSACK_Msk       /**< Suspend Acknowledge */
+#endif
 } XMC_CAN_NODE_STATUS_t;
 
 /**
@@ -332,7 +340,9 @@ typedef enum XMC_CAN_NODE_CONTROL
   XMC_CAN_NODE_CONTROL_CAN_DISABLE = CAN_NODE_NCR_CANDIS_Msk,        /**< CAN disable */
   XMC_CAN_NODE_CONTROL_CONF_CHANGE_ENABLE= CAN_NODE_NCR_CCE_Msk,     /**< Configuration change enable */
   XMC_CAN_NODE_CONTROL_CAN_ANALYZER_NODEDE = CAN_NODE_NCR_CALM_Msk,  /**< CAN Analyzer mode */
+#if !defined(MULTICAN_PLUS)
   XMC_CAN_NODE_CONTROL_SUSPENDED_ENABLE = CAN_NODE_NCR_SUSEN_Msk     /**< Suspend Enable */
+#endif
 } XMC_CAN_NODE_CONTROL_t;
 
 /**
@@ -415,15 +425,31 @@ typedef enum XMC_CAN_NODE_LAST_ERROR_INC
  */
 typedef enum XMC_CAN_NODE_INTERRUPT_TRIGGER
 {
-  XMC_CAN_NODE_INTR_TRIGGER_0 = 0X1U,
-  XMC_CAN_NODE_INTR_TRIGGER_1 = 0X2U,
-  XMC_CAN_NODE_INTR_TRIGGER_2 = 0X4U,
-  XMC_CAN_NODE_INTR_TRIGGER_3 = 0X8U,
-  XMC_CAN_NODE_INTR_TRIGGER_4 = 0X16U,
-  XMC_CAN_NODE_INTR_TRIGGER_5 = 0X32U,
-  XMC_CAN_NODE_INTR_TRIGGER_6 = 0X64U,
-  XMC_CAN_NODE_INTR_TRIGGER_7 = 0X128U,
+  XMC_CAN_NODE_INTR_TRIGGER_0 = 0x1U,
+  XMC_CAN_NODE_INTR_TRIGGER_1 = 0x2U,
+  XMC_CAN_NODE_INTR_TRIGGER_2 = 0x4U,
+  XMC_CAN_NODE_INTR_TRIGGER_3 = 0x8U,
+  XMC_CAN_NODE_INTR_TRIGGER_4 = 0x16U,
+  XMC_CAN_NODE_INTR_TRIGGER_5 = 0x32U,
+  XMC_CAN_NODE_INTR_TRIGGER_6 = 0x64U,
+  XMC_CAN_NODE_INTR_TRIGGER_7 = 0x128U,
 } XMC_CAN_NODE_INTERRUPT_TRIGGER_t;
+
+#if defined(MULTICAN_PLUS) || defined(DOXYGEN)
+/**
+ * Defines the Clock source used for the MCAN peripheral. @note Only available for XMC1400, XMC4800 and XMC4700 series
+ */
+typedef enum XMC_CAN_CANCLKSRC
+{
+#if UC_FAMILY == XMC4
+  XMC_CAN_CANCLKSRC_FPERI = 0x1U,
+  XMC_CAN_CANCLKSRC_FOHP = 0x2U,
+#else
+  XMC_CAN_CANCLKSRC_MCLK = 0x1U,
+  XMC_CAN_CANCLKSRC_FOHP = 0x2U
+#endif
+} XMC_CAN_CANCLKSRC_t;
+#endif
 
 /*********************************************************************************************************************
  * DATA STRUCTURES
@@ -557,7 +583,6 @@ typedef struct XMC_CAN_MO
 #ifdef __cplusplus
 extern "C" {
 #endif
-/* GLOBAL APIs */
 
 /**
  *
@@ -696,13 +721,28 @@ __STATIC_INLINE void XMC_CAN_EventTrigger(XMC_CAN_t *const obj,const XMC_CAN_NOD
  *
  */
 
+
+#if defined(MULTICAN_PLUS)
+void XMC_CAN_Init(XMC_CAN_t *const obj, XMC_CAN_CANCLKSRC_t clksrc, uint32_t can_frequency);
+/**
+ *
+ */
+XMC_CAN_CANCLKSRC_t XMC_CAN_GetBaudrateClockSource(XMC_CAN_t *const obj);
+/**
+ *
+ */
+void XMC_CAN_SetBaudrateClockSource(XMC_CAN_t *const obj,const XMC_CAN_CANCLKSRC_t source);
+/**
+ *
+ */
+uint32_t XMC_CAN_GetBaudrateClockFrequency(XMC_CAN_t *const obj);
+#else
 void XMC_CAN_Init(XMC_CAN_t *const obj, uint32_t can_frequency);
+#endif
 
 /**
  *
  * @param can_mo Pointer to Message Object structure. Refer @ref XMC_CAN_MO_t data structure for details.
- * @param pndreg Pending register number
- * @param pndbit Pending bit number
  *
  * @return None
  *
@@ -882,7 +922,7 @@ void XMC_CAN_NODE_DisableEvent(XMC_CAN_NODE_t *const can_node, const XMC_CAN_NOD
 
 /**
  *
- * @param can_node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
+ * @param node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
  *
  * @return XMC_CAN_NODE_LAST_ERROR_DIR_t Last error transfer direction. Refer @ref XMC_CAN_NODE_LAST_ERROR_DIR_t.
  *
@@ -890,7 +930,7 @@ void XMC_CAN_NODE_DisableEvent(XMC_CAN_NODE_t *const can_node, const XMC_CAN_NOD
  * Returns NODE Last Error occurred during Transmit/receive direction. It returns value of NFCR register.
  *
  * \par<b>Related APIs:</b><BR>
- * None
+ * XMC_CAN_NODE_GetLastErrTransferInc()\n\n\n
  *
  */
 
@@ -902,7 +942,7 @@ __STATIC_INLINE XMC_CAN_NODE_LAST_ERROR_DIR_t XMC_CAN_NODE_GetLastErrTransferDir
 
 /**
  *
- * @param can_node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
+ * @param node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
  *
  * @return XMC_CAN_NODE_LAST_ERROR_INC_t Last error transfer increment. Refer @ref XMC_CAN_NODE_LAST_ERROR_INC_t.
  *
@@ -910,7 +950,7 @@ __STATIC_INLINE XMC_CAN_NODE_LAST_ERROR_DIR_t XMC_CAN_NODE_GetLastErrTransferDir
  *  Returns NODE Last Error Transfer Increment. It returns value of NFCR register.
  *
  * \par<b>Related APIs:</b><BR>
- * None
+ * XMC_CAN_NODE_GetLastErrTransferDir()\n\n\n
  *
  */
 
@@ -1088,6 +1128,7 @@ __STATIC_INLINE uint32_t XMC_CAN_NODE_GetStatus(XMC_CAN_NODE_t *const can_node)
 /**
  *
  * @param can_node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
+ * @param can_node_status Status to clear.Refer @ref XMC_CAN_NODE_STATUS_t for valid values.
  *
  * @return None
  *
@@ -1265,7 +1306,7 @@ __STATIC_INLINE void XMC_CAN_NODE_ReSetAnalyzerMode(XMC_CAN_NODE_t *const can_no
   can_node->NCR &= ~(uint32_t)CAN_NODE_NCR_CALM_Msk;
 }
 
-
+#if !defined(MULTICAN_PLUS)
 /**
  * @param can_node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
  *
@@ -1288,6 +1329,26 @@ __STATIC_INLINE void XMC_CAN_NODE_EnableSuspend(XMC_CAN_NODE_t *const can_node)
 {
   can_node->NCR |= (uint32_t)CAN_NODE_NCR_SUSEN_Msk;
 }
+#else
+/**
+ * @param can_node Pointer Pointing to CAN_NODE Structure. Defines CAN_NODE registers, Range :CAN_NODE0-CAN_NODE2.
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Disables the transmission on CAN node x as soon as bus-idle is reached.
+ *
+ * \par<b>Related API's:</b><br>
+ * None
+ *
+ * @note Only available for XMC1400,XMC4800 and XMC4700 series
+ */
+
+__STATIC_INLINE void XMC_CAN_NODE_DisableTransmit(XMC_CAN_NODE_t *const can_node)
+{
+  can_node->NCR |= (uint32_t)CAN_NODE_NCR_TXDIS_Msk;
+}
+#endif
 
 
 /**
@@ -1727,7 +1788,6 @@ __STATIC_INLINE void XMC_CAN_MO_AcceptOnlyMatchingIDE(XMC_CAN_MO_t *const can_mo
 /**
  *
  * @param can_mo            Pointer to Message Object structure. Refer @ref XMC_CAN_MO_t data structure for details.
- * @param can_id_mask	    CAN MO acceptance mask.
  *
  * @return None
  *
@@ -1748,7 +1808,6 @@ __STATIC_INLINE void XMC_CAN_MO_AcceptStandardAndExtendedID(XMC_CAN_MO_t *const 
 /**
  *
  * @param can_mo            Pointer to Message Object structure. Refer @ref XMC_CAN_MO_t data structure for details.
-
  *
  * @return None
  *
@@ -1771,7 +1830,6 @@ __STATIC_INLINE void XMC_CAN_MO_SetStandardID(XMC_CAN_MO_t *const can_mo)
 /**
  *
  * @param can_mo            Pointer to Message Object structure. Refer @ref XMC_CAN_MO_t data structure for details.
- * @param can_id_mask	    CAN MO acceptance mask.
  *
  * @return None
  *
@@ -1785,7 +1843,7 @@ __STATIC_INLINE void XMC_CAN_MO_SetStandardID(XMC_CAN_MO_t *const can_mo)
  * After setting the identifier type user has to set the identifier value by using @ref XMC_CAN_MO_SetIdentifier() API.
  *
  */
-
+ 
 __STATIC_INLINE void XMC_CAN_MO_SetExtendedID(XMC_CAN_MO_t *const can_mo)
 {
   can_mo->can_id_mode = (uint32_t)XMC_CAN_FRAME_TYPE_EXTENDED_29BITS;

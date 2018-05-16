@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_sdmmc.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -62,9 +62,7 @@
  * HEADER FILES
  *******************************************************************************/
  
-#include <xmc_sdmmc.h>
-
-#include <xmc_scu.h>
+#include "xmc_sdmmc.h"
 
 /*
  * The SDMMC peripheral is only available on the
@@ -72,6 +70,7 @@
  * the XMC4500.h (device header file).
  */
 #if defined (SDMMC)
+#include "xmc_scu.h"
 
 /*******************************************************************************
  * MACROS
@@ -170,7 +169,12 @@ void XMC_SDMMC_Enable(XMC_SDMMC_t *const sdmmc)
 {
   XMC_ASSERT("XMC_SDMMC_Enable: Invalid module pointer", XMC_SDMMC_CHECK_MODULE_PTR(sdmmc));
 
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_SDMMC);
+#endif
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_SDMMC);
+#endif  
 }
 
 /* Assert the peripheral reset */
@@ -178,7 +182,12 @@ void XMC_SDMMC_Disable(XMC_SDMMC_t *const sdmmc)
 {
   XMC_ASSERT("XMC_SDMMC_Disable: Invalid module pointer", XMC_SDMMC_CHECK_MODULE_PTR(sdmmc));
 
+#if defined(PERIPHERAL_RESET_SUPPORTED)
   XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_SDMMC);
+#endif  
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_SDMMC);
+#endif
 }
 
 /* Initialize SDMMC peripheral */
@@ -186,7 +195,7 @@ XMC_SDMMC_STATUS_t XMC_SDMMC_Init(XMC_SDMMC_t *const sdmmc, const XMC_SDMMC_CONF
 {
   XMC_ASSERT("XMC_SDMMC_Init: Invalid module pointer", XMC_SDMMC_CHECK_MODULE_PTR(sdmmc));
   XMC_ASSERT("XMC_SDMMC_Init: Invalid clock divider value", XMC_SDMMC_CHECK_SDCLK_FREQ(config->clock_divider));
-  XMC_ASSERT("XMC_SDMMC_Init: Invalid bus wid.h", XMC_SDMMC_CHECK_DATA_LINES(config->bus_width));
+  XMC_ASSERT("XMC_SDMMC_Init: Invalid bus width", XMC_SDMMC_CHECK_DATA_LINES(config->bus_width));
   
   /* Enable SDMMC peripheral */
   XMC_SDMMC_Enable(sdmmc);
@@ -310,7 +319,8 @@ void XMC_SDMMC_SetDataTransferMode(XMC_SDMMC_t *const sdmmc, XMC_SDMMC_TRANSFER_
   sdmmc->BLOCK_COUNT = (uint16_t)(response->num_blocks);
 
   /* Type of data transfer: single, infinite, multiple or stop multiple */
-  sdmmc->TRANSFER_MODE |= (uint16_t)response->type;
+  sdmmc->TRANSFER_MODE = (uint16_t)((sdmmc->TRANSFER_MODE & (uint16_t)~SDMMC_TRANSFER_MODE_MULTI_BLOCK_SELECT_Msk) |
+                                    ((uint16_t)response->type));
 
   /*
    * Clear block count enable bit; that's only valid for

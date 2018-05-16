@@ -1,12 +1,12 @@
 /**
  * @file xmc_scu.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -49,6 +49,9 @@
  *       XMC_SCU_INTERRUPT_EnableEvent, XMC_SCU_INTERRUPT_DisableEvent,
  *       XMC_SCU_INTERRUPT_TriggerEvent, XMC_SCU_INTERUPT_GetEventStatus,
  *       XMC_SCU_INTERUPT_ClearEventStatus
+ *
+ * 2015-11-30:
+ *     - Documentation improved <br>
  *      
  * @endcond 
  *
@@ -152,7 +155,7 @@
  */
  
 /*********************************************************************************************************************
-	* MACROS
+ * MACROS
  ********************************************************************************************************************/
 
 /*********************************************************************************************************************
@@ -165,7 +168,7 @@ typedef enum XMC_SCU_STATUS
 {
   XMC_SCU_STATUS_OK   = 0UL, /**< SCU related operation successfully completed.*/
   XMC_SCU_STATUS_ERROR,      /**< SCU related operation failed. When API cannot fulfill request, this value is returned. */
-  XMC_SCU_STATUS_BUSY    ,   /**< Cannot execute the SCU related operation request because
+  XMC_SCU_STATUS_BUSY,       /**< Cannot execute the SCU related operation request because
                                   another operation is in progress. \a XMC_SCU_STATUS_BUSY is returned when API is busy
                                   processing another request. */
 } XMC_SCU_STATUS_t;
@@ -176,7 +179,7 @@ typedef enum XMC_SCU_STATUS
  ********************************************************************************************************************/
 
 /**
- * Function pointer type used for registering callback functions on SCU event occurence.
+ * Function pointer type used for registering callback functions on SCU event occurrence.
  */
 typedef void (*XMC_SCU_INTERRUPT_EVENT_HANDLER_t)(void);
 
@@ -309,7 +312,7 @@ void XMC_SCU_INTERRUPT_EnableEvent(const XMC_SCU_INTERRUPT_EVENT_t event);
  * @return None
  *
  * \par<b>Description</b><br>
- * Disables generation of interrupt on occurence of the input event.\n\n
+ * Disables generation of interrupt on occurrence of the input event.\n\n
  * The events are disabled by resetting the respective bit fields in the SRMSK register. \n
  * \par<b>Related APIs:</b><BR>
  * NVIC_DisableIRQ(), XMC_SCU_INTERRUPT_EnableEvent()\n\n\n
@@ -548,7 +551,7 @@ __STATIC_INLINE uint32_t XMC_SCU_GetMirrorStatus(void)
  *          \b Range: \a XMC_SCU_STATUS_OK if the event handler is successfully configured.\n
  *            \a XMC_SCU_STATUS_ERROR if the input event is invalid.\n
  * \par<b>Description</b><br>
- * Assigns the event handler function to be executed on occurence of the selected event.\n\n
+ * Assigns the event handler function to be executed on occurrence of the selected event.\n\n
  * If the input event is valid, the handler function will be assigned to a table to be executed
  * when the interrupt is generated and the event status is set in the event status register. By using this API,
  * polling for a particular event can be avoided. This way the CPU utilization will be optimized. Multiple SCU events

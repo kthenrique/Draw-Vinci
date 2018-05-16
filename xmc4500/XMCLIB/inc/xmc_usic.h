@@ -1,12 +1,12 @@
 /**
  * @file xmc_usic.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -45,6 +45,27 @@
  *      
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API
+ * 
+ * 2015-08-17:
+ *     - Bug fixed in XMC_USIC_CH_SetTransmitBufferStatus API. OR operator removed.
+ *
+ * 2015-08-24:
+ *     - Added APIs for enabling/disabling delay compensation XMC_USIC_CH_DisableDelayCompensation() and
+ *       XMC_USIC_CH_DisableDelayCompensation()
+ *
+ * 2015-08-25:
+ *     - Added APIs for defining if the data shift unit input is derived
+ *       from the input data path DXn or from the selected protocol pre-processors: XMC_USIC_CH_ConnectInputDataShiftToPPP()
+ *       and XMC_USIC_CH_ConnectInputDataShiftToDataInput()
+ *
+ * 2015-08-27:
+ *     - Fixed bug in XMC_USIC_CH_BRG_CLOCK_SOURCE_DX1T value.
+ *     - Added APIs for direct TBUF access: XMC_USIC_CH_WriteToTBUF() and XMC_USIC_CH_WriteToTBUFTCI()
+ *     - Added APIs for external input for BRG configuration:XMC_USIC_CH_ConfigExternalInputSignalToBRG() and XMC_USIC_CH_SetBRGInputClockSource()
+ *
+ * 2015-08-28:
+ *     - Added API for enabling the transfer trigger unit to set bit TCSR.TE if the trigger signal DX2T becomes active. Feature used for RS-232
+ *       Clear to Send (CTS) signal: XMC_USIC_CH_EnableTBUFDataValidTrigger() and XMC_USIC_CH_DisableTBUFDataValidTrigger().
  *
  * @endcond
  *
@@ -56,7 +77,7 @@
  * HEADER FILES
  *******************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -107,35 +128,6 @@
 #define XMC_USIC2_CH1 ((XMC_USIC_CH_t *)USIC2_CH1_BASE)	/**< USIC2 channel 1 base address */
 #endif
 
-#if defined(USIC2)
-/**
- * Macro checks if the channel is available. It returns \a true if the channel is available
- * and returns \a false if the channel is not available.
- */
-#define XMC_USIC_CHECK_CH(channel) ((channel == XMC_USIC0_CH0) || \
-                                     (channel == XMC_USIC0_CH1) || \
-                                     (channel == XMC_USIC1_CH0) || \
-                                     (channel == XMC_USIC1_CH1) || \
-                                     (channel == XMC_USIC2_CH0) || \
-                                     (channel == XMC_USIC2_CH1) )
-#elif defined(USIC1)
-/**
- * Macro checks if the channel is available. It returns \a true if the channel is available
- * and returns \a false if the channel is not available.
- */
-#define XMC_USIC_CHECK_CH(channel) ((channel == XMC_USIC0_CH0) || \
-                                     (channel == XMC_USIC0_CH1) || \
-                                     (channel == XMC_USIC1_CH0) || \
-                                     (channel == XMC_USIC1_CH1) )
-#else
-/**
- * Macro checks if the channel is available. It returns \a true if the channel is available
- * and returns \a false if the channel is not available.
- */
-#define XMC_USIC_CHECK_CH(channel) ((channel == XMC_USIC0_CH0) || \
-                                     (channel == XMC_USIC0_CH1) )
-#endif
-
 #define USIC_CH_DXCR_DSEL_Msk  USIC_CH_DX0CR_DSEL_Msk   /**< Common mask for DSEL bitfield mask in DXnCR register */
 #define USIC_CH_DXCR_DSEL_Pos  USIC_CH_DX0CR_DSEL_Pos   /**< Common mask for DSEL bitfield position in DXnCR register */
 #define USIC_CH_DXCR_SFSEL_Pos USIC_CH_DX0CR_SFSEL_Pos  /**< Common mask for SFSEL bitfield position in DXnCR register */
@@ -145,13 +137,15 @@
 #define USIC_CH_DXCR_DSEN_Msk  USIC_CH_DX0CR_DSEN_Msk   /**< Common mask for DSEN bitfield mask in DXnCR register */
 #define USIC_CH_DXCR_CM_Pos    USIC_CH_DX0CR_CM_Pos     /**< Common mask for CM bitfield position in DXnCR register */
 #define USIC_CH_DXCR_CM_Msk    USIC_CH_DX0CR_CM_Msk     /**< Common mask for CM bitfield mask in DXnCR register */
+#define USIC_CH_DXCR_INSW_Msk  USIC_CH_DX0CR_INSW_Msk   /**< Common mask for INSW bitfield mask in DXnCR register */
+#define USIC_CH_DXCR_INSW_pos  USIC_CH_DX0CR_INSW_Pos   /**< Common mask for INSW bitfield position in DXnCR register */
 
 #if UC_FAMILY == XMC1
- #include <xmc1_usic_map.h>
+ #include "xmc1_usic_map.h"
 #endif
 
 #if UC_FAMILY == XMC4
- #include <xmc4_usic_map.h>
+ #include "xmc4_usic_map.h"
 #endif
 
 /*******************************************************************************
@@ -397,7 +391,7 @@ typedef enum XMC_USIC_CH_RXFIFO_EVENT
 typedef enum XMC_USIC_CH_BRG_CLOCK_SOURCE
 {
   XMC_USIC_CH_BRG_CLOCK_SOURCE_DIVIDER = 0x0UL, /**< Baudrate generator clock source : Source divider. (Internal clock source)*/
-  XMC_USIC_CH_BRG_CLOCK_SOURCE_DX1T    = 0x1UL << USIC_CH_BRG_CLKSEL_Pos  /**< Baudrate generator clock source : DX1T. (External clock source) */
+  XMC_USIC_CH_BRG_CLOCK_SOURCE_DX1T    = 0x2UL << USIC_CH_BRG_CLKSEL_Pos  /**< Baudrate generator clock source : DX1T. (External clock source) */
 } XMC_USIC_CH_BRG_CLOCK_SOURCE_t;
 
 /**
@@ -532,6 +526,36 @@ typedef struct XMC_USIC_CH
 extern "C" {
 #endif
 
+__STATIC_INLINE bool XMC_USIC_IsModuleValid(const XMC_USIC_t *const module)
+{
+  bool tmp;
+
+  tmp = (module == XMC_USIC0);
+#if defined(XMC_USIC1)  
+  tmp = tmp || (module == XMC_USIC1);
+#endif
+#if defined(XMC_USIC2)  
+  tmp = tmp || (module == XMC_USIC2);
+#endif
+
+  return tmp;
+}
+
+__STATIC_INLINE bool XMC_USIC_IsChannelValid(const XMC_USIC_CH_t *const channel)
+{
+  bool tmp;
+
+  tmp = ((channel == XMC_USIC0_CH0) || (channel == XMC_USIC0_CH1));
+#if defined(XMC_USIC1)  
+  tmp = tmp || ((channel == XMC_USIC1_CH0) || (channel == XMC_USIC1_CH1));
+#endif
+#if defined(XMC_USIC2)  
+  tmp = tmp || ((channel == XMC_USIC2_CH0) || (channel == XMC_USIC2_CH1));
+#endif
+
+  return tmp;
+}
+
 /* Common APIs */
 
 /**
@@ -589,6 +613,7 @@ void XMC_USIC_CH_Enable(XMC_USIC_CH_t *const channel);
  * XMC_USIC_CH_Enable(), XMC_USIC_Disable() \n\n\n
  */
 void XMC_USIC_CH_Disable(XMC_USIC_CH_t *const channel);
+
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
@@ -611,6 +636,30 @@ void XMC_USIC_CH_Disable(XMC_USIC_CH_t *const channel);
  * XMC_USIC_CH_SetStartTransmisionMode(), XMC_USIC_CH_SetInputSource() \n\n\n
  */
 XMC_USIC_CH_STATUS_t XMC_USIC_CH_SetBaudrate(XMC_USIC_CH_t *const channel, uint32_t rate, uint32_t oversampling);
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param  pdiv Desired divider for the external frequency input. \b Range: minimum value = 1, maximum value = 1024 \n
+ * @param  oversampling Required oversampling. The value indicates the number of time quanta for one symbol of data. \n
+ * 						This can be related to the number of samples for each logic state of the data signal. \n
+ * 						\b Range: 1 to 32. Value should be chosen based on the protocol used.
+ * @param  combination_mode Selects which edge of the synchronized(and optionally filtered) signal DXnS actives the trigger
+ *                          output DXnT of the input stage.
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Enables the external frequency input for the Baudrate Generator and configures the divider, oversampling and
+ * the combination mode of the USIC channel. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_SetBRGInputClockSource(), XMC_USIC_CH_SetInputTriggerCombinationMode() \n\n\n
+ */
+void XMC_USIC_CH_ConfigExternalInputSignalToBRG(XMC_USIC_CH_t *const channel,
+		                                         const uint16_t pdiv,
+												 const uint32_t oversampling,
+												 const XMC_USIC_CH_INPUT_COMBINATION_MODE_t combination_mode);
 
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
@@ -645,6 +694,47 @@ __STATIC_INLINE void XMC_USIC_CH_SetInputSource(XMC_USIC_CH_t *const channel, co
  * @return None
  *
  * \par<b>Description</b><br>
+ * The input of the data shift unit is controlled by the
+ * protocol pre-processor. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_ConnectInputDataShiftToDataInput()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_ConnectInputDataShiftToPPP(XMC_USIC_CH_t *const channel, const XMC_USIC_CH_INPUT_t input)
+{
+  channel->DXCR[input] &=(uint32_t)~USIC_CH_DXCR_INSW_Msk;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param  input USIC channel input stage of type @ref XMC_USIC_CH_INPUT_t. \n
+ * 				 \b Range: @ref XMC_USIC_CH_INPUT_DX0 to @ref XMC_USIC_CH_INPUT_DX5
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * The input of the data shift unit is connected to
+ * the selected data input line. \n\n
+ *
+ * This setting is used
+ * if the signals are directly derived from an input
+ * pin without treatment by the protocol preprocessor.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_ConnectInputDataShiftToPPP()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_ConnectInputDataShiftToDataInput(XMC_USIC_CH_t *const channel, const XMC_USIC_CH_INPUT_t input)
+{
+  channel->DXCR[input] |= USIC_CH_DXCR_INSW_Msk;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param  input USIC channel input stage of type @ref XMC_USIC_CH_INPUT_t. \n
+ * 				 \b Range: @ref XMC_USIC_CH_INPUT_DX0 to @ref XMC_USIC_CH_INPUT_DX5
+ * @return None
+ *
+ * \par<b>Description</b><br>
  * Enables input inversion for USIC channel input data signal. \n\n
  *
  * Polarity of the input source can be changed to provide inverted data input.
@@ -670,11 +760,44 @@ __STATIC_INLINE void XMC_USIC_CH_EnableInputInversion(XMC_USIC_CH_t *const chann
  * \par<b>Related APIs:</b><BR>
  * XMC_USIC_CH_EnableInputInversion()\n\n\n
  */
- 
 __STATIC_INLINE void XMC_USIC_CH_DisableInputInversion(XMC_USIC_CH_t *const channel, const XMC_USIC_CH_INPUT_t input)
 {
   channel->DXCR[input] &=(uint32_t)~USIC_CH_DXCR_DPOL_Msk;
 }
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Enables delay compensation. \n\n
+ *
+ * Delay compensation can be applied to the receive path.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_DisableDelayCompensation()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_EnableDelayCompensation(XMC_USIC_CH_t *const channel)
+{
+  channel->DXCR[1U] |= USIC_CH_DX1CR_DCEN_Msk;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Disables delay compensation.. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_EnableDelayCompensation()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_DisableDelayCompensation(XMC_USIC_CH_t *const channel)
+{
+  channel->DXCR[1U] &=(uint32_t)~USIC_CH_DX1CR_DCEN_Msk;
+}
+
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
@@ -791,6 +914,67 @@ __STATIC_INLINE void XMC_USIC_CH_SetInputTriggerCombinationMode(XMC_USIC_CH_t *c
   channel->DXCR[input] = (uint32_t)(channel->DXCR[input] & (~USIC_CH_DXCR_CM_Msk)) |
                          ((uint32_t)combination_mode << USIC_CH_DXCR_CM_Pos);
 }
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param  clock_source clock source for the BRG.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Sets the clock source for the BRG. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_SetInputTriggerCombinationMode(), XMC_USIC_CH_SetExternalClockBRGDivider()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_SetBRGInputClockSource(XMC_USIC_CH_t *const channel, const XMC_USIC_CH_BRG_CLOCK_SOURCE_t clock_source)
+{
+  channel->BRG = (uint32_t)(channel->BRG & (~USIC_CH_BRG_CLKSEL_Msk)) | (uint32_t)(clock_source);
+}
+
+/**
+ * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param data Data to be transmitted. \n
+ *           \b Range: 16bit unsigned data. minimum= 0, maximum= 65535
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Writes data into the transmit buffer. \n\n
+ * The data provided is placed in TBUF[0U].
+ *
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_WriteToTBUFTCI() \n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_WriteToTBUF(XMC_USIC_CH_t *const channel, const uint16_t data)
+{
+  channel->TBUF[0U] = data;
+}
+
+/**
+ * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @param data Data to be transmitted.
+ * @param transmit_control_information transmit control information to be configured while transmitting the data. \n
+ * 			\b Range: minimum= 0, maximum= 31.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Writes data to the transmit buffer in a control mode. \n\n
+ * When the respective control mode is enabled , this API can be used.
+ *
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_WriteToTBUF() \n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_WriteToTBUFTCI(XMC_USIC_CH_t *const channel,
+                                             const uint16_t data,
+                                             const uint32_t transmit_control_information)
+{
+  channel->TBUF[transmit_control_information] = data;
+}
+
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
@@ -1036,6 +1220,41 @@ __STATIC_INLINE void XMC_USIC_CH_DisableFrameLengthControl(XMC_USIC_CH_t *const 
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Bit TCSR.TE is set if DX2T becomes active while TDV = 1. \n\n
+ * Enables the transfer trigger unit to set bit TCSR.TE if the trigger signal DX2T becomes active
+ * for event driven transfer starts.
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_DisableTBUFDataValidTrigger()\n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_EnableTBUFDataValidTrigger(XMC_USIC_CH_t *const channel)
+{
+  channel->TCSR |= (uint32_t)USIC_CH_TCSR_TDVTR_Msk;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Disables the trigger of TDV depending on DX2T signal. \n\n
+ * Bit TCSR.TE is permanently set.
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_EnableTBUFDataValidTrigger() \n\n\n
+ */
+__STATIC_INLINE void XMC_USIC_CH_DisableTBUFDataValidTrigger(XMC_USIC_CH_t *const channel)
+{
+  channel->TCSR &= (uint32_t)~USIC_CH_TCSR_TDVTR_Msk;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
  * @param  service_request_line service request number of the event to be triggered. \n
  * 			\b Range: 0 to 5.
  * @return None
@@ -1053,7 +1272,6 @@ __STATIC_INLINE void XMC_USIC_CH_TriggerServiceRequest(XMC_USIC_CH_t *const chan
   channel->FMR |= (uint32_t)(USIC_CH_FMR_SIO0_Msk << service_request_line);
 }
 
-
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
@@ -1070,7 +1288,7 @@ __STATIC_INLINE void XMC_USIC_CH_TriggerServiceRequest(XMC_USIC_CH_t *const chan
 __STATIC_INLINE void XMC_USIC_CH_SetTransmitBufferStatus(XMC_USIC_CH_t *const channel,
 		                                                 const XMC_USIC_CH_TBUF_STATUS_SET_t transmit_buffer_status)
 {
-  channel->FMR |= (uint32_t)transmit_buffer_status;
+  channel->FMR = (uint32_t)transmit_buffer_status;
 }
 
 /**
@@ -1148,13 +1366,12 @@ void XMC_USIC_CH_TXFIFO_SetSizeTriggerLimit(XMC_USIC_CH_t *const channel,
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
- * @param event Events to be enabled. Multiple events can be bitwise OR combined. \n
- * 	\b Range: @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_STANDARD, @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_ERROR.
+ * @param event Events to be enabled. Multiple events can be bitwise OR combined. @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_t \n
  * @return None
  *
  * \par<b>Description</b><br>
  * Enables the interrupt events related to transmit FIFO. \n\n
- * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_TXFIFO_EVENT_CONF.
+ * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_t.
  * Multiple events can be enabled by providing multiple events in a single call. For providing 
  * multiple events, combine the events using bitwise OR operation. Events are configured in the TBCTR register.<br>
  * 
@@ -1173,15 +1390,14 @@ __STATIC_INLINE void XMC_USIC_CH_TXFIFO_EnableEvent(XMC_USIC_CH_t *const channel
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
- * @param event Events to be disabled. \n
- * 	\b Range: @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_STANDARD, @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_ERROR.
+ * @param event Events to be disabled. @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_t \n
  * @return None
  *
  * \par<b>Description</b><br>
  * Disables the interrupt events related to transmit FIFO. \n\n
  * By disabling the interrupt events, generation of interrupt is stopped. User can poll the event 
  * flags from the status register using the API XMC_USIC_CH_TXFIFO_GetEvent(). 
- * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_TXFIFO_EVENT_CONF. For providing
+ * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_TXFIFO_EVENT_CONF_t. For providing
  * multiple events, combine the events using bitwise OR operation.
  *
  * \par<b>Related APIs:</b><BR>
@@ -1342,14 +1558,13 @@ __STATIC_INLINE uint32_t XMC_USIC_CH_TXFIFO_GetLevel(XMC_USIC_CH_t *const channe
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
- * @return Status of standard transmit and transmit buffer error events. \n
- * 			\b Range: @ref XMC_USIC_CH_TXFIFO_EVENT_STANDARD, @ref XMC_USIC_CH_TXFIFO_EVENT_ERROR.
+ * @return Status of standard transmit and transmit buffer error events. @ref XMC_USIC_CH_TXFIFO_EVENT_t \n
  * 
  * \par<b>Description</b><br>
  * Gets the transmit FIFO event status. \n\n
  * Gives the status of transmit FIFO standard transmit buffer event and transmit buffer error event.
  * The status bits are located at their bit positions in the TRBSR register in the returned value.
- * User can make use of the @ref XMC_USIC_CH_TXFIFO_EVENT enumeration for checking the status of return value.
+ * User can make use of the @ref XMC_USIC_CH_TXFIFO_EVENT_t enumeration for checking the status of return value.
  * The status can be found by using the bitwise AND operation on the returned value with the enumerated value.<br>
  * 
  * Note: Event status flags should be cleared by the user explicitly.
@@ -1438,14 +1653,12 @@ void XMC_USIC_CH_RXFIFO_SetSizeTriggerLimit(XMC_USIC_CH_t *const channel,
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
  * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
- * @param event Events to be enabled. Multiple events can be bitwise OR combined. \n
- * 			\b Range: @ref XMC_USIC_CH_RXFIFO_EVENT_CONF_STANDARD, @ref XMC_USIC_CH_RXFIFO_EVENT_CONF_ERROR,
- * 			@ref XMC_USIC_CH_RXFIFO_EVENT_CONF_ALTERNATE.
+ * @param event Events to be enabled. Multiple events can be bitwise OR combined. @ref XMC_USIC_CH_RXFIFO_EVENT_CONF_t\n
  * @return None
  *
  * \par<b>Description</b><br>
  * Enables the interrupt events related to transmit FIFO. \n\n
- * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_RXFIFO_EVENT_CONF.
+ * Event bitmasks can be constructed using the enumeration @ref XMC_USIC_CH_RXFIFO_EVENT_CONF_t.
  * Multiple events can be enabled by providing multiple events in a single call. For providing 
  * multiple events, combine the events using bitwise OR operation.<br>
  * 
@@ -1726,7 +1939,7 @@ __STATIC_INLINE void XMC_USIC_CH_SetMclkOutputPassiveLevel(XMC_USIC_CH_t *const 
  * Sets the idle mode shift clock output level and selects the shift clock source. \n\n
  * Shift clock idle mode output level can be set to logic high or low. Shift clock output can be configured to have a 
  * delay of half shift clock period. Both the configurations are available as enumeration values defined with type
- * @ref XMC_USIC_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL.
+ * @ref XMC_USIC_CH_BRG_SHIFT_CLOCK_PASSIVE_LEVEL_t.
  * This value should be configured based on the slave device requirement.
  * Shift clock source can be selected between internal clock(master) and external input(slave).
  * 

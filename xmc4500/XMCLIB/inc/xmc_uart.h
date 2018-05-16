@@ -1,12 +1,12 @@
  /**
  * @file xmc_uart.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
 *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -44,7 +44,12 @@
  *     - Added XMC_UART_CH_TriggerServiceRequest() and XMC_UART_CH_SelectInterruptNodePointer <br>
  *
  * 2015-06-20:
- *     - Removed version macros and declaration of GetDriverVersion API
+ *     - Removed version macros and declaration of GetDriverVersion API <br>
+ *
+ * 2015-09-01:
+ *     - Modified XMC_UART_CH_SetInputSource() for avoiding complete DXCR register overwriting. <br>
+ *     - Modified XMC_UART_CH_EVENT_t enum for supporting XMC_UART_CH_EnableEvent() and XMC_UART_CH_DisableEvent()
+ *       for supporting multiple events configuration <br>
  * @endcond 
  *
  */
@@ -56,7 +61,7 @@
  * HEADER FILES
  *********************************************************************************************************************/
 
-#include <xmc_usic.h>
+#include "xmc_usic.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -147,13 +152,13 @@ typedef enum XMC_UART_CH_STATUS_FLAG
 */
 typedef enum XMC_CH_UART_EVENT
 {
-  XMC_UART_CH_EVENT_RECEIVE_START       = (int32_t)(0x80000000U | USIC_CH_CCR_RSIEN_Msk), /**< Receive start event */
-  XMC_UART_CH_EVENT_DATA_LOST           = (int32_t)(0x80000000U | USIC_CH_CCR_DLIEN_Msk), /**< Data lost event */
-  XMC_UART_CH_EVENT_TRANSMIT_SHIFT      = (int32_t)(0x80000000U | USIC_CH_CCR_TSIEN_Msk), /**< Transmit shift event */
-  XMC_UART_CH_EVENT_TRANSMIT_BUFFER     = (int32_t)(0x80000000U | USIC_CH_CCR_TBIEN_Msk), /**< Transmit buffer event */
-  XMC_UART_CH_EVENT_STANDARD_RECEIVE    = (int32_t)(0x80000000U | USIC_CH_CCR_RIEN_Msk),  /**< Receive event */
-  XMC_UART_CH_EVENT_ALTERNATIVE_RECEIVE = (int32_t)(0x80000000U | USIC_CH_CCR_AIEN_Msk),  /**< Alternate receive event */
-  XMC_UART_CH_EVENT_BAUD_RATE_GENERATOR = (int32_t)(0x80000000U | USIC_CH_CCR_BRGIEN_Msk), /**< Baudrate generator event */
+  XMC_UART_CH_EVENT_RECEIVE_START       = USIC_CH_CCR_RSIEN_Msk,  /**< Receive start event */
+  XMC_UART_CH_EVENT_DATA_LOST           = USIC_CH_CCR_DLIEN_Msk,  /**< Data lost event */
+  XMC_UART_CH_EVENT_TRANSMIT_SHIFT      = USIC_CH_CCR_TSIEN_Msk,  /**< Transmit shift event */
+  XMC_UART_CH_EVENT_TRANSMIT_BUFFER     = USIC_CH_CCR_TBIEN_Msk,  /**< Transmit buffer event */
+  XMC_UART_CH_EVENT_STANDARD_RECEIVE    = USIC_CH_CCR_RIEN_Msk,   /**< Receive event */
+  XMC_UART_CH_EVENT_ALTERNATIVE_RECEIVE = USIC_CH_CCR_AIEN_Msk,   /**< Alternate receive event */
+  XMC_UART_CH_EVENT_BAUD_RATE_GENERATOR = USIC_CH_CCR_BRGIEN_Msk, /**< Baudrate generator event */
   
   XMC_UART_CH_EVENT_SYNCHRONIZATION_BREAK = USIC_CH_PCR_ASCMode_SBIEN_Msk, /**< Event synchronization break */
   XMC_UART_CH_EVENT_COLLISION = USIC_CH_PCR_ASCMode_CDEN_Msk,              /**< Event collision */
@@ -227,7 +232,7 @@ extern "C" {
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, XMC_UART0_CH1,XMC_UART1_CH0, XMC_UART1_CH1,XMC_UART2_CH0, XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param config Constant pointer to UART configuration structure of type @ref XMC_UART_CH_CONFIG_t.
  * @return XMC_UART_CH_STATUS_t Status of initializing the USIC channel for UART protocol.\n
  *          \b Range: @ref XMC_UART_CH_STATUS_OK if initialization is successful.\n
@@ -251,7 +256,7 @@ void XMC_UART_CH_Init(XMC_USIC_CH_t *const channel, const XMC_UART_CH_CONFIG_t *
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @return None
  *
  * \par<b>Description</b><br>
@@ -270,7 +275,7 @@ __STATIC_INLINE void XMC_UART_CH_Start(XMC_USIC_CH_t *const channel)
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @return XMC_UART_CH_STATUS_t Status to indicate if the communication channel is stopped successfully.\n
  *                              @ref XMC_UART_CH_STATUS_OK if the communication channel is stopped.
  *                              @ref XMC_UART_CH_STATUS_BUSY if the communication channel is busy.
@@ -287,7 +292,7 @@ XMC_UART_CH_STATUS_t XMC_UART_CH_Stop(XMC_USIC_CH_t *const channel);
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				   \b Range: @ref XMC_UART0_CH0, XMC_UART0_CH1 ,XMC_UART1_CH0, XMC_UART1_CH1, XMC_UART2_CH0, XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param rate Desired baudrate. \n
  *           \b Range: minimum value = 100, maximum value depends on the peripheral clock frequency\n
  * 				   and \a oversampling. Maximum baudrate can be derived using the formula: (fperiph * 1023)/(1024 * oversampling)
@@ -312,7 +317,7 @@ XMC_UART_CH_STATUS_t XMC_UART_CH_SetBaudrate(XMC_USIC_CH_t *const channel, uint3
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  data Data to be transmitted. \n 
  *          \b Range: 16 bit unsigned data within the range 0 to 65535. Actual size of
  *          data transmitted depends on the configured number of bits for the UART protocol in the register SCTR.
@@ -335,7 +340,7 @@ void XMC_UART_CH_Transmit(XMC_USIC_CH_t *const channel, const uint16_t data);
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @return uint16_t Received data over UART communication channel.
  * \par<b>Description</b><br>
  * Provides one word of data received over UART communication channel.\n\n
@@ -351,7 +356,7 @@ uint16_t XMC_UART_CH_GetReceivedData(XMC_USIC_CH_t *const channel);
 
 /**
  * @param  channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  word_length Data word length. \n
  *          \b Range: minimum= 1, maximum= 16.
  * @return None
@@ -376,7 +381,7 @@ __STATIC_INLINE void XMC_UART_CH_SetWordLength(XMC_USIC_CH_t *const channel, con
 
 /**
  * @param  channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  frame_length Number of data bits in each UART frame. \n
  *          \b Range: minimum= 1, maximum= 64.
  * @return None
@@ -397,7 +402,7 @@ __STATIC_INLINE void XMC_UART_CH_SetFrameLength(XMC_USIC_CH_t *const channel, co
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  event Event bitmasks to enable. Use the type @ref XMC_UART_CH_EVENT_t for naming events. \n
  * 				  \b Range: @ref XMC_UART_CH_EVENT_RECEIVE_START, @ref XMC_UART_CH_EVENT_DATA_LOST,
  * 				  @ref XMC_UART_CH_EVENT_TRANSMIT_SHIFT, @ref XMC_UART_CH_EVENT_TRANSMIT_BUFFER,
@@ -416,7 +421,7 @@ void XMC_UART_CH_EnableEvent(XMC_USIC_CH_t *const channel, const uint32_t event)
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  event Bitmask of events to disable. Use the type @ref XMC_UART_CH_EVENT_t for naming events.\n
  * 				  \b Range: @ref XMC_UART_CH_EVENT_RECEIVE_START, @ref XMC_UART_CH_EVENT_DATA_LOST,
  * 				  @ref XMC_UART_CH_EVENT_TRANSMIT_SHIFT, @ref XMC_UART_CH_EVENT_TRANSMIT_BUFFER,
@@ -435,7 +440,7 @@ void XMC_UART_CH_DisableEvent(XMC_USIC_CH_t *const channel, const uint32_t event
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param service_request Service request number for generating protocol interrupts.\n
  * 				  \b Range: 0 to 5.
  * @return None
@@ -459,7 +464,7 @@ __STATIC_INLINE void XMC_UART_CH_SetInterruptNodePointer(XMC_USIC_CH_t *const ch
 
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  interrupt_node Interrupt node pointer to be configured. \n
  * 						  \b Range: @ref XMC_UART_CH_INTERRUPT_NODE_POINTER_TRANSMIT_SHIFT,
  * 						  			@ref XMC_UART_CH_INTERRUPT_NODE_POINTER_TRANSMIT_BUFFER etc.
@@ -486,7 +491,7 @@ __STATIC_INLINE void XMC_UART_CH_SelectInterruptNodePointer(XMC_USIC_CH_t *const
 
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				   \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param  service_request_line service request number of the event to be triggered. \n
  * 			\b Range: 0 to 5.
  * @return None
@@ -506,7 +511,7 @@ __STATIC_INLINE void XMC_UART_CH_TriggerServiceRequest(XMC_USIC_CH_t *const chan
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @return Status of UART channel events. \n 
  *          \b Range: Use @ref XMC_UART_CH_STATUS_FLAG_t enumerations for
  * 					event bitmasks. @ref XMC_UART_CH_STATUS_FLAG_TRANSMISSION_IDLE, @ref XMC_UART_CH_STATUS_FLAG_RECEPTION_IDLE,
@@ -528,7 +533,7 @@ __STATIC_INLINE uint32_t XMC_UART_CH_GetStatusFlag(XMC_USIC_CH_t *const channel)
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param flag UART events to be cleared. \n
  *          \b Range: Use @ref XMC_UART_CH_STATUS_FLAG_t enumerations for
  * 					event bitmasks. @ref XMC_UART_CH_STATUS_FLAG_TRANSMISSION_IDLE, @ref XMC_UART_CH_STATUS_FLAG_RECEPTION_IDLE,
@@ -551,7 +556,7 @@ __STATIC_INLINE void XMC_UART_CH_ClearStatusFlag(XMC_USIC_CH_t *const channel, c
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -572,13 +577,13 @@ __STATIC_INLINE void XMC_UART_CH_ClearStatusFlag(XMC_USIC_CH_t *const channel, c
  */
 __STATIC_INLINE void XMC_UART_CH_SetInputSource(XMC_USIC_CH_t *const channel, const XMC_UART_CH_INPUT_t input, const uint8_t source)
 {
-  channel->DXCR[input] = 0U;
+  channel->DXCR[input] = (uint32_t)(channel->DXCR[input] & (~(USIC_CH_DX0CR_INSW_Msk|USIC_CH_DX0CR_DSEN_Msk)));
   XMC_USIC_CH_SetInputSource(channel, (XMC_USIC_CH_INPUT_t)input, source);
 }
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param pulse_length Length of the zero pulse in number of time quanta. \n 
  *          \b Range: 0 to 7.
  * @return None
@@ -599,7 +604,7 @@ __STATIC_INLINE void XMC_UART_CH_SetPulseLength(XMC_USIC_CH_t *const channel, co
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param sample_point Sample point among the number of samples. \n
  * 				  \b Range: minimum= 0, maximum= \a oversampling (DCTQ).
  * @return None
@@ -620,7 +625,7 @@ __STATIC_INLINE void XMC_UART_CH_SetSamplePoint(XMC_USIC_CH_t *const channel, co
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -639,7 +644,7 @@ __STATIC_INLINE void XMC_UART_CH_EnableInputInversion(XMC_USIC_CH_t *const chann
 
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -657,7 +662,7 @@ __STATIC_INLINE void XMC_UART_CH_DisableInputInversion(XMC_USIC_CH_t *const chan
 }
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -675,7 +680,7 @@ __STATIC_INLINE void XMC_UART_CH_EnableInputDigitalFilter(XMC_USIC_CH_t *const c
 }
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -693,7 +698,7 @@ __STATIC_INLINE void XMC_UART_CH_DisableInputDigitalFilter(XMC_USIC_CH_t *const 
 }
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -710,7 +715,7 @@ __STATIC_INLINE void XMC_UART_CH_EnableInputSync(XMC_USIC_CH_t *const channel, c
 }
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).
@@ -728,7 +733,7 @@ __STATIC_INLINE void XMC_UART_CH_DisableInputSync(XMC_USIC_CH_t *const channel, 
 }
 /**
  * @param channel Constant pointer to USIC channel handle of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_UART0_CH0, @ref XMC_UART0_CH1,@ref XMC_UART1_CH0,@ref XMC_UART1_CH1,@ref XMC_UART2_CH0,@ref XMC_UART2_CH1 @note Availability of UART1 and UART2 depends on device selection
  * @param input UART channel input stage of type @ref XMC_UART_CH_INPUT_t. \n 
  *          \b Range: @ref XMC_UART_CH_INPUT_RXD (for DX0),
  * 					@ref XMC_UART_CH_INPUT_RXD1 (for DX3), @ref XMC_UART_CH_INPUT_RXD2 (for DX5).

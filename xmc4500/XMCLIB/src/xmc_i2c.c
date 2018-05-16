@@ -1,12 +1,12 @@
 /**
  * @file xmc_i2c.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -43,7 +43,17 @@
        - Modified XMC_I2C_CH_Stop() API for not setting to IDLE the channel if it is busy <br>
  *
  * 2015-06-20:
- *     - Removed GetDriverVersion API
+ *     - Removed GetDriverVersion API <br>
+ *
+ * 2015-08-14:
+ *     - updated the XMC_I2C_CH_SetBaudrate API to support dynamic change from 400K to low frequencies <br>
+ *
+ * 2015-09-01:
+ *     - Modified XMC_I2C_CH_EnableEvent() and XMC_I2C_CH_DisableEvent() for supporting multiple events configuration <br>
+ *
+ * 2015-10-02:
+ *     - Fixed 10bit addressing
+ *
  * @endcond 
  *
  */
@@ -62,7 +72,7 @@
                                                  frame transfer is possible after each edge of the signal.*/
 #define WORDLENGTH              (7U)        /**< Word length */
 #define SET_TDV                 (1U)		/**< Transmission data valid */
-#define XMC_I2C_10BIT_ADDR_MASK (0xF800U)   /**< Address mask for 10-bit mode */
+#define XMC_I2C_10BIT_ADDR_MASK (0x7C00U)   /**< Address mask for 10-bit mode */
 
 /*********************************************************************************************************************
  * ENUMS
@@ -113,7 +123,7 @@ void XMC_I2C_CH_Init(XMC_USIC_CH_t *const channel, const XMC_I2C_CH_CONFIG_t *co
   channel->TCSR = ((uint32_t)SET_TDV << (uint32_t)USIC_CH_TCSR_TDEN_Pos) | USIC_CH_TCSR_TDSSM_Msk;
 
   /* Clear status flags */
-  channel->PSCR = 0xFFFFFFFF;
+  channel->PSCR = 0xFFFFFFFFU;
 
   /* Disable parity generation */
   channel->CCR = 0x0U;
@@ -123,7 +133,7 @@ void XMC_I2C_CH_SetSlaveAddress(XMC_USIC_CH_t *const channel, const uint16_t add
 {
   if ((address & XMC_I2C_10BIT_ADDR_MASK) == XMC_I2C_10BIT_ADDR_GROUP)
   {
-    channel->PCR_IICMode = address;
+    channel->PCR_IICMode = (address & 0xffU) | ((address << 1) & 0xfe00U);
   }
   else
   {
@@ -135,9 +145,13 @@ uint16_t XMC_I2C_CH_GetSlaveAddress(const XMC_USIC_CH_t *const channel)
 {
   uint32_t address = channel->PCR_IICMode & (uint32_t)USIC_CH_PCR_IICMode_SLAD_Msk;
   
-  if ((address & XMC_I2C_10BIT_ADDR_MASK) != XMC_I2C_10BIT_ADDR_GROUP)
+  if ((address & 0xffU) == 0U)
   {
     address = address >> XMC_I2C_7BIT_ADDR_Pos;
+  }
+  else
+  {
+    address = (address & 0xffU) | ((address >> 1) & 0x0300U);
   }
   
   return (uint16_t)address;
@@ -151,6 +165,7 @@ XMC_I2C_CH_STATUS_t XMC_I2C_CH_SetBaudrate(XMC_USIC_CH_t *const channel, uint32_
   
   if (rate <= (uint32_t)XMC_I2C_CH_MAX_SPEED_STANDARD)
   {
+		channel->PCR_IICMode &= (uint32_t)~USIC_CH_PCR_IICMode_STIM_Msk;
     if (XMC_USIC_CH_SetBaudrate(channel, rate, (uint32_t)XMC_I2C_CH_CLOCK_OVERSAMPLING_STANDARD) == XMC_USIC_CH_STATUS_OK)
     {
       status = XMC_I2C_CH_STATUS_OK;
@@ -228,6 +243,7 @@ void XMC_I2C_CH_MasterRepeatedStart(XMC_USIC_CH_t *const channel, const uint16_t
     channel->IN[0U] = tmp;
   }
 }
+
 /* Sends master stop command to IN/TBUF register based on FIFO/non-FIFO modes. */
 void XMC_I2C_CH_MasterStop(XMC_USIC_CH_t *const channel)
 {
@@ -249,6 +265,7 @@ void XMC_I2C_CH_MasterStop(XMC_USIC_CH_t *const channel)
     channel->IN[0U] = (uint32_t)XMC_I2C_CH_TDF_MASTER_STOP;
   }
 }
+
 /* Sends master send command along with data to IN/TBUF register based on FIFO/non-FIFO modes. */
 void XMC_I2C_CH_MasterTransmit(XMC_USIC_CH_t *const channel, const uint8_t data)
 {
@@ -270,6 +287,7 @@ void XMC_I2C_CH_MasterTransmit(XMC_USIC_CH_t *const channel, const uint8_t data)
     channel->IN[0] = (uint32_t)XMC_I2C_CH_TDF_MASTER_SEND | data;
   }
 }
+
 /* Sends slave send command along with data to IN/TBUF register based on FIFO/non-FIFO modes. */
 void XMC_I2C_CH_SlaveTransmit(XMC_USIC_CH_t *const channel, const uint8_t data)
 {
@@ -313,6 +331,7 @@ void XMC_I2C_CH_MasterReceiveAck(XMC_USIC_CH_t *const channel)
     channel->IN[0] = (uint32_t)XMC_I2C_CH_TDF_MASTER_RECEIVE_ACK;
   }
 }
+
 /* Sends master receive nack command to IN/TBUF register based on FIFO/non-FIFO modes. */
 void XMC_I2C_CH_MasterReceiveNack(XMC_USIC_CH_t *const channel)
 {
@@ -334,6 +353,7 @@ void XMC_I2C_CH_MasterReceiveNack(XMC_USIC_CH_t *const channel)
     channel->IN[0] = (uint32_t)XMC_I2C_CH_TDF_MASTER_RECEIVE_NACK;
   }
 }
+
 /* Reads the data from RBUF if FIFO size is 0 otherwise from OUTR. */
 uint8_t XMC_I2C_CH_GetReceivedData(const XMC_USIC_CH_t *const channel)
 {
@@ -351,6 +371,7 @@ uint8_t XMC_I2C_CH_GetReceivedData(const XMC_USIC_CH_t *const channel)
 
   return retval;
 }
+
 /* Sets the operating mode of USIC to IDLE */
 XMC_I2C_CH_STATUS_t XMC_I2C_CH_Stop(XMC_USIC_CH_t *const channel)
 {
@@ -367,27 +388,15 @@ XMC_I2C_CH_STATUS_t XMC_I2C_CH_Stop(XMC_USIC_CH_t *const channel)
   }
   return status;
 }
-/* Enables the input parameter event by updating CCR register */
-void XMC_I2C_CH_EnableEvent(XMC_USIC_CH_t *const channel, uint32_t event)
+
+void XMC_I2C_CH_EnableEvent(XMC_USIC_CH_t *const channel, const uint32_t event)
 {
-  if ((event & 0x80000000U) != 0U)
-  {
-    channel->CCR |= event & 0x7fffffffU;
-  }
-  else
-  {
-    channel->PCR_IICMode |= event;
-  }
+  channel->CCR |= (event&0x1fc00U);
+  channel->PCR_IICMode |= ((event) & 0x41fc0000U);
 }
-/* Disables the input parameter event by updating CCR register */
-void XMC_I2C_CH_DisableEvent(XMC_USIC_CH_t *const channel, uint32_t event)
+
+void XMC_I2C_CH_DisableEvent(XMC_USIC_CH_t *const channel, const uint32_t event)
 {
-  if ((event & 0x80000000U) != 0U)
-  {
-    channel->CCR &= ~(event & 0x7fffffffU);
-  }
-  else
-  {
-    channel->PCR_IICMode &= ~event;
-  }
+  channel->CCR &= (uint32_t)~(event&0x1fc00U);
+  channel->PCR_IICMode &= (uint32_t)~((event) & 0x41fc0000U);
 }

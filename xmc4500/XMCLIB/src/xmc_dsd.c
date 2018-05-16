@@ -1,12 +1,12 @@
 /**
  * @file xmc_dsd.c
- * @date 2015-06-19 
+ * @date 2016-01-12
  *
  * @cond
  **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without           
@@ -48,14 +48,17 @@
  *      
  * 2015-06-19:
  *     - Removed GetDriverVersion API <BR>
+ * 
+ * 2015-09-18:
+ *     - Support added for XMC4800 microcontroller family <BR>
  * @endcond 
  *
  */
- 
- /*********************************************************************************************************************
+
+/*********************************************************************************************************************
  * HEADER FILES
  ********************************************************************************************************************/
-#include <xmc_dsd.h>
+#include "xmc_dsd.h"
 
 #if defined(DSD)
 
@@ -63,6 +66,10 @@
  * MACROS
  ********************************************************************************************************************/
 
+#define XMC_DSD_MIN_FILTER_START  (4U)
+#define XMC_DSD_MIN_DECIMATION_FACTOR (4U)
+#define XMC_DSD_MAX_DECIMATION_FACTOR (256U)
+#define XMC_DSD_MAX_DECIMATION_FACTOR_AUX (32U)
 
 /*********************************************************************************************************************
  * API IMPLEMENTATION
@@ -73,12 +80,11 @@ void XMC_DSD_Enable(XMC_DSD_t *const dsd)
 {
   XMC_ASSERT("XMC_DSD_Enable:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   XMC_UNUSED_ARG(dsd);
-  #if ((UC_FAMILY == XMC4))
-    XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DSD);
-    #if (UC_SERIES == XMC44)
-      XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DSD);
-    #endif
-  #endif
+
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DSD);
+#endif
+  XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DSD);
 }
 
 /*Disable the DSD Module*/
@@ -86,13 +92,11 @@ void XMC_DSD_Disable(XMC_DSD_t *const dsd)
 {
   XMC_ASSERT("XMC_DSD_Disable:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   XMC_UNUSED_ARG(dsd);
-  #if ((UC_FAMILY == XMC4))
-    XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DSD);
-    #if (UC_SERIES == XMC44)
-      XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DSD);
-    #endif
-  #endif
 
+  XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_DSD);
+#if defined(CLOCK_GATING_SUPPORTED)
+  XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_DSD);
+#endif
 }
 
 /* Enable the module clock*/
@@ -131,7 +135,7 @@ bool XMC_DSD_IsEnabled(XMC_DSD_t *const dsd)
   XMC_ASSERT("XMC_DSD_Disable:Invalid module pointer", XMC_DSD_CHECK_MODULE_PTR(dsd));
   XMC_UNUSED_ARG(dsd);
   
-  #if (UC_SERIES == XMC44)
+  #if ((UC_SERIES == XMC44) || (UC_SERIES == XMC48)||(UC_SERIES == XMC47))
   if(XMC_SCU_RESET_IsPeripheralResetAsserted(XMC_SCU_PERIPHERAL_RESET_DSD) == false) 
   {
     if(XMC_SCU_CLOCK_IsPeripheralClockGated(XMC_SCU_PERIPHERAL_CLOCK_DSD) == false)

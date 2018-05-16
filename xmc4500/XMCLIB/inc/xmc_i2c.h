@@ -1,12 +1,12 @@
 /**
  * @file xmc_i2c.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -40,11 +40,30 @@
  *     - Initial <br>
  *      
  * 2015-05-20:
- *     - Description updated
- *     - Added XMC_I2C_CH_TriggerServiceRequest() and XMC_I2C_CH_SelectInterruptNodePointer()
+ *     - Description updated <br>
+ *     - Added XMC_I2C_CH_TriggerServiceRequest() and XMC_I2C_CH_SelectInterruptNodePointer() <br>
  *
  * 2015-06-20:
- *     - Removed version macros and declaration of GetDriverVersion API
+ *     - Removed version macros and declaration of GetDriverVersion API <br>
+ *
+ * 2015-08-27:
+ *     - Added APIs for external input for BRG configuration:XMC_I2C_CH_ConfigExternalInputSignalToBRG() <br>
+ *
+ * 2015-09-01:
+ *     - Added APIs for enabling or disabling the ACK response to a 0x00 slave address: XMC_I2C_CH_EnableSlaveAcknowledgeTo00() and
+ *       XMC_I2C_CH_DisableSlaveAcknowledgeTo00(). <br>
+ *     - Modified XMC_I2C_CH_SetInputSource() API for avoiding complete DXCR register overwriting. <br>
+ *     - Modified XMC_I2C_CH_EVENT_t enum for supporting XMC_I2C_CH_EnableEvent() and XMC_I2C_CH_DisableEvent()
+ *       for supporting multiple events configuration <br>
+ *
+ * 2015-10-02:
+ *     - Fix 10bit addressing
+ *
+ * 2015-10-07:
+ *     - Fix register access in XMC_I2C_CH_EnableSlaveAcknowledgeTo00() and XMC_I2C_CH_DisableSlaveAcknowledgeTo00() APIs.
+ *     - Naming of APIs modified: from XMC_I2C_CH_EnableSlaveAcknowledgeTo00() to  XMC_I2C_CH_EnableAcknowledgeAddress0()
+ *       and from XMC_I2C_CH_DisableSlaveAcknowledgeTo00() to XMC_I2C_CH_DisableAcknowledgeAddress0().
+ *
  * @endcond 
  *
  */
@@ -56,7 +75,7 @@
  * HEADER FILES
  *******************************************************************************/
 
-#include <xmc_usic.h>
+#include "xmc_usic.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -99,7 +118,7 @@
 #define XMC_I2C2_CH1 XMC_USIC2_CH1                   /**< USIC2 channel 1 base address */
 #endif
 
-#define XMC_I2C_10BIT_ADDR_GROUP       (0xF000U)	 /**< Value to verify the address is 10-bit or not */
+#define XMC_I2C_10BIT_ADDR_GROUP       (0x7800U)	 /**< Value to verify the address is 10-bit or not */
 
 /*******************************************************************************
  * ENUMS
@@ -172,13 +191,13 @@ typedef enum XMC_I2C_CH_CMD
  */
 typedef enum XMC_I2C_CH_EVENT
 {
-  XMC_I2C_CH_EVENT_RECEIVE_START       = (int32_t)(0x80000000U | USIC_CH_CCR_RSIEN_Msk),  /**< Receive start event */
-  XMC_I2C_CH_EVENT_DATA_LOST           = (int32_t)(0x80000000U | USIC_CH_CCR_DLIEN_Msk),  /**< Data lost event */
-  XMC_I2C_CH_EVENT_TRANSMIT_SHIFT      = (int32_t)(0x80000000U | USIC_CH_CCR_TSIEN_Msk),  /**< Transmit shift event */
-  XMC_I2C_CH_EVENT_TRANSMIT_BUFFER     = (int32_t)(0x80000000U | USIC_CH_CCR_TBIEN_Msk),  /**< Transmit buffer event */
-  XMC_I2C_CH_EVENT_STANDARD_RECEIVE    = (int32_t)(0x80000000U | USIC_CH_CCR_RIEN_Msk),   /**< Receive event */
-  XMC_I2C_CH_EVENT_ALTERNATIVE_RECEIVE = (int32_t)(0x80000000U | USIC_CH_CCR_AIEN_Msk),   /**< Alternate receive event */
-  XMC_I2C_CH_EVENT_BAUD_RATE_GENERATOR = (int32_t)(0x80000000U | USIC_CH_CCR_BRGIEN_Msk), /**< Baudrate generator event */
+  XMC_I2C_CH_EVENT_RECEIVE_START       = USIC_CH_CCR_RSIEN_Msk,  /**< Receive start event */
+  XMC_I2C_CH_EVENT_DATA_LOST           = USIC_CH_CCR_DLIEN_Msk,  /**< Data lost event */
+  XMC_I2C_CH_EVENT_TRANSMIT_SHIFT      = USIC_CH_CCR_TSIEN_Msk,  /**< Transmit shift event */
+  XMC_I2C_CH_EVENT_TRANSMIT_BUFFER     = USIC_CH_CCR_TBIEN_Msk,  /**< Transmit buffer event */
+  XMC_I2C_CH_EVENT_STANDARD_RECEIVE    = USIC_CH_CCR_RIEN_Msk,   /**< Receive event */
+  XMC_I2C_CH_EVENT_ALTERNATIVE_RECEIVE = USIC_CH_CCR_AIEN_Msk,   /**< Alternate receive event */
+  XMC_I2C_CH_EVENT_BAUD_RATE_GENERATOR = USIC_CH_CCR_BRGIEN_Msk, /**< Baudrate generator event */
 
   XMC_I2C_CH_EVENT_START_CONDITION_RECEIVED = USIC_CH_PCR_IICMode_SCRIEN_Msk,             /**< Start condition received event */
   XMC_I2C_CH_EVENT_REPEATED_START_CONDITION_RECEIVED = USIC_CH_PCR_IICMode_RSCRIEN_Msk,   /**< Repeated start condition received event */
@@ -227,7 +246,9 @@ typedef enum XMC_I2C_CH_INTERRUPT_NODE_POINTER
 typedef struct XMC_I2C_CH_CONFIG
 {
   uint32_t baudrate;   /**< baud rate configuration upto max of 400KHz */
-  uint16_t address;    /**< master's own address  (used in multi-master mode) */
+  uint16_t address;    /**< slave address 
+                            A 7-bit address needs to be left shifted it by 1.
+                            A 10-bit address needs to be ORed with XMC_I2C_10BIT_ADDR_GROUP. */
 } XMC_I2C_CH_CONFIG_t;
 
 /*******************************************************************************
@@ -264,10 +285,10 @@ void XMC_I2C_CH_Init(XMC_USIC_CH_t *const channel, const XMC_I2C_CH_CONFIG_t *co
  * @return None<br>
  *
  * \par<b>Description:</b><br>
- * Sets the @ref rate of I2C \a channel.
+ * Sets the rate of I2C \a channel.
  *
  * \par<b>Note:</b><br>
- * Standard over sampling is considered if @ref rate <= 100KHz and fast over sampling is considered if @ref rate > 100KHz.<br>
+ * Standard over sampling is considered if rate <= 100KHz and fast over sampling is considered if rate > 100KHz.<br>
  *
  * \par<b>Related APIs:</b><br>
  * XMC_USIC_CH_SetBaudrate()\n\n
@@ -336,7 +357,7 @@ __STATIC_INLINE void XMC_I2C_CH_SetInterruptNodePointer(XMC_USIC_CH_t *const cha
 
 /**
  * @param channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				  \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				  \b Range: @ref XMC_I2C0_CH0, @ref XMC_I2C0_CH1,@ref XMC_I2C1_CH0,@ref XMC_I2C1_CH1,@ref XMC_I2C2_CH0,@ref XMC_I2C2_CH1 @note Availability of I2C1 and I2C2 depends on device selection
  * @param  interrupt_node Interrupt node pointer to be configured. \n
  * 						  \b Range: @ref XMC_SPI_CH_INTERRUPT_NODE_POINTER_TRANSMIT_SHIFT,
  * 						  			@ref XMC_SPI_CH_INTERRUPT_NODE_POINTER_TRANSMIT_BUFFER etc.
@@ -363,7 +384,7 @@ __STATIC_INLINE void XMC_I2C_CH_SelectInterruptNodePointer(XMC_USIC_CH_t *const 
 
 /**
  * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
- * 				   \b Range: @ref XMC_USIC0_CH0, @ref XMC_USIC0_CH1 to @ref XMC_USIC2_CH1 based on device support.
+ * 				   \b Range: @ref XMC_I2C0_CH0, @ref XMC_I2C0_CH1,@ref XMC_I2C1_CH0,@ref XMC_I2C1_CH1,@ref XMC_I2C2_CH0,@ref XMC_I2C2_CH1 @note Availability of I2C1 and I2C2 depends on device selection
  * @param  service_request_line service request number of the event to be triggered. \n
  * 			\b Range: 0 to 5.
  * @return None
@@ -391,8 +412,7 @@ __STATIC_INLINE void XMC_I2C_CH_TriggerServiceRequest(XMC_USIC_CH_t *const chann
  * Sets the input source for I2C \a channel.<br>
  * Defines the input stage for the corresponding input line.
  *
- *\Note
- * After configuring the input source for corresponding channel, interrupt node pointer is set.
+ * @note After configuring the input source for corresponding channel, interrupt node pointer is set.
  *
  * \par<b>Related APIs:</b><br>
  * XMC_USIC_CH_SetInptSource(), XMC_USIC_CH_SetInterruptNodePointer()
@@ -400,7 +420,7 @@ __STATIC_INLINE void XMC_I2C_CH_TriggerServiceRequest(XMC_USIC_CH_t *const chann
  */
 __STATIC_INLINE void XMC_I2C_CH_SetInputSource(XMC_USIC_CH_t *const channel, const XMC_I2C_CH_INPUT_t input, const uint8_t source)
 {
-  channel->DXCR[input] = USIC_CH_DX0CR_DSEN_Msk;
+  channel->DXCR[input] =  (uint32_t)(channel->DXCR[input] & (~USIC_CH_DX0CR_INSW_Msk)) | USIC_CH_DX0CR_DSEN_Msk;
   XMC_USIC_CH_SetInputSource(channel, (XMC_USIC_CH_INPUT_t)input, source);
 }
 
@@ -633,6 +653,62 @@ __STATIC_INLINE uint32_t XMC_I2C_CH_GetStatusFlag(XMC_USIC_CH_t *const channel)
 __STATIC_INLINE void XMC_I2C_CH_ClearStatusFlag(XMC_USIC_CH_t *const channel, uint32_t flag)
 {
   channel->PSCR |= flag;
+}
+
+/**
+ * @param  channel Pointer to USIC channel handler of type @ref XMC_USIC_CH_t \n
+ * 				   \b Range: @ref XMC_I2C0_CH0, @ref XMC_I2C0_CH1,@ref XMC_I2C1_CH0,@ref XMC_I2C1_CH1,@ref XMC_I2C2_CH0,@ref XMC_I2C2_CH1 @note Availability of I2C1 and I2C2 depends on device selection
+ * @param  pdiv Desired divider for the external frequency input. \b Range: minimum value = 1, maximum value = 1024 \n
+ * @param  oversampling Required oversampling. The value indicates the number of time quanta for one symbol of data. \n
+ * 						This can be related to the number of samples for each logic state of the data signal. \n
+ * 						\b Range: 1 to 32. Value should be chosen based on the protocol used.
+ * @param  combination_mode  USIC channel input combination mode \n
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Enables the external frequency input for the Baudrate Generator and configures the divider, oversampling and
+ * the combination mode of the USIC channel. \n\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_USIC_CH_SetBRGInputClockSource(), XMC_USIC_CH_SetInputTriggerCombinationMode() \n\n\n
+ */
+__STATIC_INLINE void XMC_I2C_CH_ConfigExternalInputSignalToBRG(XMC_USIC_CH_t *const channel,
+		                                                       const uint16_t pdiv,
+											                   const uint32_t oversampling,
+											                   const XMC_USIC_CH_INPUT_COMBINATION_MODE_t combination_mode)
+{
+  XMC_USIC_CH_ConfigExternalInputSignalToBRG(channel,pdiv,oversampling,combination_mode);
+}
+
+/**
+ * @param channel Constant pointer to USIC channel structure of type @ref XMC_USIC_CH_t
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Retrieves the status byte of I2C \a channel using PSR_IICMode register.\n
+ *
+ * \par<b>Related APIs:</b><br>
+ * XMC_I2C_CH_DisableAcknowledgeAddress0()\n\n
+ */
+__STATIC_INLINE void XMC_I2C_CH_EnableAcknowledgeAddress0(XMC_USIC_CH_t *const channel)
+{
+  channel->PCR_IICMode |= USIC_CH_PCR_IICMode_ACK00_Msk;
+}
+
+/**
+ * @param channel Constant pointer to USIC channel structure of type @ref XMC_USIC_CH_t
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * This bit defines that slave device should not be sensitive to the slave address 00H.\n
+ *
+ * \par<b>Related APIs:</b><br>
+ * XMC_I2C_CH_EnableAcknowledgeAddress0()\n\n
+ */
+__STATIC_INLINE void XMC_I2C_CH_DisableAcknowledgeAddress0(XMC_USIC_CH_t *const channel)
+{
+  channel->PCR_IICMode &= ~USIC_CH_PCR_IICMode_ACK00_Msk;
 }
 
 #ifdef __cplusplus

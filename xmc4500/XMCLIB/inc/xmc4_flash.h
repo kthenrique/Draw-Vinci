@@ -1,12 +1,12 @@
 /**
  * @file xmc4_flash.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -42,6 +42,16 @@
  *     - Updated for Documentation related changes<br>
  * 2015-06-20: 
  *     - Removed version macros and declaration of GetDriverVersion API 
+ * 2015-08-17: 
+ *     - Added the below API's to the public interface.
+ *       1. XMC_FLASH_Reset
+ *       2. XMC_FLASH_ErasePhysicalSector
+ *       3. XMC_FLASH_EraseUCB
+ *       4. XMC_FLASH_ResumeProtection
+ *       5. XMC_FLASH_RepairPhysicalSector 
+ *     - Added support for XMC4800/4700 devices
+ * 2015-12-07:
+ *     - Fix XMC_FLASH_READ_ACCESS_TIME for XMC43, 47 and 48 devices
  * @endcond 
  *
  */
@@ -53,7 +63,7 @@
  * HEADER FILES
  ********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if UC_FAMILY == XMC4
 
@@ -70,7 +80,7 @@
 /*********************************************************************************************************************
  * MACROS
  ********************************************************************************************************************/
-#define XMC_FLASH_UNCACHED_BASE    (0x0c000000U) /**< Non cached flash starting address of for
+#define XMC_FLASH_UNCACHED_BASE    (0x0C000000U) /**< Non cached flash starting address of for
                                                       XMC4 family of microcontrollers */
 #define XMC_FLASH_WORDS_PER_PAGE   (64UL)        /**< Number of words in a page (256 bytes / 4 bytes = 64 words)*/
 #define XMC_FLASH_BYTES_PER_PAGE   (256UL)       /**< Number of bytes in a  page*/
@@ -96,23 +106,36 @@
 #define XMC_FLASH_SECTOR_7         (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x1C000UL) /**<Starting address of sector7 */
 #define XMC_FLASH_SECTOR_8         (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x20000UL) /**<Starting address of sector8 */
 #define XMC_FLASH_SECTOR_9         (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x40000UL) /**<Starting address of sector9 */
-#define XMC_FLASH_SECTOR_10        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x80000UL) /**<Starting address of sector10 */
-#define XMC_FLASH_SECTOR_11        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0xC0000UL) /**<Starting address of sector11 */
+#define XMC_FLASH_SECTOR_10        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x80000UL) /**<Starting address of sector10*/
+#define XMC_FLASH_SECTOR_11        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0xC0000UL) /**<Starting address of sector11*/
+
+#define XMC_FLASH_SECTOR_12        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x100000UL) /**<Starting address of sector12*/
+#define XMC_FLASH_SECTOR_13        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x140000UL) /**<Starting address of sector13*/
+#define XMC_FLASH_SECTOR_14        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x180000UL) /**<Starting address of sector14*/
+#define XMC_FLASH_SECTOR_15        (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x1C0000UL) /**<Starting address of sector15*/
 
 #define XMC_FLASH_PHY_SECTOR_0     (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x00000UL) /**<Starting address of non cached
                                                                                          physical sector0 */
 #define XMC_FLASH_PHY_SECTOR_4     (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x10000UL) /**<Starting address of non cached
-                                                                                         physical sector0 */
-#define XMC_FLASH_PHY_SECTOR_8     (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x10000UL) /**<Starting address of non cached
-                                                                                         physical sector0 */
+                                                                                         physical sector4 */
+#define XMC_FLASH_PHY_SECTOR_8     (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x20000UL) /**<Starting address of non cached
+                                                                                         physical sector8 */
 #define XMC_FLASH_PHY_SECTOR_9     (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x40000UL) /**<Starting address of non cached
-                                                                                         physical sector0 */
+                                                                                         physical sector9 */
 #define XMC_FLASH_PHY_SECTOR_10    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x80000UL) /**<Starting address of non cached
-                                                                                         physical sector0 */
+                                                                                         physical sector10 */
 #define XMC_FLASH_PHY_SECTOR_11    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0xC0000UL) /**<Starting address of non cached
-                                                                                         physical sector0 */
+                                                                                         physical sector11 */
+#define XMC_FLASH_PHY_SECTOR_12    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x100000UL) /**<Starting address of non cached
+                                                                                         physical sector12 */
+#define XMC_FLASH_PHY_SECTOR_13    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x140000UL) /**<Starting address of non cached
+                                                                                         physical sector13 */
+#define XMC_FLASH_PHY_SECTOR_14    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x180000UL) /**<Starting address of non cached
+                                                                                         physical sector14 */
+#define XMC_FLASH_PHY_SECTOR_15    (uint32_t *)(XMC_FLASH_UNCACHED_BASE + 0x1C0000UL) /**<Starting address of non cached
+                                                                                         physical sector15 */
 
-#if UC_SERIES == XMC45
+#if UC_SERIES == XMC45 || UC_SERIES == XMC43 || UC_SERIES == XMC47 || UC_SERIES == XMC48
 #define XMC_FLASH_READ_ACCESS_TIME (22E-9F) /* Flash read access time  */
 #else
 #define XMC_FLASH_READ_ACCESS_TIME (20E-9F)
@@ -203,6 +226,8 @@ typedef enum XMC_FLASH_PROTECTION
   XMC_FLASH_PROTECTION_WRITE_SECTOR_8      = 0x0100UL,  /**< Sector 8 write protection */
   XMC_FLASH_PROTECTION_WRITE_SECTOR_9      = 0x0200UL,  /**< Sector 9 write protection */
   XMC_FLASH_PROTECTION_WRITE_SECTORS_10_11 = 0x0400UL,  /**< Sector 10 and 11 write protection */
+  XMC_FLASH_PROTECTION_WRITE_SECTORS_12_13 = 0x0800UL,  /**< Sector 12 and 13 write protection */
+  XMC_FLASH_PROTECTION_WRITE_SECTORS_14_15 = 0x1000UL,  /**< Sector 14 and 15 write protection */
   XMC_FLASH_PROTECTION_READ_GLOBAL         = 0x8000UL   /**< Global read protection (Applicable for UserLevel0 alone)*/
 } XMC_FLASH_PROTECTION_t;
 
@@ -525,10 +550,12 @@ void XMC_FLASH_ConfirmProtection(uint8_t user);
  * Verifies sector read protection is properly installed or not.\n\n Before entering into verify read protection
  * process, it clears the error status bits inside status register. It temporarily disables the protection with
  * passwords \a password0 and \a password1 respectively. It reads the FSR register and verifies the protection state.
+ * Resumption of read protection after disablement is achieved by XMC_FLASH_ResumeProtection or until next reset.
  *
  * \par<b>Related APIs:</b><BR>
  * XMC_FLASH_InstallProtection()<BR> 
  * XMC_FLASH_VerifyWriteProtection()<BR>
+ * XMC_FLASH_ResumeProtection()<BR>
  */
 bool XMC_FLASH_VerifyReadProtection(uint32_t password_0, uint32_t password_1);
 
@@ -548,15 +575,106 @@ bool XMC_FLASH_VerifyReadProtection(uint32_t password_0, uint32_t password_1);
  * process, it clears the error status bits inside status register. It temporarily disables the protection with
  * passwords \a password0 and \a password1 respectively for the intended sectors specified in \a protection_mask.
  * It reads the FSR register and verifies the write protection state.
+ * Resumption of write protection after disablement is achieved by XMC_FLASH_ResumeProtection or until next reset.
  *
  * \par<b>Related APIs:</b><BR>
  * XMC_FLASH_InstallProtection()<BR> 
  * XMC_FLASH_VerifyReadProtection()<BR>
+ * XMC_FLASH_ResumeProtection()<BR>
  */
 bool XMC_FLASH_VerifyWriteProtection(uint32_t user, 
                                      uint32_t protection_mask, 
                                      uint32_t password_0, 
                                      uint32_t password_1);
+
+/**
+ *
+ * @param None
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Resumes flash protection as it was configured before.\n\n
+ * It clears all the disable proection status flags FSR.WPRODISx and FSR.RPRODIS. But FSR.WPRODISx is not 
+ * cleared when corresponding UCBx is not in the “confirmed” state. 
+ *
+ * \par<b>Related APIs:</b><BR>
+ * None
+ */
+void XMC_FLASH_ResumeProtection(void);
+
+/**
+ *
+ * @param None
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Repairs the physical sector "PS4".\n\n 
+ * For selected devices, Erase Physical Sector can also be used for Sector Soft Repair, depending on the configuration 
+ * of PROCON1.PSR. This command sequence is required to run an EEPROM emulation algorithm that cycles the logical  
+ * sectors S4..S7 of PS4. This command sequence repairs the corrupted logical sectors inside the physical sector due to 
+ * interrupted erase operation.
+ *
+ * \par<b>Related APIs:</b><BR>
+ * None
+ */
+void XMC_FLASH_RepairPhysicalSector(void);
+/**
+ *
+ * @param sector_start_address Pointer to the starting address of physical sector. Use XMC_FLASH_SECTOR_x MACRO defined
+ *                             in xmc4_flash.h file.
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Erases the physical sector "PSA".\n\n If "PSA" does not point to base address of a correct sector or an unavailable 
+ * sector, it returns SQER. 
+ *
+ *
+ * \par<b>Related APIs:</b><BR>
+ * None
+ */
+void XMC_FLASH_ErasePhysicalSector(uint32_t *sector_start_address);
+
+/**
+ *
+ * @param ucb_sector_start_address Pointer to the starting address of physical sector. Use XMC_FLASH_UCBx MACRO 
+ *                                 defined in xmc4_flash.h file.
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * The addressed user configuration block “UCB” is erased.\n\n
+ * Erases UCB whose startting address specified in the input parameter \a ucb_sector_start_address. When the UCB has 
+ * an active write protection or the Flash module has an active global read protection the execution fails and 
+ * PROER is set. The command fails with SQER when \a ucb_sector_start_address is not the start address of a valid UCB.
+ * Call \ref XMC_FLASH_GetStatus API after this API to verify the erase was proper ot not. 
+ *
+ * \par<b>Related APIs:</b><BR>
+ * None
+ */
+void XMC_FLASH_EraseUCB(uint32_t *ucb_sector_start_address);
+
+/**
+ *
+ * @param None
+ *
+ * @return None
+ *
+ * \par<b>Description:</b><br>
+ * Resets the command interpreter to its initial state.\n\n
+ * Reset to Read can cancel every command sequence before its last command cycle has been received. All error flags 
+ * gets cleared by calling this API. 
+ * \par<b>Note:</b><br>
+ * todo
+ *
+ * \par<b>Related APIs:</b><BR>
+ * None
+ */
+void XMC_FLASH_Reset(void);
+
+
 
 #ifdef __cplusplus
 }

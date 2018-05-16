@@ -1,13 +1,13 @@
 
 /**
  * @file xmc_dma.c
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -61,11 +61,11 @@
  * HEADER FILES
  *******************************************************************************/
 
-#include <xmc_dma.h>
+#include "xmc_dma.h"
 
 #if defined (GPDMA0)
 
-#include <xmc_scu.h>
+#include "xmc_scu.h"
 
 /*******************************************************************************
  * MACROS
@@ -110,7 +110,7 @@ void XMC_DMA_Enable(XMC_DMA_t *const dma)
   if (dma == XMC_DMA0)
   {
 #endif
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_GPDMA0);
 #endif
     XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_GPDMA0);
@@ -118,7 +118,7 @@ void XMC_DMA_Enable(XMC_DMA_t *const dma)
   }
   else
   {
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     XMC_SCU_CLOCK_UngatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_GPDMA1);
 #endif
     XMC_SCU_RESET_DeassertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_GPDMA1);
@@ -138,7 +138,7 @@ void XMC_DMA_Disable(XMC_DMA_t *const dma)
   {
 #endif
     XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_GPDMA0);
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_GPDMA0);
 #endif
 #if defined(GPDMA1)
@@ -146,7 +146,7 @@ void XMC_DMA_Disable(XMC_DMA_t *const dma)
   else
   {
     XMC_SCU_RESET_AssertPeripheralReset(XMC_SCU_PERIPHERAL_RESET_GPDMA1);
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     XMC_SCU_CLOCK_GatePeripheralClock(XMC_SCU_PERIPHERAL_CLOCK_GPDMA1);
 #endif
   }
@@ -163,7 +163,7 @@ bool XMC_DMA_IsEnabled(const XMC_DMA_t *const dma)
   {
 #endif
     status = !XMC_SCU_RESET_IsPeripheralResetAsserted(XMC_SCU_PERIPHERAL_RESET_GPDMA0);
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     status = status && !XMC_SCU_CLOCK_IsPeripheralClockGated(XMC_SCU_PERIPHERAL_CLOCK_GPDMA0);
 #endif
 #if defined(GPDMA1)
@@ -171,7 +171,7 @@ bool XMC_DMA_IsEnabled(const XMC_DMA_t *const dma)
   else
   {
     status = !XMC_SCU_RESET_IsPeripheralResetAsserted(XMC_SCU_PERIPHERAL_RESET_GPDMA1);
-#if (UC_SERIES != XMC45)
+#if defined(CLOCK_GATING_SUPPORTED)
     status = status && !XMC_SCU_CLOCK_IsPeripheralClockGated(XMC_SCU_PERIPHERAL_CLOCK_GPDMA1);
 #endif
   }
@@ -277,12 +277,6 @@ void XMC_DMA_ClearOverrunStatus(XMC_DMA_t *const dma, const uint8_t line)
     DLR->OVRCLR |= (uint32_t)(0x100UL << line);
   }
 #endif
-}
-
-/* Enable DMA channel */
-void XMC_DMA_CH_Enable(XMC_DMA_t *const dma, const uint8_t channel)
-{
-  dma->CHENREG = (uint32_t)(0x101UL << channel);
 }
 
 /* Disable DMA channel */

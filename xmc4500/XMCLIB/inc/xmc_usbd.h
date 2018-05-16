@@ -1,44 +1,36 @@
 /**
  * @file xmc_usbd.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
- * @cond
- **********************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ *********************************************************************************************************************
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
- * Redistribution and use in source and binary forms, with or without           
- * modification,are permitted provided that the following conditions are met:   
+ * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
+ * following conditions are met:   
  *                                                                              
- *   Redistributions of source code must retain the above copyright notice,      
- *   this list of conditions and the following disclaimer.                        
+ * Redistributions of source code must retain the above copyright notice, this list of conditions and the following 
+ * disclaimer.                        
  * 
- *   Redistributions in binary form must reproduce the above copyright notice,   
- *   this list of conditions and the following disclaimer in the documentation    
- *   and/or other materials provided with the distribution.                       
+ * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following 
+ * disclaimer in the documentation and/or other materials provided with the distribution.                       
  * 
- *   Neither the name of the copyright holders nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software without
- *   specific prior written permission.                                           
+ * Neither the name of the copyright holders nor the names of its contributors may be used to endorse or promote 
+ * products derived from this software without specific prior written permission.                                           
  *                                                                              
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"  
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE    
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE   
- * ARE  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   
- * LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF         
- * SUBSTITUTE GOODS OR  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN      
- * CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)       
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE   
- * POSSIBILITY OF SUCH DAMAGE.                                                  
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+ * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE  
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE  FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR  
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
+ * WHETHER IN CONTRACT, STRICT LIABILITY,OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                                  
  *                                                                              
- * To improve the quality of the software, users are encouraged to share        
- * modifications, enhancements or bug fixes with Infineon Technologies AG       
- * dave@infineon.com).                                                          
- **********************************************************************************
+ * To improve the quality of the software, users are encouraged to share modifications, enhancements or bug fixes with 
+ * Infineon Technologies AG dave@infineon.com).                                                          
+ *********************************************************************************************************************
  *
  * Change History
  * --------------
@@ -48,6 +40,7 @@
  * 2015-03-18:
  *     - Updated the doxygen comments for documentation. <br>
  *     - Updated the XMC_USBD_PATCH_VERSION to 4. <br>
+ *
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API.<br>
  *     - Updated the doxygen comments for API XMC_USBD_IsEnumDone().<br>
@@ -57,22 +50,20 @@
  *
  */
 
-
 #ifndef XMC_USBD_H
 #define XMC_USBD_H
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
-#include <stdlib.h>
-#include <string.h>
-
-#include <xmc_common.h>
+ *********************************************************************************************************************/
+#include "xmc_common.h"
 
 #if defined(USB0)
 
-#include <xmc_usbd_regs.h>
-#include <xmc_scu.h>
+#include <stdlib.h>
+#include <string.h>
+#include "xmc_usbd_regs.h"
+#include "xmc_scu.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -124,16 +115,18 @@
  * @{
  */
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * MACROS
- *******************************************************************************/
+ *********************************************************************************************************************/
+ 
 #define XMC_USBD_NUM_TX_FIFOS                          (7U) 	/**< Number of hardware transmission endpoint fifos */
 
-#define XMC_USBD_MAX_FIFO_SIZE                         (2048U)/**< Maximum USBD endpoint fifo size */
+#define XMC_USBD_MAX_FIFO_SIZE                         (2048U)  /**< Maximum USBD endpoint fifo size */
 
 #define XMC_USBD_NUM_EPS                               (7U)		/**< Number of hardware endpoints */
 
-#define	XMC_USBD_MAX_PACKET_SIZE                       (64U)	/**< Maximum packet size for all endpoints (including ep0) */
+#define	XMC_USBD_MAX_PACKET_SIZE                       (64U)	/**< Maximum packet size for all endpoints 
+	                                                                (including ep0) */
 
 /**< Maximum transfer size for endpoints.
  *
@@ -188,9 +181,9 @@
 #define XMC_USBD_EP6_BUFFER_SIZE                       (64U)	/* Endpoint 6 buffer size */
 
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 /**
  * Defines the options for the global receive fifo packet status.
@@ -323,9 +316,9 @@ typedef void (*XMC_USBD_SignalDeviceEvent_t)   (XMC_USBD_EVENT_t event);/**< Poi
 typedef void (*XMC_USBD_SignalEndpointEvent_t) (uint8_t ep_addr, XMC_USBD_EP_EVENT_t ep_event);/**< Pointer to USB endpoint event call back.
 																								Uses type ::XMC_USBD_EP_EVENT_t and EP address as the argument of callback.*/
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * DATA STRUCTURES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 /**
  * Describes the USB Device Driver Capabilities.
@@ -491,9 +484,9 @@ extern const XMC_USBD_DRIVER_t Driver_USBD0;
  **/
 extern XMC_USBD_DEVICE_t xmc_device;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
  
 #ifdef __cplusplus
 extern "C" {

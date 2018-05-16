@@ -1,12 +1,12 @@
 /**
  * @file xmc_ebu.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -43,17 +43,6 @@
  * @endcond 
  *
  */
-/**
- * @file xmc_ebu.h
- * @date 19 Jun, 2015
- * @version 1.0.3
- *
- * History <br>
- *
- * Version 1.0.0  Initial <br>
- * Version 1.0.2  Documentation updates <br>
- * Version 1.0.3  Removed version macros and declaration of GetDriverVersion API
- */ 
  
 #ifndef XMC_EBU_H
 #define XMC_EBU_H

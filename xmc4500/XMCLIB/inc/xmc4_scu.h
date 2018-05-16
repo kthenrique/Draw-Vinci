@@ -1,12 +1,12 @@
 /**
  * @file xmc4_scu.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -39,6 +39,9 @@
  * 2015-06-20:
  *     - Initial version
  *     - Documentation improved
+ *
+ * 2015-11-30:
+ *     - Documentation improved <br>
  *      
  * @endcond 
  *
@@ -51,7 +54,7 @@
  * HEADER FILES
  ********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if UC_FAMILY == XMC4
 
@@ -68,17 +71,17 @@
 /*********************************************************************************************************************
  * MACROS
  ********************************************************************************************************************/
-#define PLL_PDIV_XTAL_8MHZ (1U)
-#define PLL_NDIV_XTAL_8MHZ (89U)
-#define PLL_K2DIV_XTAL_8MHZ (2U)
+#define PLL_PDIV_XTAL_8MHZ (1U)  /* PDIV value for main PLL settings, fPLL = 120MHz with fOSC = 8MHz */
+#define PLL_NDIV_XTAL_8MHZ (89U)  /* NDIV value for main PLL settings, fPLL = 120MHz with fOSC = 8MHz */
+#define PLL_K2DIV_XTAL_8MHZ (2U)  /* K2DIV value for main PLL settings, fPLL = 120MHz with fOSC = 8MHz */
 
-#define PLL_PDIV_XTAL_12MHZ (1U)
-#define PLL_NDIV_XTAL_12MHZ (79U)
-#define PLL_K2DIV_XTAL_12MHZ (3U)
+#define PLL_PDIV_XTAL_12MHZ (1U)  /* PDIV value for main PLL settings, fPLL = 120MHz with fOSC = 12MHz */
+#define PLL_NDIV_XTAL_12MHZ (79U)  /* NDIV value for main PLL settings, fPLL = 120MHz with fOSC = 12MHz */
+#define PLL_K2DIV_XTAL_12MHZ (3U)  /* K2DIV value for main PLL settings, fPLL = 120MHz with fOSC = 12MHz */
 
-#define PLL_PDIV_XTAL_16MHZ (1U)
-#define PLL_NDIV_XTAL_16MHZ (59U)
-#define PLL_K2DIV_XTAL_16MHZ (3U)
+#define PLL_PDIV_XTAL_16MHZ (1U)  /* PDIV value for main PLL settings, fPLL = 120MHz with fOSC = 16MHz */
+#define PLL_NDIV_XTAL_16MHZ (59U)  /* NDIV value for main PLL settings, fPLL = 120MHz with fOSC = 16MHz */
+#define PLL_K2DIV_XTAL_16MHZ (3U)  /* K2DIV value for main PLL settings, fPLL = 120MHz with fOSC = 16MHz */
 
 #define XMC_SCU_INTERRUPT_EVENT_WDT_WARN           SCU_INTERRUPT_SRSTAT_PRWARN_Msk /**< Watchdog prewarning event. */
 #define XMC_SCU_INTERRUPT_EVENT_RTC_PERIODIC       SCU_INTERRUPT_SRSTAT_PI_Msk     /**< RTC periodic interrupt. */
@@ -134,21 +137,27 @@
  */
 typedef enum XMC_SCU_CCU_TRIGGER
 {
+#if defined(CCU40)
   XMC_SCU_CCU_TRIGGER_CCU40 = SCU_GENERAL_CCUCON_GSC40_Msk, /**< Trigger mask used for Global Start Control of
                                                                  CCU40 peripheral. */
+#endif
+#if defined(CCU41)
   XMC_SCU_CCU_TRIGGER_CCU41 = SCU_GENERAL_CCUCON_GSC41_Msk, /**< Trigger mask used for Global Start Control of
                                                                  CCU41 peripheral. */
-#if defined(SCU_GENERAL_CCUCON_GSC42_Msk)
+#endif
+#if defined(CCU42)
   XMC_SCU_CCU_TRIGGER_CCU42 = SCU_GENERAL_CCUCON_GSC42_Msk, /**< Trigger mask used for Global Start Control of
                                                                  CCU42 peripheral. */
 #endif
-#if defined(SCU_GENERAL_CCUCON_GSC43_Msk)
+#if defined(CCU43)
   XMC_SCU_CCU_TRIGGER_CCU43 = SCU_GENERAL_CCUCON_GSC43_Msk, /**< Trigger mask used for Global Start Control of
                                                                  CCU43 peripheral. */
 #endif
+#if defined(CCU80)
   XMC_SCU_CCU_TRIGGER_CCU80 = SCU_GENERAL_CCUCON_GSC80_Msk, /**< Trigger mask used for Global Start Control of
                                                                  CCU80 peripheral. */
-#if defined(SCU_GENERAL_CCUCON_GSC81_Msk)
+#endif
+#if defined(CCU81)
   XMC_SCU_CCU_TRIGGER_CCU81 = SCU_GENERAL_CCUCON_GSC81_Msk /**< Trigger mask used for Global Start Control of
                                                                  CCU41 peripheral. */
 #endif
@@ -175,6 +184,9 @@ typedef enum XMC_SCU_TRAP
 #endif
 #if defined(SCU_TRAP_TRAPSTAT_TEMPLOT_Msk)
   XMC_SCU_TRAP_DIETEMP_LOW  = SCU_TRAP_TRAPSTAT_TEMPLOT_Msk,  /**< Die temperature lower than expected. */ 
+#endif
+#if defined(ECAT0)
+  XMC_SCU_TRAP_ECAT_RESET = SCU_TRAP_TRAPSTAT_ECAT0RST_Msk, /**< EtherCat Reset */ 
 #endif
 } XMC_SCU_TRAP_t;
 
@@ -271,52 +283,73 @@ typedef enum XMC_SCU_NMIREQ
 typedef enum XMC_SCU_PERIPHERAL_RESET
 {
   XMC_SCU_PERIPHERAL_RESET_VADC   = SCU_RESET_PRSTAT0_VADCRS_Msk,   /**< VADC reset. */ 
-#if defined(SCU_RESET_PRSTAT0_DSDRS_Msk)
+#if defined(DSD)
   XMC_SCU_PERIPHERAL_RESET_DSD    = SCU_RESET_PRSTAT0_DSDRS_Msk,    /**< DSD reset. */
 #endif
   XMC_SCU_PERIPHERAL_RESET_CCU40  = SCU_RESET_PRSTAT0_CCU40RS_Msk,  /**< CCU40 reset. */
+#if defined(CCU41)
   XMC_SCU_PERIPHERAL_RESET_CCU41  = SCU_RESET_PRSTAT0_CCU41RS_Msk,  /**< CCU41 reset. */
-#if defined(SCU_RESET_PRSTAT0_CCU42RS_Msk)
+#endif  
+#if defined(CCU42)
   XMC_SCU_PERIPHERAL_RESET_CCU42  = SCU_RESET_PRSTAT0_CCU42RS_Msk,  /**< CCU42 reset. */
 #endif
+#if defined(CCU80)
   XMC_SCU_PERIPHERAL_RESET_CCU80  = SCU_RESET_PRSTAT0_CCU80RS_Msk,  /**< CCU80 reset. */
-#if defined(SCU_RESET_PRSTAT0_CCU81RS_Msk)
+#endif  
+#if defined(CCU81)
   XMC_SCU_PERIPHERAL_RESET_CCU81  = SCU_RESET_PRSTAT0_CCU81RS_Msk,  /**< CCU81 reset. */
 #endif
+#if defined(POSIF0)
   XMC_SCU_PERIPHERAL_RESET_POSIF0 = SCU_RESET_PRSTAT0_POSIF0RS_Msk, /**< POSIF0 reset. */
-#if defined(SCU_RESET_PRSTAT0_POSIF1RS_Msk)
+#endif  
+#if defined(POSIF1)
   XMC_SCU_PERIPHERAL_RESET_POSIF1 = SCU_RESET_PRSTAT0_POSIF1RS_Msk, /**< POSIF1 reset.*/
 #endif
   XMC_SCU_PERIPHERAL_RESET_USIC0  = SCU_RESET_PRSTAT0_USIC0RS_Msk,  /**< USIC0 reset. */
   XMC_SCU_PERIPHERAL_RESET_ERU1   = SCU_RESET_PRSTAT0_ERU1RS_Msk,   /**< ERU1 reset. */
-#if defined(SCU_RESET_PRSTAT0_HRPWM0RS_Msk)
+#if defined(HRPWM0)
   XMC_SCU_PERIPHERAL_RESET_HRPWM0 = SCU_RESET_PRSTAT0_HRPWM0RS_Msk,  /**< HRPWM0 reset. */
 #endif
-#if defined(SCU_RESET_PRSTAT1_CCU43RS_Msk)
+#if defined(CCU43)
   XMC_SCU_PERIPHERAL_RESET_CCU43  = (SCU_RESET_PRSTAT1_CCU43RS_Msk | 0x10000000UL),   /**< CCU43 reset. */
 #endif
+#if defined(LEDTS0)
   XMC_SCU_PERIPHERAL_RESET_LEDTS0 = (SCU_RESET_PRSTAT1_LEDTSCU0RS_Msk | 0x10000000UL), /**< LEDTS0 reset. */
+#endif  
+#if defined(CAN)
   XMC_SCU_PERIPHERAL_RESET_MCAN   = (SCU_RESET_PRSTAT1_MCAN0RS_Msk | 0x10000000UL), /**< MCAN reset. */
+#endif  
+#if defined(DAC)  
   XMC_SCU_PERIPHERAL_RESET_DAC    = (SCU_RESET_PRSTAT1_DACRS_Msk | 0x10000000UL),    /**< DAC reset. */
-#if defined(SCU_RESET_PRSTAT1_MMCIRS_Msk)
+#endif  
+#if defined(SDMMC)
   XMC_SCU_PERIPHERAL_RESET_SDMMC  = (SCU_RESET_PRSTAT1_MMCIRS_Msk | 0x10000000UL),     /**< SDMMC reset. */
 #endif
+#if defined(USIC1)
   XMC_SCU_PERIPHERAL_RESET_USIC1  = (SCU_RESET_PRSTAT1_USIC1RS_Msk | 0x10000000UL),    /**< USIC1 reset. */
-#if defined(SCU_RESET_PRSTAT1_USIC2RS_Msk)
+#endif  
+#if defined(USIC2)
   XMC_SCU_PERIPHERAL_RESET_USIC2  = (SCU_RESET_PRSTAT1_USIC2RS_Msk | 0x10000000UL),    /**< USIC2 reset. */
 #endif
   XMC_SCU_PERIPHERAL_RESET_PORTS  = (SCU_RESET_PRSTAT1_PPORTSRS_Msk | 0x10000000UL),   /**< PORTS reset. */
   XMC_SCU_PERIPHERAL_RESET_WDT    = (SCU_RESET_PRSTAT2_WDTRS_Msk | 0x20000000UL),      /**< WDT reset. */
-#if defined(SCU_RESET_PRSTAT2_ETH0RS_Msk)
+#if defined(ETH0)
   XMC_SCU_PERIPHERAL_RESET_ETH0   = (SCU_RESET_PRSTAT2_ETH0RS_Msk | 0x20000000UL),     /**< ETH0 reset. */
 #endif
   XMC_SCU_PERIPHERAL_RESET_GPDMA0 = (SCU_RESET_PRSTAT2_DMA0RS_Msk | 0x20000000UL),     /**< DMA0 reset. */
-#if defined(SCU_RESET_PRSTAT2_DMA1RS_Msk)
+#if defined(GPDMA1)
   XMC_SCU_PERIPHERAL_RESET_GPDMA1 = (SCU_RESET_PRSTAT2_DMA1RS_Msk | 0x20000000UL),     /**< DMA1 reset. */
 #endif
+#if defined(FCE)
   XMC_SCU_PERIPHERAL_RESET_FCE    = (SCU_RESET_PRSTAT2_FCERS_Msk | 0x20000000UL),      /**< FCE reset. */
+#endif
+#if defined(USB0)  
   XMC_SCU_PERIPHERAL_RESET_USB0   = (SCU_RESET_PRSTAT2_USBRS_Msk | 0x20000000UL),      /**< USB0 reset. */
-#if defined(SCU_RESET_PRSTAT3_EBURS_Msk)
+#endif  
+#if defined(ECAT0)  
+  XMC_SCU_PERIPHERAL_RESET_ECAT0  = (SCU_RESET_PRSTAT2_ECAT0RS_Msk | 0x20000000UL),      /**< ECAT0 reset. */
+#endif  
+#if defined(EBU)
   XMC_SCU_PERIPHERAL_RESET_EBU    = (SCU_RESET_PRSTAT3_EBURS_Msk | 0x30000000UL)       /**< EBU reset. */
 #endif
 } XMC_SCU_PERIPHERAL_RESET_t;
@@ -329,13 +362,13 @@ typedef enum XMC_SCU_PERIPHERAL_RESET
 typedef enum XMC_SCU_CLOCK
 {
   XMC_SCU_CLOCK_USB = SCU_CLK_CLKCLR_USBCDI_Msk, /**< USB module clock. */
-#if defined(SCU_CLK_CLKCLR_MMCCDI_Msk)
+#if defined(SDMMC)
   XMC_SCU_CLOCK_MMC = SCU_CLK_CLKCLR_MMCCDI_Msk, /**< MMC module clock. */
 #endif
-#if defined(SCU_CLK_CLKCLR_ETH0CDI_Msk)
+#if defined(ETH0)
   XMC_SCU_CLOCK_ETH = SCU_CLK_CLKCLR_ETH0CDI_Msk, /**< Ethernet module clock. */
 #endif
-#if defined(SCU_CLK_CLKCLR_EBUCDI_Pos)
+#if defined(EBU)
   XMC_SCU_CLOCK_EBU = SCU_CLK_CLKCLR_EBUCDI_Msk, /**< EBU module clock. */
 #endif
   XMC_SCU_CLOCK_CCU = SCU_CLK_CLKCLR_CCUCDI_Msk, /**< CCU module clock. */
@@ -352,49 +385,72 @@ typedef enum XMC_SCU_CLOCK
 typedef enum XMC_SCU_PERIPHERAL_CLOCK
 {
   XMC_SCU_PERIPHERAL_CLOCK_VADC   = SCU_CLK_CGATSTAT0_VADC_Msk,  /**< VADC peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT0_DSD_Msk)
+#if defined(DSD)
   XMC_SCU_PERIPHERAL_CLOCK_DSD    = SCU_CLK_CGATSTAT0_DSD_Msk,   /**< DSD peripheral gating. */
 #endif
   XMC_SCU_PERIPHERAL_CLOCK_CCU40  = SCU_CLK_CGATSTAT0_CCU40_Msk,  /**< CCU40 peripheral gating. */
+#if defined(CCU41)
   XMC_SCU_PERIPHERAL_CLOCK_CCU41  = SCU_CLK_CGATSTAT0_CCU41_Msk,  /**< CCU41 peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT0_CCU42_Msk)
+#endif  
+#if defined(CCU42)
   XMC_SCU_PERIPHERAL_CLOCK_CCU42  = SCU_CLK_CGATSTAT0_CCU42_Msk,  /**< CCU42 peripheral gating. */
 #endif
+#if defined(CCU80)
   XMC_SCU_PERIPHERAL_CLOCK_CCU80  = SCU_CLK_CGATSTAT0_CCU80_Msk,  /**< CCU80 peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT0_CCU81_Msk)
+#endif  
+#if defined(CCU81)
   XMC_SCU_PERIPHERAL_CLOCK_CCU81  = SCU_CLK_CGATSTAT0_CCU81_Msk,  /**< CCU81 peripheral gating. */
 #endif
+#if defined(POSIF0)
   XMC_SCU_PERIPHERAL_CLOCK_POSIF0 = SCU_CLK_CGATSTAT0_POSIF0_Msk,  /**< POSIF0 peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT0_POSIF1_Msk)
+#endif  
+#if defined(POSIF1)
   XMC_SCU_PERIPHERAL_CLOCK_POSIF1 = SCU_CLK_CGATSTAT0_POSIF1_Msk,   /**< POSIF1 peripheral gating. */
 #endif
   XMC_SCU_PERIPHERAL_CLOCK_USIC0  = SCU_CLK_CGATSTAT0_USIC0_Msk,   /**< USIC0 peripheral gating. */
   XMC_SCU_PERIPHERAL_CLOCK_ERU1   = SCU_CLK_CGATSTAT0_ERU1_Msk,    /**< ERU1 peripheral gating. */
+#if defined(HRPWM0)
   XMC_SCU_PERIPHERAL_CLOCK_HRPWM0 = SCU_CLK_CGATSTAT0_HRPWM0_Msk,  /**< HRPWM0 peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT1_CCU43_Msk)
+#endif
+#if defined(CCU43)
   XMC_SCU_PERIPHERAL_CLOCK_CCU43  = (SCU_CLK_CGATSTAT1_CCU43_Msk | 0x10000000UL),   /**< CCU43 peripheral gating. */
 #endif
+#if defined(LEDTS0)
   XMC_SCU_PERIPHERAL_CLOCK_LEDTS0 = (SCU_CLK_CGATSTAT1_LEDTSCU0_Msk | 0x10000000UL), /**< LEDTS0 peripheral gating. */
+#endif  
+#if defined(CAN)
   XMC_SCU_PERIPHERAL_CLOCK_MCAN   = (SCU_CLK_CGATSTAT1_MCAN0_Msk | 0x10000000UL),   /**< MCAN peripheral gating. */
+#endif
+#if defined(DAC)  
   XMC_SCU_PERIPHERAL_CLOCK_DAC    = (SCU_CLK_CGATSTAT1_DAC_Msk | 0x10000000UL),     /**< DAC peripheral gating. */
+#endif  
 #if defined(SDMMC)
   XMC_SCU_PERIPHERAL_CLOCK_SDMMC  = (SCU_CLK_CGATSTAT1_MMCI_Msk | 0x10000000UL),    /**< SDMMC peripheral gating. */
 #endif
+#if defined(USIC1)
   XMC_SCU_PERIPHERAL_CLOCK_USIC1  = (SCU_CLK_CGATSTAT1_USIC1_Msk | 0x10000000UL),   /**< USIC1 peripheral gating. */
+#endif  
 #if defined(USIC2)
   XMC_SCU_PERIPHERAL_CLOCK_USIC2  = (SCU_CLK_CGATSTAT1_USIC2_Msk | 0x10000000UL),    /**< USIC2 peripheral gating. */
 #endif
   XMC_SCU_PERIPHERAL_CLOCK_PORTS  = (SCU_CLK_CGATSTAT1_PPORTS_Msk | 0x10000000UL),   /**< PORTS peripheral gating. */
   XMC_SCU_PERIPHERAL_CLOCK_WDT    = (SCU_CLK_CGATSTAT2_WDT_Msk | 0x20000000UL),      /**< WDT peripheral gating. */
-#if defined(SCU_CLK_CGATSTAT2_ETH0_Msk)
+#if defined(ETH0)
   XMC_SCU_PERIPHERAL_CLOCK_ETH0   = (SCU_CLK_CGATSTAT2_ETH0_Msk | 0x20000000UL),     /**< ETH0 peripheral gating. */
 #endif
   XMC_SCU_PERIPHERAL_CLOCK_GPDMA0 = (SCU_CLK_CGATSTAT2_DMA0_Msk | 0x20000000UL),     /**< DMA0 peripheral gating. */
 #if defined(GPDMA1)
-  XMC_SCU_PERIPHERAL_CLOCK_GPDMA1 = (SCU_CLK_CGATSTAT2_DMA1Msk | 0x20000000UL),     /**< DMA1 peripheral gating. */
+  XMC_SCU_PERIPHERAL_CLOCK_GPDMA1 = (SCU_CLK_CGATSTAT2_DMA1_Msk | 0x20000000UL),     /**< DMA1 peripheral gating. */
 #endif
+#if defined(FCE)
   XMC_SCU_PERIPHERAL_CLOCK_FCE    = (SCU_CLK_CGATSTAT2_FCE_Msk | 0x20000000UL),      /**< FCE peripheral gating. */
+#endif  
+#if defined(USB0)
   XMC_SCU_PERIPHERAL_CLOCK_USB0   = (SCU_CLK_CGATSTAT2_USB_Msk | 0x20000000UL),      /**< USB0 peripheral gating. */
+#endif  
+#if defined(ECAT0)
+  XMC_SCU_PERIPHERAL_CLOCK_ECAT0   = (SCU_CLK_CGATSTAT2_ECAT0_Msk | 0x20000000UL),      /**< ECAT0 peripheral gating. */
+#endif  
 #if defined(EBU)
   XMC_SCU_PERIPHERAL_CLOCK_EBU    = (SCU_CLK_CGATSTAT3_EBU_Msk | 0x30000000UL)       /**< EBU peripheral gating. */
 #endif
@@ -408,9 +464,9 @@ typedef enum XMC_SCU_PERIPHERAL_CLOCK
  */ 
 typedef enum XMC_SCU_CLOCK_SYSCLKSRC
 {
-	XMC_SCU_CLOCK_SYSCLKSRC_OFI = (0UL << SCU_CLK_SYSCLKCR_SYSSEL_Pos), /**< Internal Fast Clock (fOFI) as a 
+  XMC_SCU_CLOCK_SYSCLKSRC_OFI = (0UL << SCU_CLK_SYSCLKCR_SYSSEL_Pos), /**< Internal Fast Clock (fOFI) as a 
                                                                            source for system clock (fSYS). */
-	XMC_SCU_CLOCK_SYSCLKSRC_PLL = (1UL << SCU_CLK_SYSCLKCR_SYSSEL_Pos)  /**< PLL output (fPLL) as a
+  XMC_SCU_CLOCK_SYSCLKSRC_PLL = (1UL << SCU_CLK_SYSCLKCR_SYSSEL_Pos)  /**< PLL output (fPLL) as a
                                                                            source for system clock (fSYS). */
 } XMC_SCU_CLOCK_SYSCLKSRC_t;
 
@@ -421,8 +477,8 @@ typedef enum XMC_SCU_CLOCK_SYSCLKSRC
  */ 
 typedef enum XMC_SCU_CLOCK_SYSPLLCLKSRC
 {
-  XMC_SCU_CLOCK_SYSPLLCLKSRC_OSCHP = 0UL,	/**< External crystal oscillator
-  												(fOHP) as the source for P-Divider. */
+  XMC_SCU_CLOCK_SYSPLLCLKSRC_OSCHP = 0UL,  /**< External crystal oscillator
+                                                (fOHP) as the source for P-Divider. */
   XMC_SCU_CLOCK_SYSPLLCLKSRC_OFI = SCU_PLL_PLLCON2_PINSEL_Msk | SCU_PLL_PLLCON2_K1INSEL_Msk /**< Backup clock(fOFI)
                                                                              as the source for P-Divider. */
 } XMC_SCU_CLOCK_SYSPLLCLKSRC_t;
@@ -440,6 +496,17 @@ typedef enum XMC_SCU_CLOCK_USBCLKSRC
   XMC_SCU_CLOCK_USBCLKSRC_SYSPLL = (1UL << SCU_CLK_USBCLKCR_USBSEL_Pos)  /**< Main PLL output (fPLL) as a
                                                                            source for USB clock (fUSB/fSDMMC). */
 } XMC_SCU_CLOCK_USBCLKSRC_t;
+
+#if defined(ECAT0) 
+/**
+ * Defines options for selecting the ECAT clock source.
+ */ 
+typedef enum XMC_SCU_CLOCK_ECATCLKSRC
+{
+  XMC_SCU_CLOCK_ECATCLKSRC_USBPLL = (0UL << SCU_CLK_ECATCLKCR_ECATSEL_Pos), /**< USB PLL (fUSBPLL) as a source for ECAT clock. */
+  XMC_SCU_CLOCK_ECATCLKSRC_SYSPLL = (1UL << SCU_CLK_ECATCLKCR_ECATSEL_Pos)  /**< Main PLL output (fPLL) as a source for ECAT clock. */
+} XMC_SCU_CLOCK_ECATCLKSRC_t;
+#endif
 
 /**
  *  Defines options for selecting the source of WDT clock(fWDT). These enums are used to configure \a WDTSEL bits of \a WDTCLKCR
@@ -549,8 +616,56 @@ typedef enum XMC_SCU_CLOCK_SYSPLL_MODE
   XMC_SCU_CLOCK_SYSPLL_MODE_PRESCALAR /**< fPLL derived from fOSC and PLL operating in prescalar mode(i.e.VCO bypassed). */
 } XMC_SCU_CLOCK_SYSPLL_MODE_t;
 
+/**
+ *
+ */
+typedef enum XMC_SCU_CLOCK_SLEEP_MODE_CONFIG
+{
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_SYSCLK_FOFI = 0,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_SYSCLK_FOFI
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_SYSCLK_FPLL = SCU_CLK_SLEEPCR_SYSSEL_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_SYSCLK_FPLL
+#if defined(USB0)
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_USB = SCU_CLK_SLEEPCR_USBCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_USB
+#endif  
+#if defined(SDMMC)
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_SDMMC = SCU_CLK_SLEEPCR_MMCCR_Msk,//!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_SDMMC
+#endif  
+#if defined(ETH0)
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_ETH = SCU_CLK_SLEEPCR_ETH0CR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_ETH
+#endif  
+#if defined(EBU)
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_EBU = SCU_CLK_SLEEPCR_EBUCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_EBU
+#endif  
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_CCU = SCU_CLK_SLEEPCR_CCUCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_CCU
+  XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_WDT = SCU_CLK_SLEEPCR_WDTCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_WDT
+} XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_t;
 
-                                             
+/**
+ *
+ */
+typedef enum XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG
+{
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_SYSCLK_FOFI = 0,  //!< XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_SYSCLK_FOFI
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_SYSCLK_FPLL = SCU_CLK_SLEEPCR_SYSSEL_Msk,  //!< XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_SYSCLK_FPLL
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_FLASH_POWERDOWN = SCU_CLK_DSLEEPCR_FPDN_Msk,//!< XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_FLASH_POWERDOWN
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_PLL_POWERDOWN = SCU_CLK_DSLEEPCR_PLLPDN_Msk,  //!< XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_PLL_POWERDOWN
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_VCO_POWERDOWN = SCU_CLK_DSLEEPCR_VCOPDN_Msk,  //!< XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_VCO_POWERDOWN
+#if defined(USB0)
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_USB = SCU_CLK_SLEEPCR_USBCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_USB
+#endif  
+#if defined(SDMMC)
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_SDMMC = SCU_CLK_SLEEPCR_MMCCR_Msk,//!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_SDMMC
+#endif  
+#if defined(ETH0)
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_ETH = SCU_CLK_SLEEPCR_ETH0CR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_ETH
+#endif  
+#if defined(EBU)
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_EBU = SCU_CLK_SLEEPCR_EBUCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_EBU
+#endif  
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_CCU = SCU_CLK_SLEEPCR_CCUCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_CCU
+  XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_DISABLE_WDT = SCU_CLK_SLEEPCR_WDTCR_Msk,  //!< XMC_SCU_CLOCK_SLEEP_MODE_CONFIG_DISABLE_WDT
+} XMC_SCU_CLOCK_DEEPSLEEP_MODE_CONFIG_t;
+
+
 /*********************************************************************************************************************
  * DATA STRUCTURES
  ********************************************************************************************************************/
@@ -579,9 +694,9 @@ typedef struct XMC_SCU_CLOCK_CONFIG
 {
   XMC_SCU_CLOCK_SYSPLL_CONFIG_t         syspll_config;      /**< PLL configuration */
   bool                                  enable_oschp;       /**< Enable external high precision oscillator.
-  															Should be enabled when fOHP has to be source of system clock. */
+                                                                 Should be enabled when fOHP has to be source of system clock. */
   bool                                  enable_osculp;      /**< Enable external ultra low power oscillator.
-  															Should be enabled when fULP has to be source of standby clock(fSTDBY). */
+                                                                 Should be enabled when fULP has to be source of standby clock(fSTDBY). */
   XMC_SCU_CLOCK_FOFI_CALIBRATION_MODE_t calibration_mode;   /**< Backup clock trimming mode. */
   XMC_SCU_HIB_STDBYCLKSRC_t             fstdby_clksrc;      /**< Standby clock source. */
   XMC_SCU_CLOCK_SYSCLKSRC_t             fsys_clksrc;        /**< Choice of system clock. */
@@ -688,7 +803,7 @@ bool XMC_SCU_IsTemperatureSensorEnabled(void);
  * Allows to improve the accuracy of the temperature measurement with the adjustment of \a OFFSET and \a GAIN bit fields
  * in the \a DTSCON register.
  * Offset adjustment is defined as a shift of the conversion result. The range of the offset adjustment is 7 bits with a 
- * resolution that corresponds to +/- 12.5ï¿½C. The offset value gets added to the measure result. 
+ * resolution that corresponds to +/- 12.5°C. The offset value gets added to the measure result. 
  * Offset is considered as a signed value.
  * Gain adjustment helps in minimizing gain error. When the \a gain value is 0, result is generated with maximum gain.
  * When the \a gain value is 63, result is generated with least gain, i.e, \a RESULT - 63 at the highest measured temperature.\n
@@ -740,6 +855,7 @@ XMC_SCU_STATUS_t XMC_SCU_StartTemperatureMeasurement(void);
  * \par<b>Description</b><br>
  * Reads the measured value of die temperature.\n\n
  * Temperature measurement result is read from \a RESULT bit field of \a DTSSTAT register.
+ * The temperature measured in °C is given by (RESULT - 605) / 2.05 [°C]
  * \par<b>Related APIs:</b><BR>
  * XMC_SCU_IsTemperatureSensorBusy() \n\n\n
  */
@@ -760,8 +876,8 @@ bool XMC_SCU_IsTemperatureSensorBusy(void);
 
 /**
  * @return bool Status of die temperature sensor whether it is ready to start measurement. \n
- *			\b Range: \n \a true if temperature sensor is ready to start measurement. \n
- *			\a false if temperature sensor is not ready to start measurement.
+ *          \b Range: \n \a true if temperature sensor is ready to start measurement. \n
+ *          \a false if temperature sensor is not ready to start measurement.
  *
  * \par<b>Description</b><br>
  * Checks if the die temperature sensor is ready to start a measurement\n\n
@@ -1476,11 +1592,11 @@ __STATIC_INLINE XMC_SCU_HIB_RTCCLKSRC_t XMC_SCU_HIB_GetRtcClockSource(void)
  *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_USB - USB clock fUSB. \n
  *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_PLL - PLL output fPLL. \n
  * \if XMC42
- * 						XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
+ *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
  *
  * \endif
  * \if XMC41
- * 						XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
+ *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
  * \endif
  *
  * @return None
@@ -1500,10 +1616,10 @@ void XMC_SCU_CLOCK_SetExternalOutputClockSource(const XMC_SCU_CLOCK_EXTOUTCLKSRC
  *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_USB - USB clock fUSB. \n
  *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_PLL - PLL output fPLL. \n
  * \if XMC42
- * 						XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
+ *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
  * \endif
  * \if XMC41
- * 						XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
+ *                      XMC_SCU_CLOCK_EXTOUTCLKSRC_STDBY - Standby clock fSTDBY. \n
  * \endif
  *
  * \par<b>Description</b><br>
@@ -1553,6 +1669,46 @@ __STATIC_INLINE XMC_SCU_CLOCK_SYSPLLCLKSRC_t XMC_SCU_CLOCK_GetSystemPllClockSour
   return (XMC_SCU_CLOCK_SYSPLLCLKSRC_t)(SCU_PLL->PLLCON0 & SCU_PLL_PLLCON0_VCOBYP_Msk);
 }
 
+#if defined(ECAT0) 
+/**
+ *
+ * @param source  Source of ECAT clock.\n
+ *            \b Range: Use type @ref XMC_SCU_CLOCK_ECATCLKSRC_t to identify the clock source.\n
+ *                       XMC_SCU_CLOCK_ECATCLKSRC_USBPLL - USB PLL (fUSBPLL) as a source for ECAT clock. \n
+ *                       XMC_SCU_CLOCK_ECATCLKSRC_SYSPLL - Main PLL output (fPLL) as a source for ECAT clock. \n
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Selects the source of ECAT clock (fECAT).\n\n
+ * The value is configured to \a ECATSEL bit of \a ECATCLKCR register.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_GetECATClockSource() \n\n\n
+ */
+__STATIC_INLINE void XMC_SCU_CLOCK_SetECATClockSource(const XMC_SCU_CLOCK_ECATCLKSRC_t source)
+{
+  SCU_CLK->ECATCLKCR = (SCU_CLK->ECATCLKCR & ((uint32_t)~SCU_CLK_ECATCLKCR_ECATSEL_Msk)) |
+                      ((uint32_t)source);
+}
+
+/**
+ * @return XMC_SCU_CLOCK_ECATCLKSRC_t   Source of ECAT clock.\n
+ *            \b Range: Use type @ref XMC_SCU_CLOCK_ECATCLKSRC_t to identify the clock source.\n
+ *                       XMC_SCU_CLOCK_ECATCLKSRC_USBPLL - USB PLL (fUSBPLL) as a source for ECAT clock. \n
+ *                       XMC_SCU_CLOCK_ECATCLKSRC_SYSPLL - Main PLL output (fPLL) as a source for ECAT clock. \n
+ *
+ * \par<b>Description</b><br>
+ * Provides the source of ECAT clock (fECAT).
+ * The value is obtained by reading \a ECATSEL bit of \a ECATCLKCR register.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SCU_HIB_SetRtcClockSource() \n\n\n
+ */
+__STATIC_INLINE XMC_SCU_CLOCK_ECATCLKSRC_t XMC_SCU_CLOCK_GetECATClockSource(void)
+{
+  return (XMC_SCU_CLOCK_ECATCLKSRC_t)((SCU_CLK->ECATCLKCR & SCU_CLK_ECATCLKCR_ECATSEL_Msk) >> SCU_CLK_ECATCLKCR_ECATSEL_Pos);
+}
+#endif
+
 /**
  *
  * @param divider   Ratio of fSYS clock source to the value of fSYS.
@@ -1571,7 +1727,7 @@ void XMC_SCU_CLOCK_SetSystemClockDivider(const uint32_t divider);
 
 /**
  * @return uint32_t   Ratio of fSYS clock source to the value of fSYS.
- *              \b Range: 1 to 256.
+ *              \b Range: 0 to 255.
  *
  * \par<b>Description</b><br>
  * Provides the value of ratio between the source of system clock to the the value of system clock frequency. \n\n
@@ -1587,9 +1743,9 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetSystemClockDivider(void)
 /**
  *
  * @param ratio  Ratio of fCCU clock source to the value of fCCU.
- *              \b Range: 0 or 1.\n
- *                  0-> fCCU= fSYS \n
- *                  1-> fCCU= fSYS/2.
+ *              \b Range: 1 or 2.\n
+ *                  1-> fCCU= fSYS \n
+ *                  2-> fCCU= fSYS/2.
  *
  * @return None
  *
@@ -1624,9 +1780,9 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetCcuClockDivider(void)
 /**
  *
  * @param ratio  Ratio between system clock(fSYS) and CPU clock(fCPU).
- *          \b Range: 0 or 1.\n
- *            0-> fCPU= fSYS. \n
- *            1-> fCPU= fSYS/2.
+ *          \b Range: 1 or 2.\n
+ *            1-> fCPU= fSYS. \n
+ *            2-> fCPU= fSYS/2.
  *
  * @return None
  *
@@ -1658,9 +1814,9 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetCpuClockDivider(void)
 /**
  *
  * @param ratio  Ratio of peripheral clock source to the value of peripheral clock.\n
- *          \b Range: 0 or 1.\n
- *                0-> fPERIPH= fCPU.\n
- *                1-> fPERIPH= fCPU/2.
+ *          \b Range: 1 or 2.\n
+ *                1-> fPERIPH= fCPU.\n
+ *                2-> fPERIPH= fCPU/2.
  *
  * @return None
  *
@@ -1709,7 +1865,7 @@ void XMC_SCU_CLOCK_SetUsbClockDivider(const uint32_t ratio);
 /**
  *
  * @return uint32_t  Ratio of PLL output clock(fPLL) to USB clock(fUSB).
- *          \b Range: 1 to 8.
+ *          \b Range: 0 to 7.
  *
  * \par<b>Description</b><br>
  * Provides the ratio between PLL output frequency(fPLL) and USB clock(fUSB).\n\n
@@ -1727,7 +1883,7 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetUsbClockDivider(void)
 #if defined(EBU)
 /**
  *
- * @param divider  Ratio of PLL clock(fPLL) to EBU clock(fEBU).\n
+ * @param ratio Ratio of PLL clock(fPLL) to EBU clock(fEBU).\n
  *          \b Range: 1 to 64.
  *
  * @return None
@@ -1743,7 +1899,7 @@ void XMC_SCU_CLOCK_SetEbuClockDivider(const uint32_t ratio);
 /**
  *
  * @return uint32_t  Ratio of PLL clock(fPLL) to EBU clock(fEBU).\n
- *          \b Range: 1 to 64.
+ *          \b Range: 0 to 63.
  *
  * \par<b>Description</b><br>
  * Provides the ratio between PLL clock(fPLL) and EBU clock(fEBU).\n\n
@@ -1777,7 +1933,7 @@ void XMC_SCU_CLOCK_SetWdtClockDivider(const uint32_t ratio);
 /**
  *
  * @return uint32_t  Ratio between the source of WDT clock and the WDT clock.\n
- *          \b Range: 1 to 256.
+ *          \b Range: 0 to 255.
  *
  * \par<b>Description</b><br>
  * Provides the ratio between the WDT parent clock and the WDT clock. \n\n
@@ -1813,7 +1969,7 @@ void XMC_SCU_CLOCK_SetExternalOutputClockDivider(const uint32_t ratio);
 /**
  *
  * @return uint32_t  Ratio between the external output parent clock selected and the output clock.\n
- *          \b Range: 1 to 512.
+ *          \b Range: 0 to 511.
  *
  * \par<b>Description</b><br>
  * Provides the divider value applied on parent clock before the generation of external output clock. \n\n
@@ -1825,6 +1981,40 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetExternalOutputClockDivider(void)
 {
   return (uint32_t)((SCU_CLK->EXTCLKCR & SCU_CLK_EXTCLKCR_ECKDIV_Msk) >> SCU_CLK_EXTCLKCR_ECKDIV_Pos);
 }
+
+#if defined(ECAT0)
+/**
+ *
+ * @param ratio   Ratio between the source of ECAT clock and the ECAT clock.\n
+ *          \b Range: 1 to 4.
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Configures the ECAT clock by setting the clock divider for the ECAT clock source.\n\n
+ * The value is configured to \a ECADIV bits of \a ECATCLKCR register. The value of divider
+ * is decremented by 1 before configuring.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_SetECATClockSource(), XMC_SCU_CLOCK_GetECATClockDivider() \n\n\n
+ */
+void XMC_SCU_CLOCK_SetECATClockDivider(const uint32_t divider);
+
+/**
+ *
+ * @return uint32_t  Ratio between the source of ECAT clock and the ECAT clock.\n
+ *          \b Range: 0 to 3.
+ *
+ * \par<b>Description</b><br>
+ * Provides the ratio between the ECAT parent clock and the ECAT clock. \n\n
+ * The value is obtained by reading \a ECADIV bits of \a ECATCLKCR register.
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_SetECATClockSource(), XMC_SCU_CLOCK_SetECATClockDivider() \n\n\n
+ */
+__STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetECATClockDivider(void)
+{
+  return (uint32_t)((SCU_CLK->ECATCLKCR & SCU_CLK_ECATCLKCR_ECADIV_Msk) >> SCU_CLK_ECATCLKCR_ECADIV_Pos);
+}
+#endif
 
 /**
  *
@@ -1992,6 +2182,7 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetEthernetClockFrequency(void)
   return XMC_SCU_CLOCK_GetSystemClockFrequency() >> 1U;
 }
 
+#if defined(EBU)
 /**
  * @return uint32_t   EBU clock frequency in Hertz.
  *
@@ -2004,6 +2195,7 @@ __STATIC_INLINE uint32_t XMC_SCU_CLOCK_GetEthernetClockFrequency(void)
  * XMC_SCU_CLOCK_GetEbuClockDivider(), XMC_SCU_CLOCK_GetSystemPllClockFrequency() \n\n\n
  */
 uint32_t XMC_SCU_CLOCK_GetEbuClockFrequency(void); 
+#endif
  
 /**
  * @return uint32_t   WDT clock frequency in Hertz.
@@ -2038,7 +2230,24 @@ uint32_t XMC_SCU_CLOCK_GetWdtClockFrequency(void);
  */
 uint32_t XMC_SCU_CLOCK_GetExternalOutputClockFrequency(void); 
 
- /**
+#if defined(ECAT)
+/**
+ * @return uint32_t   ECAT clock frequency in Hertz.
+ *
+ * \par<b>Description</b><br>
+ * Provides the frequency of ECAT clock(fECAT).\n\n
+ * The value is derived using \a ECADIV bits of \a ECATCLKCR register and ECAT clock source.
+ * Based on these values it is calculated using the following formula:\n
+ * if ECAT clock source = PLL:  fECAT = fPLL/(ECADIV + 1).\n
+ * if ECAT clock source =  USBPLL:  fECAT = fUSBPLL/(ECADIV + 1).\n
+ *
+ * \par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_GetECATClockSource(), XMC_SCU_CLOCK_GetECATClockDivider() \n\n\n
+ */
+uint32_t XMC_SCU_CLOCK_GetECATClockFrequency(void);
+#endif
+
+/**
  * @return None
  *
  * \par<b>Description</b><br>
@@ -2245,7 +2454,7 @@ bool XMC_SCU_CLOCK_IsUsbPllLocked(void);
  * @return None
  *
  * \par<b>Description</b><br>
- * Configures the calibration of internal oscillator.\n\n
+ * Configures the calibration mode of internal oscillator.\n\n
  * Based on the calibration mode selected, the internal oscillator calibration will be configured.
  * The calibration is useful while using fast internal clock(fOFI). When factory mode calibration is used,
  * the internal oscillator is trimmed using the firmware configured values. If automatic calibration is 
@@ -2377,6 +2586,50 @@ void XMC_SCU_HIB_EnableInternalSlowClock(void);
  */
 void XMC_SCU_HIB_DisableInternalSlowClock(void);
 
+/**
+ * @param config  Register configuration value that defines some system behavior aspects while in Deep Sleep mode.\n
+ * Note: Refer user manual for valid register value before configuring the register. \n
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Configuration register that defines some system behavior aspects while in Deep Sleep mode.
+ * The PLL re-initialization is required after wake-up from Deep Sleep mode if was enabled
+ * before entering Deep Sleep mode and configured to go into power down while in Deep Sleep mode. \n
+ * Note: Swiching off a module clock during operation may result in unexpected effects like
+ * e.g. clock spikes or protocol violations. Before entering Deep Sleep mode the affected
+ * modules should be in reset state. After restoration of the clocks the modules need
+ * to be re-initialized in order to ensure proper function. \n
+ *\par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_Init() \n\n\n
+ *
+ */
+__STATIC_INLINE void XMC_SCU_CLOCK_SetDeepSleepConfig(uint32_t config)
+{
+  SCU_CLK->DSLEEPCR = config;
+}
+
+/**
+ * @param config  Register configuration value that defines some system behavior aspects while in Sleep mode.\n
+ * Note: Refer user manual for valid register value before configuring the register. \n
+ *
+ * @return None
+ *
+ * \par<b>Description</b><br>
+ * Configuration register that defines some system behavior aspects while in Deep Sleep mode.
+ * The original clock configuration gets restored upon wake-up from sleep mode. \n
+ * Note: Swiching off a module clock during operation may result in unexpected effects like
+ * e.g. clock spikes or protocol violations. Before entering Sleep mode the affected
+ * modules should be in reset state. After restoration of the clocks the modules need
+ * to be re-initialized in order to ensure proper function. \n
+ *\par<b>Related APIs:</b><BR>
+ * XMC_SCU_CLOCK_Init() \n\n\n
+ *
+ */
+__STATIC_INLINE void XMC_SCU_CLOCK_SetSleepConfig(uint32_t config)
+{
+  SCU_CLK->SLEEPCR = config;
+}
 
 
 /**

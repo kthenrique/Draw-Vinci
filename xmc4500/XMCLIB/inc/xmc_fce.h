@@ -1,12 +1,12 @@
 /**
  * @file xmc_fce.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
 *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -51,16 +51,13 @@
 #ifndef XMC_FCE_H
 #define XMC_FCE_H
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
+ *********************************************************************************************************************/
  
 #include <xmc_common.h>
 
 #if defined (FCE)
-
-#include <xmc_scu.h>
-#include <string.h>
 
 /**
  * @addtogroup XMClib
@@ -85,10 +82,12 @@
  *    * CRC kernel 0 and 1: IEEE 802.3 CRC32 ethernet polynomial: 0x04C11DB71 <br>
  *    * CRC kernel 2: CCITT CRC16 polynomial: 0x1021 <br>
  *    * CRC kernel 3: SAE J1850 CRC8 polynomial: 0x1D <br>
- *    * Configuration Registers enable to control the CRC operation and perform automatic checksum checks at the end of a message. <br>
+ *    * Configuration Registers enable to control the CRC operation and perform automatic checksum checks at 
+ *      the end of a message. <br>
  *    * Extended register interface to control reliability of FCE execution in safety applications. <br>
  *    * Error notification scheme via dedicated interrupt node for: <br>
-        a)Transient error detection: Error interrupt generation (maskable) with local status register (cleared by software) <br>
+        a)Transient error detection: Error interrupt generation (maskable) with local status register 
+		  (cleared by software) <br>
         b)Checksum failure: Error interrupt generation (maskable) with local status register (cleared by software) <br>
 		
      FCE provides one interrupt line to the interrupt system. Each CRC engine has its own set of flag registers. <br>
@@ -96,9 +95,10 @@
  * @{
  */
  
-/*******************************************************************************
+/**********************************************************************************************************************
  * MACROS
- *******************************************************************************/
+ *********************************************************************************************************************/
+ 
 #define XMC_FCE_CRC32_0        FCE_KE0 /**< Kernel 0 <br> */
 #define XMC_FCE_CRC32_1        FCE_KE1 /**< Kernel 1 <br> */
 #define XMC_FCE_CRC16          FCE_KE2 /**< Kernel 2 <br> */
@@ -111,9 +111,9 @@
 #define XMC_FCE_INVSEL_SET     (1U) /**< Enables output inversion */
 #define XMC_FCE_INVSEL_RESET   (0U) /**< Disables output inversion */
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
+ *********************************************************************************************************************/
  
 /**
  * FCE interrupt configuration
@@ -176,10 +176,13 @@ typedef enum XMC_FCE_STATUS
   XMC_FCE_STATUS_ERROR   /**< Returns ERROR when API cannot fulfil request */
 } XMC_FCE_STATUS_t;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * DATA STRUCTURES
- *******************************************************************************/
- 
+ *********************************************************************************************************************/
+
+/**
+ * FCE kernel
+ */ 
 typedef FCE_KE_TypeDef XMC_FCE_Kernel_t;
 
 /* Anonymous structure/union guard start */
@@ -190,6 +193,9 @@ typedef FCE_KE_TypeDef XMC_FCE_Kernel_t;
   #pragma warning 586
 #endif
 
+/**
+ * @brief XMC_FCE configuration structure
+ */
 typedef struct XMC_FCE_CONFIG
 {
   union
@@ -213,6 +219,9 @@ typedef struct XMC_FCE_CONFIG
   #pragma warning restore
 #endif
 
+/**
+ * FCE handler
+ */
 typedef struct XMC_FCE
 {
   XMC_FCE_Kernel_t *kernel_ptr;    /**< FCE Kernel Pointer */
@@ -220,9 +229,9 @@ typedef struct XMC_FCE
   uint32_t seedvalue;              /**< CRC seed value to be used */
 } XMC_FCE_t;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
  
 #ifdef __cplusplus
 extern "C" {
@@ -329,7 +338,7 @@ void XMC_FCE_Enable(void);
  * 
  * \par
  * The function sets to the CFG and CRC registers with the FCE configuration and
- * seeds values. The function always returns ::XMC_FCE_STATUS_SUCCESS.
+ * seeds values. The function always returns XMC_FCE_STATUS_SUCCESS.
  *
  * \par<b>Note: </b><br>
  * The software must first ensure that the CRC kernel is properly configured with the
@@ -546,8 +555,8 @@ __STATIC_INLINE void XMC_FCE_UpdateLength(const XMC_FCE_t *const engine, const u
  * @param data Pointer to the data buffer
  * @param length Total number of bytes of data buffer
  * @param result Pointer to computed CRC result
- * @return ::XMC_FCE_STATUS_t Returns ::XMC_FCE_STATUS_ERROR on error, ::XMC_FCE_STATUS_SUCCESS
- *         otherwise.
+ * @return XMC_FCE_STATUS_ERROR on error
+ * @return XMC_FCE_STATUS_SUCCESS otherwise.
  *
  * \par<b>Description: </b><br>
  * Calculate and updates the CRC8 checksum in the result pointer <br>
@@ -569,8 +578,8 @@ XMC_FCE_STATUS_t XMC_FCE_CalculateCRC8(const XMC_FCE_t *const engine,
  * @param data Pointer to the data buffer
  * @param length Length of data buffer
  * @param result Pointer to computed CRC result
- * @return ::XMC_FCE_STATUS_t Returns ::XMC_FCE_STATUS_ERROR on error, ::XMC_FCE_STATUS_SUCCESS
- *         otherwise.
+ * @return XMC_FCE_STATUS_ERROR on error
+ * @return XMC_FCE_STATUS_SUCCESS otherwise.
  *
  * \par<b>Description: </b><br>
  * Calculate and update the RC16 checksum in the result pointer <br>
@@ -593,8 +602,8 @@ XMC_FCE_STATUS_t XMC_FCE_CalculateCRC16(const XMC_FCE_t *const engine,
  * @param data Pointer to the data buffer
  * @param length Total number of bytes of data buffer
  * @param result Pointer to computed CRC result
- * @return ::XMC_FCE_STATUS_t Returns ::XMC_FCE_STATUS_ERROR on error, ::XMC_FCE_STATUS_SUCCESS
- *         otherwise.
+ * @return XMC_FCE_STATUS_ERROR on error
+ * @return XMC_FCE_STATUS_SUCCESS otherwise.
  *
  * \par<b>Description</b><br>
  * Calculate and update the calculated CRC32 checksum in the result pointer <br>

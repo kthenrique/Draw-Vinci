@@ -1,12 +1,12 @@
 /**
  * @file xmc_pau.h
- * @date 2015-06-20 
+ * @date 2016-01-12
  *
  * @cond
  *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -37,7 +37,7 @@
  * --------------
  *
  * 2015-02-20:
- *     - Initial <br>
+ *     - Initial version
  *      
  * 2015-05-20:
  *     - Documentation updated
@@ -55,7 +55,7 @@
  * HEADER FILES
  *********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if defined(PAU)
   
@@ -133,64 +133,111 @@ typedef enum XMC_PAU_PERIPHERAL
   #endif
   #if defined(PORT2)
    XMC_PAU_PERIPHERAL_PORT2               = PAU_PRIVDIS0_PDIS24_Msk, /**< Port 2 Privilege Disable Flag */
-  #endif
-  #if defined(USIC0_CH0)
+#endif
+#if defined(PORT3)
+   XMC_PAU_PERIPHERAL_PORT3               = PAU_PRIVDIS0_PDIS25_Msk, /**< Port 3 Privilege Disable Flag */
+#endif
+#if defined(PORT4)
+   XMC_PAU_PERIPHERAL_PORT4               = PAU_PRIVDIS0_PDIS26_Msk, /**< Port 4 Privilege Disable Flag */
+#endif
+#if defined(USIC0)
    XMC_PAU_PERIPHERAL_USIC0_CH0           = PAU_PRIVDIS1_PDIS0_Msk | 0x10000000U, /**< USIC0 Channel 0 Privilege Disable Flag */
-  #endif
-  #if defined(USIC0_CH1)
    XMC_PAU_PERIPHERAL_USIC0_CH1           = PAU_PRIVDIS1_PDIS1_Msk | 0x10000000U, /**< USIC0 Channel 1 Privilege Disable Flag */
-  #endif
-  #if defined(PRNG)
+#endif
+#if defined(USIC1)
+   XMC_PAU_PERIPHERAL_USIC1_CH0           = PAU_PRIVDIS1_PDIS16_Msk | 0x10000000U, /**< USIC1 Channel 0 Privilege Disable Flag */
+   XMC_PAU_PERIPHERAL_USIC1_CH1           = PAU_PRIVDIS1_PDIS17_Msk | 0x10000000U, /**< USIC1 Channel 1 Privilege Disable Flag */
+#endif
+#if defined(PRNG)
    XMC_PAU_PERIPHERAL_PRNG                = PAU_AVAIL1_AVAIL4_Msk | 0x10000000U, /**< PRNG Availability Flag*/
-  #endif
-  #if defined(VADC)
+#endif
+#if defined(VADC)
    XMC_PAU_PERIPHERAL_VADC_GLOBAL         = PAU_PRIVDIS1_PDIS5_Msk | 0x10000000U, /**< VADC0 Basic SFRs Privilege Disable Flag */
-  #endif
-  #if defined(VADC_G0)
+#if defined(VADC_G0)
    XMC_PAU_PERIPHERAL_VADC_GROUP0         = PAU_PRIVDIS1_PDIS6_Msk | 0x10000000U, /**< VADC0 Group 0 SFRs Privilege Disable Flag */
-  #endif
-  #if defined(VADC_G1)
+#endif
+#if defined(VADC_G1)
    XMC_PAU_PERIPHERAL_VADC_GROUP1         = PAU_PRIVDIS1_PDIS7_Msk | 0x10000000U, /**< VADC0 Group 1 SFRs Privilege Disable Flag */
-  #endif
-  #if defined(SHS0)
+#endif
+#endif
+#if defined(SHS0)
    XMC_PAU_PERIPHERAL_VADC_SHS0           = PAU_PRIVDIS1_PDIS8_Msk | 0x10000000U, /**< SHS0 Privilege Disable Flag */
-  #endif
-  #if defined(CCU40_CC40)
-   XMC_PAU_PERIPHERAL_CC40_AND_GLOBAL     = PAU_PRIVDIS1_PDIS9_Msk | 0x10000000U, /**< CC40 and CCU40 Kernel SFRs Privilege Disable Flag */
-  #endif
-  #if defined(CCU40_CC41)
-   XMC_PAU_PERIPHERAL_CC41                = PAU_PRIVDIS1_PDIS10_Msk | 0x10000000U, /**< CC41 Privilege Disable Flag */
-  #endif
-  #if defined(CCU40_CC42)
-   XMC_PAU_PERIPHERAL_CC42                = PAU_PRIVDIS1_PDIS11_Msk | 0x10000000U, /**< CC42 Privilege Disable Flag */
-  #endif
-  #if defined(CCU40_CC43)
-   XMC_PAU_PERIPHERAL_CC43                = PAU_PRIVDIS1_PDIS12_Msk | 0x10000000U, /**< CC43 Privilege Disable Flag */
-  #endif
-  #if defined(CCU80_CC80) 
-   XMC_PAU_PERIPHERAL_CC80_AND_GLOBAL     = PAU_PRIVDIS2_PDIS0_Msk | 0x20000000U, /**< CC80 and CCU80 Kernel SFRs Privilege Disable Flag */
-  #endif
-  #if defined(CCU80_CC81)
-   XMC_PAU_PERIPHERAL_CC81                = PAU_PRIVDIS2_PDIS1_Msk | 0x20000000U, /**< CC81 Privilege Disable Flag */
-  #endif
-  #if defined(CCU80_CC82)
-   XMC_PAU_PERIPHERAL_CC82                = PAU_PRIVDIS2_PDIS2_Msk | 0x20000000U, /**< CC82 Privilege Disable Flag */
-  #endif
-  #if defined(CCU80_CC83)
-   XMC_PAU_PERIPHERAL_CC83                = PAU_PRIVDIS2_PDIS3_Msk | 0x20000000U, /**< CC83 Privilege Disable Flag */
-  #endif
-  #if defined(POSIF0)
+#endif
+#if defined(CCU40)
+   XMC_PAU_PERIPHERAL_CCU40_CC40_AND_GLOBAL     = PAU_PRIVDIS1_PDIS9_Msk | 0x10000000U, /**< CCU40_CC40 and CCU40 Kernel SFRs Privilege Disable Flag */
+#if defined(CCU40_CC41)
+   XMC_PAU_PERIPHERAL_CCU40_CC41                = PAU_PRIVDIS1_PDIS10_Msk | 0x10000000U, /**< CCU40_CC41 Privilege Disable Flag */
+#endif
+#if defined(CCU40_CC42)
+   XMC_PAU_PERIPHERAL_CCU40_CC42                = PAU_PRIVDIS1_PDIS11_Msk | 0x10000000U, /**< CCU40_CC42 Privilege Disable Flag */
+#endif
+#if defined(CCU40_CC43)
+   XMC_PAU_PERIPHERAL_CCU40_CC43                = PAU_PRIVDIS1_PDIS12_Msk | 0x10000000U, /**< CCU40_CC43 Privilege Disable Flag */
+#endif
+#endif
+#if defined(CCU41)
+   XMC_PAU_PERIPHERAL_CCU41_CC40_AND_GLOBAL     = PAU_PRIVDIS1_PDIS25_Msk | 0x10000000U, /**< CCU41_CC40 and CCU41 Kernel SFRs Privilege Disable Flag */
+#if defined(CCU41_CC41)
+   XMC_PAU_PERIPHERAL_CCU41_CC41                = PAU_PRIVDIS1_PDIS26_Msk | 0x10000000U, /**< CCU41_CC41 Privilege Disable Flag */
+#endif
+#if defined(CCU41_CC42)
+   XMC_PAU_PERIPHERAL_CCU41_CC42                = PAU_PRIVDIS1_PDIS27_Msk | 0x10000000U, /**< CCU41_CC42 Privilege Disable Flag */
+#endif
+#if defined(CCU41_CC43)
+   XMC_PAU_PERIPHERAL_CCU41_CC43                = PAU_PRIVDIS1_PDIS28_Msk | 0x10000000U, /**< CCU41_CC43 Privilege Disable Flag */
+#endif
+#endif
+#if defined(CCU80) 
+   XMC_PAU_PERIPHERAL_CCU80_CC80_AND_GLOBAL     = PAU_PRIVDIS2_PDIS0_Msk | 0x20000000U, /**< CCU80_CC80 and CCU80 Kernel SFRs Privilege Disable Flag */
+#if defined(CCU80_CC81)
+   XMC_PAU_PERIPHERAL_CCU80_CC81                = PAU_PRIVDIS2_PDIS1_Msk | 0x20000000U, /**< CCU80_CC81 Privilege Disable Flag */
+#endif
+#if defined(CCU80_CC82)
+   XMC_PAU_PERIPHERAL_CCU80_CC82                = PAU_PRIVDIS2_PDIS2_Msk | 0x20000000U, /**< CCU80_CC82 Privilege Disable Flag */
+#endif
+#if defined(CCU80_CC83)
+   XMC_PAU_PERIPHERAL_CCU80_CC83                = PAU_PRIVDIS2_PDIS3_Msk | 0x20000000U, /**< CCU80_CC83 Privilege Disable Flag */
+#endif
+#endif
+#if defined(CCU81) 
+   XMC_PAU_PERIPHERAL_CCU81_CC80_AND_GLOBAL     = PAU_PRIVDIS2_PDIS16_Msk | 0x20000000U, /**< CCU81_CC80 and CCU81 Kernel SFRs Privilege Disable Flag */
+#if defined(CCU81_CC81)
+   XMC_PAU_PERIPHERAL_CCU81_CC81                = PAU_PRIVDIS2_PDIS17_Msk | 0x20000000U, /**< CCU81_CC81 Privilege Disable Flag */
+#endif
+#if defined(CCU81_CC82)
+   XMC_PAU_PERIPHERAL_CCU81_CC82                = PAU_PRIVDIS2_PDIS18_Msk | 0x20000000U, /**< CCU81_CC82 Privilege Disable Flag */
+#endif
+#if defined(CCU81_CC83)
+   XMC_PAU_PERIPHERAL_CCU81_CC83                = PAU_PRIVDIS2_PDIS19_Msk | 0x20000000U, /**< CCU81_CC83 Privilege Disable Flag */
+#endif
+#endif
+#if defined(POSIF0)
    XMC_PAU_PERIPHERAL_POSIF0              = PAU_PRIVDIS2_PDIS12_Msk | 0x20000000U, /**< POSIF0 Privilege Disable Flag */
-  #endif
-  #if defined(LEDTS0)  
+#endif
+#if defined(POSIF1)
+   XMC_PAU_PERIPHERAL_POSIF1              = PAU_PRIVDIS2_PDIS28_Msk | 0x20000000U, /**< POSIF1 Privilege Disable Flag */
+#endif
+#if defined(LEDTS0)  
    XMC_PAU_PERIPHERAL_LEDTS0              = PAU_PRIVDIS2_PDIS13_Msk | 0x20000000U, /**< LEDTS0 Privilege Disable Flag */
-  #endif
-  #if defined(LEDTS1)  
+#endif
+#if defined(LEDTS1)  
    XMC_PAU_PERIPHERAL_LEDTS1              = PAU_PRIVDIS2_PDIS14_Msk | 0x20000000U, /**< LEDTS1 Privilege Disable Flag */
-  #endif
-  #if defined(BCCU0)   
-   XMC_PAU_PERIPHERAL_BCCU0               = PAU_PRIVDIS2_PDIS15_Msk | 0x20000000U /**< BCCU0 Privilege Disable Flag */
-  #endif
+#endif
+#if defined(LEDTS2)  
+   XMC_PAU_PERIPHERAL_LEDTS2              = PAU_PRIVDIS2_PDIS29_Msk | 0x20000000U, /**< LEDTS2 Privilege Disable Flag */
+#endif
+#if defined(BCCU0)   
+   XMC_PAU_PERIPHERAL_BCCU0               = PAU_PRIVDIS2_PDIS15_Msk | 0x20000000U, /**< BCCU0 Privilege Disable Flag */
+#endif
+#if defined(CAN)   
+#if defined(CAN_NODE0)   
+   XMC_PAU_PERIPHERAL_MCAN_NODE0_AND_GLOBAL = PAU_PRIVDIS2_PDIS21_Msk | 0x20000000U, /**< MCAN NODE0 and Global SFRs Privilege */
+#endif   
+#if defined(CAN_NODE1)   
+   XMC_PAU_PERIPHERAL_MCAN_NODE1_AND_GLOBAL = PAU_PRIVDIS2_PDIS23_Msk | 0x20000000U, /**< MCAN NODE1 Privilege Disable Flag */
+#endif
+   XMC_PAU_PERIPHERAL_MCAN_OBJECTS = PAU_PRIVDIS2_PDIS28_Msk | 0x20000000U, /**< MCAN Message Objects Privilege Disable Flag */
+#endif
 } XMC_PAU_PERIPHERAL_t;
 
 

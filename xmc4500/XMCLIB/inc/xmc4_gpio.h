@@ -1,12 +1,12 @@
 /**
  * @file xmc4_gpio.h
- * @date 2015-06-20
+ * @date 2016-01-12
  *
  * @cond
   *********************************************************************************************************************
- * XMClib v2.0.0 - XMC Peripheral Driver Library
+ * XMClib v2.1.4 - XMC Peripheral Driver Library 
  *
- * Copyright (c) 2015, Infineon Technologies AG
+ * Copyright (c) 2015-2016, Infineon Technologies AG
  * All rights reserved.                        
  *                                             
  * Redistribution and use in source and binary forms, with or without modification,are permitted provided that the 
@@ -42,6 +42,8 @@
  * 2015-06-20:
  *     - Removed version macros and declaration of GetDriverVersion API
  *
+ * 2015-10-09:
+ *     - Added PORT MACRO checks and definitions for XMC4800/4700 devices
  * @endcond
  *
  */
@@ -49,15 +51,15 @@
 #ifndef XMC4_GPIO_H
 #define XMC4_GPIO_H
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * HEADER FILES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
-#include <xmc_common.h>
+#include "xmc_common.h"
 
 #if UC_FAMILY == XMC4
 
-#include <xmc4_gpio_map.h>
+#include "xmc4_gpio_map.h"
 
 /**
  * @addtogroup XMClib XMC Peripheral Library
@@ -69,9 +71,9 @@
  * @{
  */
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * MACROS
- *******************************************************************************/
+ *********************************************************************************************************************/
 
 #if defined(PORT0)
 #define XMC_GPIO_PORT0 ((XMC_GPIO_PORT_t *) PORT0_BASE)
@@ -122,6 +124,27 @@
 #define XMC_GPIO_CHECK_PORT6(port) 0
 #endif
 
+#if defined(PORT7)
+#define XMC_GPIO_PORT7 ((XMC_GPIO_PORT_t *) PORT7_BASE)
+#define XMC_GPIO_CHECK_PORT7(port) (port == XMC_GPIO_PORT7)
+#else
+#define XMC_GPIO_CHECK_PORT7(port) 0
+#endif
+
+#if defined(PORT8)
+#define XMC_GPIO_PORT8 ((XMC_GPIO_PORT_t *) PORT8_BASE)
+#define XMC_GPIO_CHECK_PORT8(port) (port == XMC_GPIO_PORT8)
+#else
+#define XMC_GPIO_CHECK_PORT8(port) 0
+#endif
+
+#if defined(PORT9)
+#define XMC_GPIO_PORT9 ((XMC_GPIO_PORT_t *) PORT9_BASE)
+#define XMC_GPIO_CHECK_PORT9(port) (port == XMC_GPIO_PORT9)
+#else
+#define XMC_GPIO_CHECK_PORT9(port) 0
+#endif
+
 #if defined(PORT14)
 #define XMC_GPIO_PORT14 ((XMC_GPIO_PORT_t *) PORT14_BASE)
 #define XMC_GPIO_CHECK_PORT14(port) (port == XMC_GPIO_PORT14)
@@ -143,6 +166,9 @@
                                    XMC_GPIO_CHECK_PORT4(port) || \
                                    XMC_GPIO_CHECK_PORT5(port) || \
                                    XMC_GPIO_CHECK_PORT6(port) || \
+                                   XMC_GPIO_CHECK_PORT7(port) || \
+                                   XMC_GPIO_CHECK_PORT8(port) || \
+                                   XMC_GPIO_CHECK_PORT9(port) || \
                                    XMC_GPIO_CHECK_PORT14(port) || \
                                    XMC_GPIO_CHECK_PORT15(port))
 
@@ -152,29 +178,13 @@
                                           XMC_GPIO_CHECK_PORT3(port) || \
                                           XMC_GPIO_CHECK_PORT4(port) || \
                                           XMC_GPIO_CHECK_PORT5(port) || \
-                                          XMC_GPIO_CHECK_PORT6(port))
+                                          XMC_GPIO_CHECK_PORT6(port) || \
+                                          XMC_GPIO_CHECK_PORT7(port) || \
+                                          XMC_GPIO_CHECK_PORT8(port) || \
+                                          XMC_GPIO_CHECK_PORT9(port))
 
 #define XMC_GPIO_CHECK_ANALOG_PORT(port) (XMC_GPIO_CHECK_PORT14(port) || \
                                           XMC_GPIO_CHECK_PORT15(port))
-
-#define XMC_GPIO_CHECK_MODE(mode) ((mode == XMC_GPIO_MODE_INPUT_TRISTATE) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_PULL_DOWN) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_PULL_UP) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_SAMPLING) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP) ||\
-                                   (mode == XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3) ||\
-                                   (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4))
 
 #define XMC_GPIO_CHECK_OUTPUT_STRENGTH(strength) ((strength == XMC_GPIO_OUTPUT_STRENGTH_STRONG_SHARP_EDGE) ||\
                                                  (strength == XMC_GPIO_OUTPUT_STRENGTH_STRONG_MEDIUM_EDGE) ||\
@@ -183,9 +193,40 @@
                                                  (strength == XMC_GPIO_OUTPUT_STRENGTH_MEDIUM) ||\
                                                  (strength == XMC_GPIO_OUTPUT_STRENGTH_WEAK))
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * ENUMS
- *******************************************************************************/
+ *********************************************************************************************************************/
+
+/**
+ * Defines the direction and characteristics of a pin. Use type \a XMC_GPIO_MODE_t for this enum. For the operation
+ * with alternate functions, the port pins are directly connected to input or output functions of the on-chip periphery.
+ */
+
+typedef enum XMC_GPIO_MODE
+{
+  XMC_GPIO_MODE_INPUT_TRISTATE = 0x0UL << PORT0_IOCR0_PC0_Pos, 	         /**< No internal pull device active */
+  XMC_GPIO_MODE_INPUT_PULL_DOWN = 0x1UL << PORT0_IOCR0_PC0_Pos, 	     /**< Internal pull-down device active */
+  XMC_GPIO_MODE_INPUT_PULL_UP = 0x2UL << PORT0_IOCR0_PC0_Pos, 	         /**< Internal pull-up device active */
+  XMC_GPIO_MODE_INPUT_SAMPLING = 0x3UL << PORT0_IOCR0_PC0_Pos, 	         /**< No internal pull device active;Pn_OUTx continuously samples the input value */
+  XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE = 0x4UL << PORT0_IOCR0_PC0_Pos,  /**< Inverted no internal pull device active */
+  XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN = 0x5UL << PORT0_IOCR0_PC0_Pos, /**< Inverted internal pull-down device active */
+  XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP = 0x6UL << PORT0_IOCR0_PC0_Pos,   /**< Inverted internal pull-up device active */
+  XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING = 0x7UL << PORT0_IOCR0_PC0_Pos,  /**< Inverted no internal pull device active; Pn_OUTx continuously samples the input value */
+  XMC_GPIO_MODE_OUTPUT_PUSH_PULL = 0x80UL, 			                     /**< Push-pull general-purpose output */
+  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN = 0xc0UL, 		                     /**< Open-drain general-purpose output */
+  XMC_GPIO_MODE_OUTPUT_ALT1 = 0x1UL << PORT0_IOCR0_PC0_Pos,
+  XMC_GPIO_MODE_OUTPUT_ALT2 = 0x2UL << PORT0_IOCR0_PC0_Pos,
+  XMC_GPIO_MODE_OUTPUT_ALT3 = 0x3UL << PORT0_IOCR0_PC0_Pos,
+  XMC_GPIO_MODE_OUTPUT_ALT4 = 0x4UL << PORT0_IOCR0_PC0_Pos,
+  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1 = XMC_GPIO_MODE_OUTPUT_PUSH_PULL | XMC_GPIO_MODE_OUTPUT_ALT1, 	/**<  Push-pull alternate output function 1 */
+  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2 = XMC_GPIO_MODE_OUTPUT_PUSH_PULL | XMC_GPIO_MODE_OUTPUT_ALT2, 	/**<  Push-pull alternate output function 2 */
+  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3 = XMC_GPIO_MODE_OUTPUT_PUSH_PULL | XMC_GPIO_MODE_OUTPUT_ALT3, 	/**<  Push-pull alternate output function 3 */
+  XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4 = XMC_GPIO_MODE_OUTPUT_PUSH_PULL | XMC_GPIO_MODE_OUTPUT_ALT4, 	/**<  Push-pull alternate output function 4 */
+  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1 = XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN | XMC_GPIO_MODE_OUTPUT_ALT1, 	/**<  Open drain alternate output function 1 */
+  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2 = XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN | XMC_GPIO_MODE_OUTPUT_ALT2, 	/**<  Open drain alternate output function 2 */
+  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3 = XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN | XMC_GPIO_MODE_OUTPUT_ALT3, 	/**<  Open drain alternate output function 3 */
+  XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4 = XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN | XMC_GPIO_MODE_OUTPUT_ALT4, 	/**<  Open drain alternate output function 4 */
+} XMC_GPIO_MODE_t;
 
 /**
  * Defines output strength and slew rate of a pin. Use type \a XMC_GPIO_OUTPUT_STRENGTH_t for this enum.
@@ -202,9 +243,9 @@ typedef enum XMC_GPIO_OUTPUT_STRENGTH
 } XMC_GPIO_OUTPUT_STRENGTH_t;
 
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * DATA STRUCTURES
- *******************************************************************************/
+ *********************************************************************************************************************/
 /**
  *  Structure points  port hardware registers. Use type XMC_GPIO_PORT_t for this structure.
  */
@@ -241,10 +282,31 @@ typedef struct XMC_GPIO_CONFIG
   XMC_GPIO_OUTPUT_STRENGTH_t output_strength;	/**< Defines pad driver mode of a pin */
 } XMC_GPIO_CONFIG_t;
 
-/*******************************************************************************
+/**********************************************************************************************************************
  * API PROTOTYPES
- *******************************************************************************/
+ *********************************************************************************************************************/
 
+__STATIC_INLINE bool XMC_GPIO_IsModeValid(XMC_GPIO_MODE_t mode)
+{
+  return ((mode == XMC_GPIO_MODE_INPUT_TRISTATE) ||
+          (mode == XMC_GPIO_MODE_INPUT_PULL_DOWN) ||
+          (mode == XMC_GPIO_MODE_INPUT_PULL_UP) ||
+          (mode == XMC_GPIO_MODE_INPUT_SAMPLING) ||
+          (mode == XMC_GPIO_MODE_INPUT_INVERTED_TRISTATE) ||
+          (mode == XMC_GPIO_MODE_INPUT_INVERTED_PULL_DOWN) ||
+          (mode == XMC_GPIO_MODE_INPUT_INVERTED_PULL_UP) ||
+          (mode == XMC_GPIO_MODE_INPUT_INVERTED_SAMPLING) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT1) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT2) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT3) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_PUSH_PULL_ALT4) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT1) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT2) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT3) ||
+          (mode == XMC_GPIO_MODE_OUTPUT_OPEN_DRAIN_ALT4));
+}
 
 /**
  *
