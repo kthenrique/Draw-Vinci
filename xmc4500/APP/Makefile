@@ -61,8 +61,11 @@ XMC_USBLIBDIR = $(XMCLIB)/src/USB
 ################################################################################
 # TOOLS & ARGS
 #
-#TERMINAL      = xfce4-terminal
-TERMINAL      = gnome-terminal
+ifeq ($(USER), henrique)
+	TERMINAL      = xfce4-terminal
+else
+	TERMINAL      = gnome-terminal
+endif
 TOOLCHAIN     = arm-none-eabi
 AS            = $(TOOLCHAIN)-as
 CC            = $(TOOLCHAIN)-gcc
