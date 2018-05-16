@@ -10,7 +10,6 @@
 
 #include "xmc4500_spi_lib.h"
 #include "mcp23s08_drv.h"
-#include "mcp3004_drv.h"
 
 /**
  * @brief SPI configuration structure

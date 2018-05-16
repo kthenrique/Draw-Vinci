@@ -300,13 +300,13 @@ class AppWindow(QMainWindow):
 
     def goLeft(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#X-10:$')
+            self.sendSingleMsg('#X-50:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goRight(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#X10:$')
+            self.sendSingleMsg('#X50:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 

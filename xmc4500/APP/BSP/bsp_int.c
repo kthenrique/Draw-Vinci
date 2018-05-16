@@ -173,6 +173,7 @@ static  void  BSP_IntHandler_Uart_Receive (void){
 			APP_TRACE_DBG ("Getting Memory Partition\n");
 			msg_receiving = 1;
 	}else {
+        //APP_TRACE_DBG ("Interrupt: Building msg ...\n");
         if (msg_receiving == 1){ // otherwise msg will be simply ignored
             // receive characters and put them into the memory partition            
             // until we detect an "end of packet character"
@@ -187,7 +188,7 @@ static  void  BSP_IntHandler_Uart_Receive (void){
                 RxDataCtr++;
             } else{
 
-                // is the character a "end of packet" character?                        // <4>
+                // is the character a "end of packet" character?
                 // send the message to the application task - to that end put a pointer to
                 // the memory block into the queue to the application task
                 OSQPost ( (OS_Q      *) &UART_QUEUE,
@@ -200,7 +201,7 @@ static  void  BSP_IntHandler_Uart_Receive (void){
                     SendNack();
                 }
 
-                // clear the receive pointer and counter                              // <5>
+                // clear the receive pointer and counter
                 RxDataPtr = NULL;
                 RxDataCtr = 0;
                 // ready for a next message

@@ -29,41 +29,38 @@ bool scrutinise(char *str, volatile COORDINATES *packet){
     APP_TRACE_INFO ("Separated in tokens ...\n");
     token_ptr = strtok(str, delim);
     while(1){
-        printf("while loop!\n");
         if (strncmp((const char *)token_ptr,(const char *)"G00",3) == 0){
             packet->x_axis = 0;
             packet->y_axis = 0;
             packet->z_axis = 0;
             packet->pos_mode = 0;
-        }
-        else if (strncmp((const char *)token_ptr,(const char *)"G1",3) == 0){
+        } else
+            if (strncmp((const char *)token_ptr,(const char *)"G1",3) == 0){
+                APP_TRACE_INFO ("G1...\n");
+        } else
+            if (strncmp((const char *)token_ptr,(const char *)"G90",3) == 0){
+                packet->pos_mode = 0;
+            } else 
+                if (strncmp((const char *)token_ptr,(const char *)"G91",3) == 0){
+                    packet->pos_mode = 1;
+                } else
+                    if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
+                        APP_TRACE_INFO ("Changing value of X...\n");
+                        packet->x_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                    } else
+                        if ((token_ptr[0] == 'y') || (token_ptr[0] == 'Y')){
+                            packet->y_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                        } else
+                            if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
+                                packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                            } else
+                                if (token_ptr[0] == 'M'){
 
-        }
-        else if (strncmp((const char *)token_ptr,(const char *)"G90",3) == 0){;
-            packet->pos_mode = 0;
-        }
-        else if (strncmp((const char *)token_ptr,(const char *)"G91",3) == 0){
-            packet->pos_mode = 1;
-        }
-        else if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
-            packet->x_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
-        }
-        else if ((token_ptr[0] == 'y') || (token_ptr[0] == 'Y')){
-            packet->y_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
-        }
-        else if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
-            packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
-        }
-        else if (token_ptr[0] == 'M'){
-
-        }
-        else if (token_ptr[0] == 'F'){
-
-            packet->speed = strtol((const char *)&token_ptr[1], &endptr, 10);
-        }
-/*        else{*/
-/*            return false;*/
-/*        }*/
+                                } else
+                                    if (token_ptr[0] == 'F'){
+                                        packet->speed = strtol((const char *)&token_ptr[1], &endptr, 10);
+                                    } else
+                                        return false;
         token_ptr = strtok(NULL, delim);
         if (token_ptr == NULL){
             break;

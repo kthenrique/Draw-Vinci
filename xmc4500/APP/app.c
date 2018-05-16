@@ -40,7 +40,6 @@
 #include <protocol.h>
 
 #include "xmc4500_spi_lib.h"
-#include "mcp3004_drv.h"
 #include "mcp23s08_drv.h"
 
 #if SEMI_HOSTING
@@ -88,7 +87,6 @@ static void AppTaskStart (void *p_arg);
 static void AppTaskCom   (void *p_arg);
 static void AppTaskPwm   (void *p_arg);
 static void AppTaskEndpoints(void *p_arg);
-void motor_drive(void);
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -244,21 +242,21 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm1 \n");
 
-    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
-                  (CPU_CHAR   *) "TaskEndpoints",
-                  (OS_TASK_PTR ) AppTaskEndpoints,
-                  (void       *) 0,
-                  (OS_PRIO     ) APP_CFG_TASK_ENDPOINTS_PRIO,
-                  (CPU_STK    *) &AppTaskEndpoints_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE,
-                  (OS_MSG_QTY  ) 0u,
-                  (OS_TICK     ) 0u,
-                  (void       *) 0,
-                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                  (OS_ERR     *) &err);
-    if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
+//    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
+//                  (CPU_CHAR   *) "TaskEndpoints",
+//                  (OS_TASK_PTR ) AppTaskEndpoints,
+//                  (void       *) 0,
+//                  (OS_PRIO     ) APP_CFG_TASK_ENDPOINTS_PRIO,
+//                  (CPU_STK    *) &AppTaskEndpoints_Stk[0],
+//                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE / 10u,
+//                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE,
+//                  (OS_MSG_QTY  ) 0u,
+//                  (OS_TICK     ) 0u,
+//                  (void       *) 0,
+//                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+//                  (OS_ERR     *) &err);
+//    if (err != OS_ERR_NONE)
+//        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
     
     APP_TRACE_DBG ("Deleting AppTaskStart ...\n");
     do {
@@ -300,13 +298,8 @@ static void AppTaskCom (void *p_arg){
 
     bool volatile valid;
     COORDINATES volatile packet;
-/*    uint8_t volatile actual = 0, actual_;*/
 
     (void) p_arg; // Just to silence compiler
-
-    // initialise packets: Make them all available to use
-/*    for(uint8_t j = 0; j < (NUM_MSG+1); j++)*/
-/*        packet[j].isAvailable = true;*/
 
     APP_TRACE_INFO ("AppTaskCom Loop...\n");
     while (DEF_ON) {
@@ -357,72 +350,6 @@ static void AppTaskCom (void *p_arg){
             if (err != OS_ERR_NONE){
                 APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
         }
-        // Distribute commands to tasks
-/*        packet[actual].isAvailable = false;*/
-/*        switch (packet[actual].port){*/
-/*            case '1':       // P1.1 -> AKA LED1*/
-/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm1_TCB,*/
-/*                            (void      *) &packet[actual],*/
-/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
-/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
-/*                            (OS_ERR    *) &err);*/
-/*                if (err != OS_ERR_NONE){*/
-/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");*/
-/*                    packet[actual].isAvailable = true;*/
-/*                    SendNack();*/
-/*                }else{*/
-/*                   actual++;*/
-/*                   SendAck();*/
-/*                }*/
-/*                break;*/
-/*            case '2':       // P1.0 -> AKA LED2*/
-/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm2_TCB,*/
-/*                            (void      *) &packet[actual],*/
-/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
-/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
-/*                            (OS_ERR    *) &err);*/
-/*                if (err != OS_ERR_NONE){*/
-/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm2\n");*/
-/*                    packet[actual].isAvailable = true;*/
-/*                    SendNack();*/
-/*                }else{*/
-/*                   actual++;*/
-/*                   SendAck();*/
-/*                }*/
-/*                break;*/
-/*            case '3':       // P5.1*/
-/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm3_TCB,*/
-/*                            (void      *) &packet[actual],*/
-/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
-/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
-/*                            (OS_ERR    *) &err);*/
-/*                if (err != OS_ERR_NONE){*/
-/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm3\n");*/
-/*                    packet[actual].isAvailable = true;*/
-/*                    SendNack();*/
-/*                }else{*/
-/*                   actual++;*/
-/*                   SendAck();*/
-/*                }*/
-/*                break;*/
-/*            case '4':       // P5.7*/
-/*                OSTaskQPost((OS_TCB    *) &AppTaskPwm4_TCB,*/
-/*                            (void      *) &packet[actual],*/
-/*                            (OS_MSG_SIZE) sizeof(packet[actual]),*/
-/*                            (OS_OPT     ) OS_OPT_POST_FIFO,*/
-/*                            (OS_ERR    *) &err);*/
-/*                if (err != OS_ERR_NONE){*/
-/*                    APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm4\n");*/
-/*                    packet[actual].isAvailable = true;*/
-/*                    SendNack();*/
-/*                }else{*/
-/*                   actual++;*/
-/*                   SendAck();*/
-/*                }*/
-/*                break;*/
-/*            default:*/
-/*                SendNack();*/
-/*        }*/
 
         APP_TRACE_INFO ("=======================\n");
     }
@@ -445,217 +372,144 @@ static void AppTaskPwm (void *p_arg){
     COORDINATES volatile *packet;
     OS_MSG_SIZE msg_size;
     //const uint8_t *pwm_pin = (uint8_t *) p_arg;
-    uint16_t count;
-    uint8_t motor_direction;
+    uint8_t motor_direction = 0x02;
     
+    if(_init_spi() != SPI_OK)
+        APP_TRACE_DBG("Error Initialising SPI\n");
+  
     //APP_TRACE_INFO ("AppTaskPwm Loop...\n");
     _mcp23s08_reset();
-  
+
     _mcp23s08_reset_ss(MCP23S08_SS);
     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
     _mcp23s08_set_ss(MCP23S08_SS);
     
+      volatile uint32_t counter = 0xfff;
+    APP_TRACE_INFO ("AppTaskPwm Loop...\n");
     while (DEF_ON){
+
         packet = (COORDINATES volatile *)OSTaskQPend (0,
                                                       OS_OPT_PEND_BLOCKING,
                                                       &msg_size,
                                                       NULL,
                                                       &err);
-        if (err != OS_ERR_NONE && err != OS_ERR_TIMEOUT)
+        if (err != OS_ERR_NONE)
             APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");
         
-        
-        if (packet->x_axis != 0)
-        {
+       APP_TRACE_INFO ("Trying to step up...\n");
+
+        if (packet->x_axis != 0){
+           APP_TRACE_INFO ("inside if...\n");
             if (packet->x_axis < 0){
                 motor_direction = 0x02;
-            }
-            else{
+                packet->x_axis = -packet->x_axis;
+            } else{
                 motor_direction = 0x03;
             }
-            count = 0;
-            while(1)
-            {
+
+            for(uint16_t count = 0; count < packet->x_axis; count++){
+
                 _mcp23s08_reset_ss(MCP23S08_SS);
                 _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
                 _mcp23s08_set_ss(MCP23S08_SS);
-                OSTimeDlyHMSM(0,
-                            0,
-                            0,
-                            200,
-                            OS_OPT_TIME_HMSM_STRICT,
-                            &err);
+
+                while(--counter);
+                counter = 0xfff;
 
 
                 _mcp23s08_reset_ss(MCP23S08_SS);
                 _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                 _mcp23s08_set_ss(MCP23S08_SS);
-                OSTimeDlyHMSM(0,
-                            0,
-                            0,
-                            200,
-                            OS_OPT_TIME_HMSM_STRICT,
-                            &err);
-                count++;
-                if (count == packet->x_axis){
-                    break;
-                }
             }
         }
-/*        // Configure different Tasks for the same code*/
-/*        APP_TRACE_INFO ("===============================================================\n");*/
-/*        switch (*pwm_pin){*/
-/*            case 1:       // P1.1 -> AKA LED1*/
-/*                compare = (uint16_t)((100 - packet->duty) * 11.71);*/
-/*                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);*/
-/*                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);*/
-/*                break;*/
-/*            case 2:       // P1.0 -> AKA LED2*/
-/*                compare = (uint16_t)((100 - packet->duty) * 11.71);*/
-/*                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_D, compare);*/
-/*                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_D);*/
-/*                break;*/
-/*            case 3:       // P5.1*/
-/*                compare = (uint16_t)((100 - packet->duty) * 24);*/
-/*                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_A, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);*/
-/*                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_A);*/
-/*                break;*/
-/*            case 4:       // P5.7*/
-/*                compare = (uint16_t)((100 - packet->duty) * 24);*/
-/*                XMC_CCU8_SLICE_SetTimerCompareMatch(SLICE_CCU8_B, XMC_CCU8_SLICE_COMPARE_CHANNEL_2, compare);*/
-/*                XMC_CCU8_EnableShadowTransfer(MODULE_CCU8, SLICE_TRANSFER_B);*/
-/*                break;*/
-/*            default:*/
-/*                    APP_TRACE_DBG ("eu aqui\n");*/
-/*                SendNack();*/
-/*        }*/
-
-/*        packet->isAvailable = true;*/
     }
 }
 
-static void AppTaskEndpoints (void *p_arg){
-    uint8_t reg_val = 0;
-    XMC_GPIO_CONFIG_t gpio_config;
-    OS_ERR err;
-    
-    if(_init_spi()!=SPI_OK)
-    {
-        /*Error should never get here*/
-    }
-    
-    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+//static void AppTaskEndpoints (void *p_arg){
+//    uint8_t reg_val = 0;
+//    XMC_GPIO_CONFIG_t gpio_config;
+//    OS_ERR err;
+//    
+//    if(_init_spi()!=SPI_OK)
+//    {
+//        /*Error should never get here*/
+//    }
+//    
+//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+//
+//    XMC_GPIO_Init(D5, &gpio_config);
+//    XMC_GPIO_SetOutputHigh(D5);
+//
+//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+//
+//    XMC_GPIO_Init(D6, &gpio_config);
+//    XMC_GPIO_SetOutputHigh(D6);
+//
+//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+//
+//    XMC_GPIO_Init(D7, &gpio_config);
+//    XMC_GPIO_SetOutputHigh(D7);
+//
+//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
+//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
+//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
+//
+//    XMC_GPIO_Init(D8, &gpio_config);
+//    XMC_GPIO_SetOutputHigh(D8);
+//
+//    _mcp23s08_reset();
+//    
+///*    _mcp23s08_reset_ss(MCP23S08_SS);*/
+///*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);*/
+///*    _mcp23s08_set_ss(MCP23S08_SS);*/
+//    
+//    APP_TRACE_INFO ("AppTaskEndpoints Loop...\n");
+//    while(DEF_ON){
+//        _mcp23s08_reset_ss(MCP23S08_SS);
+//        reg_val = _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0,MCP23S08_RD);
+//        _mcp23s08_set_ss(MCP23S08_SS);
+//
+//        if(reg_val == ENDPOINT_1)
+//        {
+//            XMC_GPIO_SetOutputHigh(D5);
+//            XMC_GPIO_SetOutputLow(D6);
+//            XMC_GPIO_SetOutputHigh(D7);
+//            XMC_GPIO_SetOutputHigh(D8);
+//        }
+//        if(reg_val == ENDPOINT_2)
+//        {
+//            XMC_GPIO_SetOutputLow(D5);
+//            XMC_GPIO_SetOutputHigh(D6);
+//            XMC_GPIO_SetOutputHigh(D7);
+//            XMC_GPIO_SetOutputHigh(D8);
+//        }
+//        if(reg_val == ENDPOINT_3)
+//        {
+//            XMC_GPIO_SetOutputHigh(D5);
+//            XMC_GPIO_SetOutputHigh(D6);
+//            XMC_GPIO_SetOutputLow(D7);
+//            XMC_GPIO_SetOutputHigh(D8);
+//        }
+//        if(reg_val == ENDPOINT_4)
+//        {
+//            XMC_GPIO_SetOutputHigh(D5);
+//            XMC_GPIO_SetOutputHigh(D6);
+//            XMC_GPIO_SetOutputHigh(D7);
+//            XMC_GPIO_SetOutputLow(D8);
+//        }
+//        OSTimeDlyHMSM(0,
+//                      0,
+//                      0,
+//                      10,
+//                      OS_OPT_TIME_HMSM_STRICT,
+//                      &err);
+//    }
+//}
 
-    XMC_GPIO_Init(D5, &gpio_config);
-    XMC_GPIO_SetOutputHigh(D5);
-
-    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-
-    XMC_GPIO_Init(D6, &gpio_config);
-    XMC_GPIO_SetOutputHigh(D6);
-
-    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-
-    XMC_GPIO_Init(D7, &gpio_config);
-    XMC_GPIO_SetOutputHigh(D7);
-
-    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-
-    XMC_GPIO_Init(D8, &gpio_config);
-    XMC_GPIO_SetOutputHigh(D8);
-
-    _mcp23s08_reset();
-    
-/*    _mcp23s08_reset_ss(MCP23S08_SS);*/
-/*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);*/
-/*    _mcp23s08_set_ss(MCP23S08_SS);*/
-    
-    while(DEF_ON){
-        _mcp23s08_reset_ss(MCP23S08_SS);
-        reg_val = _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0,MCP23S08_RD);
-        _mcp23s08_set_ss(MCP23S08_SS);
-
-        if(reg_val == ENDPOINT_1)
-        {
-            XMC_GPIO_SetOutputHigh(D5);
-            XMC_GPIO_SetOutputLow(D6);
-            XMC_GPIO_SetOutputHigh(D7);
-            XMC_GPIO_SetOutputHigh(D8);
-        }
-        if(reg_val == ENDPOINT_2)
-        {
-            XMC_GPIO_SetOutputLow(D5);
-            XMC_GPIO_SetOutputHigh(D6);
-            XMC_GPIO_SetOutputHigh(D7);
-            XMC_GPIO_SetOutputHigh(D8);
-        }
-        if(reg_val == ENDPOINT_3)
-        {
-            XMC_GPIO_SetOutputHigh(D5);
-            XMC_GPIO_SetOutputHigh(D6);
-            XMC_GPIO_SetOutputLow(D7);
-            XMC_GPIO_SetOutputHigh(D8);
-        }
-        if(reg_val == ENDPOINT_4)
-        {
-            XMC_GPIO_SetOutputHigh(D5);
-            XMC_GPIO_SetOutputHigh(D6);
-            XMC_GPIO_SetOutputHigh(D7);
-            XMC_GPIO_SetOutputLow(D8);
-        }
-        OSTimeDlyHMSM(0,
-                      0,
-                      0,
-                      10,
-                      OS_OPT_TIME_HMSM_STRICT,
-                      &err);
-    }
-}
-
-void motor_drive(void){
-  OS_ERR err;
-  
-  _mcp23s08_reset();
-  
-  _mcp23s08_reset_ss(MCP23S08_SS);
-  _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
-  _mcp23s08_set_ss(MCP23S08_SS);
-
-  _mcp23s08_reset_ss(MCP23S08_SS);
-  _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x04,MCP23S08_WR);
-  _mcp23s08_set_ss(MCP23S08_SS);
-
-
-  while(1)
-  {
-    _mcp23s08_reset_ss(MCP23S08_SS);
-    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x08,MCP23S08_WR);
-    _mcp23s08_set_ss(MCP23S08_SS);
-    OSTimeDlyHMSM(0,
-                0,
-                0,
-                200,
-                OS_OPT_TIME_HMSM_STRICT,
-                &err);
-
-
-    _mcp23s08_reset_ss(MCP23S08_SS);
-    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-    _mcp23s08_set_ss(MCP23S08_SS);
-    OSTimeDlyHMSM(0,
-                0,
-                0,
-                200,
-                OS_OPT_TIME_HMSM_STRICT,
-                &err);
-  }
-}
 /************************************************************************ EOF */
