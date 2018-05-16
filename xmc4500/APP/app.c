@@ -88,7 +88,7 @@ static void AppTaskStart (void *p_arg);
 static void AppTaskCom   (void *p_arg);
 static void AppTaskPwm   (void *p_arg);
 static void AppTaskEndpoints(void *p_arg);
-
+void motor_drive(void);
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -313,23 +313,6 @@ static void AppTaskCom (void *p_arg){
         // empty the message buffer
         memset (&msg, 0, MAX_MSG_LENGTH);
 
-        // Make sure there is always at least one packet of memory available for a eventual message
-/*        actual = actual % (NUM_MSG + 1);*/
-/*        actual_ = actual;*/
-/*        while (!packet[actual].isAvailable){ // #packets > NUM_MSG => this loop should never block*/
-/*            actual++;*/
-/*            actual = actual % (NUM_MSG + 1);*/
-/*            if (actual_ == actual){*/
-/*                actual_ = NUM_MSG + 1;*/
-/*                break;*/
-/*            }*/
-/*        }*/
-
-/*        if (actual_ == NUM_MSG +1){ // i.e. there's no packet of memory available*/
-/*            APP_TRACE_INFO ("SENDING MSGS TOO FAST\n"); // NEVER HAPPENED DURING TESTS =) but who knows?!*/
-/*            continue;*/
-/*        }*/
-
         // Check if there is message
         p_msg = OSQPend (&UART_QUEUE,
                          0,
@@ -363,7 +346,17 @@ static void AppTaskCom (void *p_arg){
             SendNack();
             continue;
         }
-
+        
+        if (packet.pos_mode == 1){
+            OSTaskQPost((OS_TCB    *) &AppTaskPwm1_TCB,
+                (void      *) &packet,
+                (OS_MSG_SIZE) sizeof(packet),
+                (OS_OPT     ) OS_OPT_POST_FIFO,
+                (OS_ERR    *) &err);
+        }
+            if (err != OS_ERR_NONE){
+                APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
+        }
         // Distribute commands to tasks
 /*        packet[actual].isAvailable = false;*/
 /*        switch (packet[actual].port){*/
@@ -446,23 +439,69 @@ static void AppTaskCom (void *p_arg){
  *        in the respective pin.
  */
 
-static void AppTaskEndpoints (void *p_arg){}
-/*    OS_ERR      err;*/
-/*    uint16_t volatile compare;*/
-/*    UART_PACKET volatile *packet;*/
-/*    OS_MSG_SIZE msg_size;*/
-/*    const uint8_t *pwm_pin = (uint8_t *) p_arg;*/
+static void AppTaskPwm (void *p_arg){
+    OS_ERR      err;
+    //uint16_t volatile compare;
+    COORDINATES volatile *packet;
+    OS_MSG_SIZE msg_size;
+    //const uint8_t *pwm_pin = (uint8_t *) p_arg;
+    uint16_t count;
+    uint8_t motor_direction;
+    
+    //APP_TRACE_INFO ("AppTaskPwm Loop...\n");
+    _mcp23s08_reset();
+  
+    _mcp23s08_reset_ss(MCP23S08_SS);
+    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
+    _mcp23s08_set_ss(MCP23S08_SS);
+    
+    while (DEF_ON){
+        packet = (COORDINATES volatile *)OSTaskQPend (0,
+                                                      OS_OPT_PEND_BLOCKING,
+                                                      &msg_size,
+                                                      NULL,
+                                                      &err);
+        if (err != OS_ERR_NONE && err != OS_ERR_TIMEOUT)
+            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");
+        
+        
+        if (packet->x_axis != 0)
+        {
+            if (packet->x_axis < 0){
+                motor_direction = 0x02;
+            }
+            else{
+                motor_direction = 0x03;
+            }
+            count = 0;
+            while(1)
+            {
+                _mcp23s08_reset_ss(MCP23S08_SS);
+                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
+                _mcp23s08_set_ss(MCP23S08_SS);
+                OSTimeDlyHMSM(0,
+                            0,
+                            0,
+                            200,
+                            OS_OPT_TIME_HMSM_STRICT,
+                            &err);
 
-/*    APP_TRACE_INFO ("AppTaskPwm Loop...\n");*/
-/*    while (DEF_ON){*/
-/*        packet = (UART_PACKET volatile *)OSTaskQPend (0,*/
-/*                                                      OS_OPT_PEND_BLOCKING,*/
-/*                                                      &msg_size,*/
-/*                                                      NULL,*/
-/*                                                      &err);*/
-/*        if (err != OS_ERR_NONE && err != OS_ERR_TIMEOUT)*/
-/*            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");*/
-/*       */
+
+                _mcp23s08_reset_ss(MCP23S08_SS);
+                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                _mcp23s08_set_ss(MCP23S08_SS);
+                OSTimeDlyHMSM(0,
+                            0,
+                            0,
+                            200,
+                            OS_OPT_TIME_HMSM_STRICT,
+                            &err);
+                count++;
+                if (count == packet->x_axis){
+                    break;
+                }
+            }
+        }
 /*        // Configure different Tasks for the same code*/
 /*        APP_TRACE_INFO ("===============================================================\n");*/
 /*        switch (*pwm_pin){*/
@@ -492,10 +531,10 @@ static void AppTaskEndpoints (void *p_arg){}
 /*        }*/
 
 /*        packet->isAvailable = true;*/
-/*    }*/
-/*}*/
+    }
+}
 
-static void AppTaskPwm (void *p_arg){
+static void AppTaskEndpoints (void *p_arg){
     uint8_t reg_val = 0;
     XMC_GPIO_CONFIG_t gpio_config;
     OS_ERR err;
@@ -535,9 +574,9 @@ static void AppTaskPwm (void *p_arg){
 
     _mcp23s08_reset();
     
-    _mcp23s08_reset_ss(MCP23S08_SS);
-    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);
-    _mcp23s08_set_ss(MCP23S08_SS);
+/*    _mcp23s08_reset_ss(MCP23S08_SS);*/
+/*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);*/
+/*    _mcp23s08_set_ss(MCP23S08_SS);*/
     
     while(DEF_ON){
         _mcp23s08_reset_ss(MCP23S08_SS);
@@ -579,5 +618,44 @@ static void AppTaskPwm (void *p_arg){
                       OS_OPT_TIME_HMSM_STRICT,
                       &err);
     }
+}
+
+void motor_drive(void){
+  OS_ERR err;
+  
+  _mcp23s08_reset();
+  
+  _mcp23s08_reset_ss(MCP23S08_SS);
+  _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
+  _mcp23s08_set_ss(MCP23S08_SS);
+
+  _mcp23s08_reset_ss(MCP23S08_SS);
+  _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x04,MCP23S08_WR);
+  _mcp23s08_set_ss(MCP23S08_SS);
+
+
+  while(1)
+  {
+    _mcp23s08_reset_ss(MCP23S08_SS);
+    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x08,MCP23S08_WR);
+    _mcp23s08_set_ss(MCP23S08_SS);
+    OSTimeDlyHMSM(0,
+                0,
+                0,
+                200,
+                OS_OPT_TIME_HMSM_STRICT,
+                &err);
+
+
+    _mcp23s08_reset_ss(MCP23S08_SS);
+    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+    _mcp23s08_set_ss(MCP23S08_SS);
+    OSTimeDlyHMSM(0,
+                0,
+                0,
+                200,
+                OS_OPT_TIME_HMSM_STRICT,
+                &err);
+  }
 }
 /************************************************************************ EOF */

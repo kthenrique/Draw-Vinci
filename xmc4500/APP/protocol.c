@@ -61,9 +61,9 @@ bool scrutinise(char *str, volatile COORDINATES *packet){
 
             packet->speed = strtol((const char *)&token_ptr[1], &endptr, 10);
         }
-        else{
-            return false;
-        }
+/*        else{*/
+/*            return false;*/
+/*        }*/
         token_ptr = strtok(NULL, delim);
         if (token_ptr == NULL){
             break;

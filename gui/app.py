@@ -288,34 +288,34 @@ class AppWindow(QMainWindow):
 
     def goUp(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:Y10$')
+            self.sendSingleMsg('#G1:Y10:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goDown(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:Y-10$')
+            self.sendSingleMsg('#G1:Y-10:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goLeft(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:X-10$')
+            self.sendSingleMsg('#X-10:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goRight(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G1:X10$')
+            self.sendSingleMsg('#X10:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def togglePen(self):
         if self.ui.playButton.isChecked():
             if self.ui.penButton.isChecked():
-                self.sendSingleMsg('#G1:Z1$')
+                self.sendSingleMsg('#G1:Z1:$')
             else:
-                self.sendSingleMsg('#G1:Z0$')
+                self.sendSingleMsg('#G1:Z0:$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
