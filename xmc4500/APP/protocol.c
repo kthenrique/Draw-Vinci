@@ -17,15 +17,8 @@
 bool scrutinise(char *str, volatile COORDINATES *packet){
     char *endptr = NULL;
     char *token_ptr = NULL;
-    //uint8_t i;
-    //char *sav_p;
     const char delim[] = ":";
-    //char *str_;
 
-/*    for (i = 0, str_ = str; i != 6; i++, str_ = NULL){*/
-/*        pieces[i] = strtok_r(str_, delim, &sav_p); // using strtok_r for reentrancy*/
-/*        if (pieces[i] == NULL) break;*/
-/*    }*/
     APP_TRACE_INFO ("Separated in tokens ...\n");
     token_ptr = strtok(str, delim);
     while(1){

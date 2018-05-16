@@ -368,23 +368,22 @@ static void AppTaskCom (void *p_arg){
 
 static void AppTaskPwm (void *p_arg){
     OS_ERR      err;
-    //uint16_t volatile compare;
     COORDINATES volatile *packet;
     OS_MSG_SIZE msg_size;
-    //const uint8_t *pwm_pin = (uint8_t *) p_arg;
     uint8_t motor_direction = 0x02;
-    
+    uint16_t count;
+    uint16_t motor_steps;
+
     if(_init_spi() != SPI_OK)
         APP_TRACE_DBG("Error Initialising SPI\n");
-  
-    //APP_TRACE_INFO ("AppTaskPwm Loop...\n");
+
     _mcp23s08_reset();
 
     _mcp23s08_reset_ss(MCP23S08_SS);
     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
     _mcp23s08_set_ss(MCP23S08_SS);
     
-      volatile uint32_t counter = 0xfff;
+    volatile uint32_t counter = 0xfff;
     APP_TRACE_INFO ("AppTaskPwm Loop...\n");
     while (DEF_ON){
 
@@ -398,16 +397,28 @@ static void AppTaskPwm (void *p_arg){
         
        APP_TRACE_INFO ("Trying to step up...\n");
 
-        if (packet->x_axis != 0){
-           APP_TRACE_INFO ("inside if...\n");
+        if ((packet->x_axis != 0) || (packet->y_axis != 0)){
+            APP_TRACE_INFO ("inside if...\n");
             if (packet->x_axis < 0){
                 motor_direction = 0x02;
-                packet->x_axis = -packet->x_axis;
-            } else{
+                motor_steps = -packet->x_axis;
+            } else
+                if (packet->x_axis > 0){
                 motor_direction = 0x03;
+                motor_steps = packet->x_axis;
             }
+            if (packet->y_axis < 0){
+                    motor_direction = 0x08;
+                    motor_steps = -packet->y_axis;
+                } else
+                    if (packet->y_axis > 0){
+                    motor_direction = 0x0C;
+                    motor_steps = packet->y_axis;
+                }
+            packet->x_axis = 0;
+            packet->y_axis = 0;
 
-            for(uint16_t count = 0; count < packet->x_axis; count++){
+            for(count = 0; count < motor_steps; count++){
 
                 _mcp23s08_reset_ss(MCP23S08_SS);
                 _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
@@ -415,7 +426,6 @@ static void AppTaskPwm (void *p_arg){
 
                 while(--counter);
                 counter = 0xfff;
-
 
                 _mcp23s08_reset_ss(MCP23S08_SS);
                 _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
