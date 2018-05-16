@@ -14,8 +14,9 @@
 
 from PyQt5.QtCore import QFile, QIODevice
 from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
-        QGraphicsLineItem, QGraphicsPolygonItem, QGraphicsPathItem)
-from PyQt5.QtGui import QPolygonF, QPainterPath
+        QGraphicsLineItem, QGraphicsPolygonItem, QGraphicsPathItem,
+        QGraphicsTextItem)
+from PyQt5.QtGui import QPolygonF, QPainterPath, QFont
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
 
@@ -152,6 +153,29 @@ class parser():
 
                 newCanvasPat.setPath(newPat)
                 listOfItems.append(newCanvasPat)
+
+            # text
+            tex = gNode.firstChildElement('text')
+            if not tex.hasAttributes():
+                pass
+            else:
+                print("text")
+
+                x     = float(tex.attribute('x'))
+                y     = float(tex.attribute('y'))
+                font  = tex.attribute('font-family')
+                size  = float(tex.attribute('font-size'))
+                weight= float(tex.attribute('font-weight'))
+                style = tex.attribute('font-style')
+                isItalic = False
+                if style == 'italic':
+                    isItalic = True
+
+                newCanvasTex = QGraphicsTextItem(tex.text())
+                newCanvasTex.setFont(QFont(font, size, weight, isItalic))
+                newCanvasTex.setPos(x,y)
+
+                listOfItems.append(newCanvasTex)
 
         file_.close()
         return listOfItems
