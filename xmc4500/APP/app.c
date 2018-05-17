@@ -65,6 +65,11 @@
 #define D6 P1_13
 #define D7 P1_14
 #define D8 P1_12
+
+#define X_AXIS_POS 0x03
+#define X_AXIS_NEG 0x02
+#define Y_AXIS_POS 0x0C
+#define Y_AXIS_NEG 0x08
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
@@ -400,19 +405,19 @@ static void AppTaskPwm (void *p_arg){
         if ((packet->x_axis != 0) || (packet->y_axis != 0)){
             APP_TRACE_INFO ("inside if...\n");
             if (packet->x_axis < 0){
-                motor_direction = 0x02;
+                motor_direction = X_AXIS_NEG;
                 motor_steps = -packet->x_axis;
             } else
                 if (packet->x_axis > 0){
-                motor_direction = 0x03;
+                motor_direction = X_AXIS_POS;
                 motor_steps = packet->x_axis;
             }
             if (packet->y_axis < 0){
-                    motor_direction = 0x08;
+                    motor_direction = Y_AXIS_NEG;
                     motor_steps = -packet->y_axis;
                 } else
                     if (packet->y_axis > 0){
-                    motor_direction = 0x0C;
+                    motor_direction = Y_AXIS_POS;
                     motor_steps = packet->y_axis;
                 }
             packet->x_axis = 0;
