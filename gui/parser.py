@@ -5,14 +5,14 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 15
+# -- Last update: 2018 Mai 18
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
 # --                 - transform it in QGraphicsItem's
 # ----------------------------------------------------------------------------
 
-from PyQt5.QtCore import QFile, QIODevice
+from PyQt5.QtCore import QFile, QIODevice, QPointF
 from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
         QGraphicsLineItem, QGraphicsPolygonItem, QGraphicsPathItem,
         QGraphicsTextItem)
@@ -114,10 +114,10 @@ class parser():
 
             # path
             pat = gNode.firstChildElement('path')
+            newPat       = QPainterPath()
+            newCanvasPat = QGraphicsPathItem()
             while not pat.isNull():
                 print("path")
-                newPat       = QPainterPath()
-                newCanvasPat = QGraphicsPathItem()
 
                 paths = (pat.attribute('d'))
 
@@ -127,81 +127,111 @@ class parser():
 
                 print(paths)
                 paths = paths.split()
-                currentCoord = [50,50]
-                lastCtrlPoint= None
+                lastCubicCtrl = None
+                lastQuadCtrl = None
                 for path in paths:
                     print(path)
                     coord = path[1:]
-                    coor = coord.replace('-', ' -')
-                    coor = coor.replace(',', ' ')
-                    coor = coor.split()
-                    coord = coor
+                    coord = coord.replace('-', ' -')
+                    coord = coord.replace(',', ' ')
+                    coord = coord.split()
+                    for index in range(len(coord)):  # Convert str to float
+                        print(coord[index])
+                        coord[index] = float(coord[index])
                     print(coord)
-                    print(currentCoord)
                     if path[0]   == 'M':        # moveTo
-                        currentCoord[0] = float(coord[0])
-                        currentCoord[1] = float(coord[1])
-                        newPat.moveTo(currentCoord[0], currentCoord[1])
+                        newPat.moveTo(coord[0], coord[1])
                     elif path[0] == 'm':        # moveTo relative
-                        currentCoord[0] = currentCoord[0] + float(coord[0])
-                        currentCoord[1] = currentCoord[1] + float(coord[1])
-                        newPat.moveTo(currentCoord[0], currentCoord[1])
+                        newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     elif path[0] == 'L':        # lineTo
-                        currentCoord[0] = float(coord[0])
-                        currentCoord[1] = float(coord[1])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(coord[0], coord[1])
                     elif path[0] == 'l':        # lineTo relative
-                        currentCoord[0] = currentCoord[0] + float(coord[0])
-                        currentCoord[1] = currentCoord[1] + float(coord[1])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     elif path[0] == 'H':        # horizontal lineTo
-                        currentCoord[0] = float(coord[0])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(coord[0], newPat.currentPosition().y())
                     elif path[0] == 'h':        # horizontal lineTo relative
-                        currentCoord[0] = currentCoord[0] + float(coord[0])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     elif path[0] == 'V':        # vertical lineTo
-                        currentCoord[1] = float(coord[0])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(newPat.currentPosition().x(), coord[0])
                     elif path[0] == 'v':        # vertical lineTo relative
-                        currentCoord[1] = currentCoord[1] + float(coord[0])
-                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                        newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     elif path[0] == 'C':        # curveto
-                        currentCoord[0] = float(coord[4])
-                        currentCoord[1] = float(coord[5])
-                        newPat.cubicTo(float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]), currentCoord[0], currentCoord[1])
-                        lastCtrlPoint= [float(coord[2]), float(coord[3])]
+                        lastCubicCtrl = QPointF(coord[2], coord[3])
+                        newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
+                        print(lastCubicCtrl)
+                        Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
+                        print(Ctrl)
                     elif path[0] == 'c':        # curveto relative
-                        currentCoord[0] = currentCoord[0] + float(coord[4])
-                        currentCoord[1] = currentCoord[1] + float(coord[5])
-                        newPat.cubicTo(float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]), currentCoord[0], currentCoord[1])
-                        lastCtrlPoint= [float(coord[2]), float(coord[3])]
+                        lastCubicCtrl = newPat.currentPosition()+QPointF(coord[2], coord[3])
+                        newPat.cubicTo(newPat.currentPosition()+QPointF(coord[0],coord[1]),\
+                                       newPat.currentPosition()+QPointF(coord[2],coord[3]),\
+                                       newPat.currentPosition()+QPointF(coord[4],coord[5]))
+                        print(lastCubicCtrl)
+                        Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
+                        print(Ctrl)
                     elif path[0] == 'S':        # smooth curveto
-                        if lastCtrlPoint:
-                            currentCoord[0] = float(coord[2])
-                            currentCoord[1] = float(coord[3])
-                            newPat.cubicTo(float(lastCtrlPoint[0]), lastCtrlPoint[1], float(coord[0]), float(coord[1]), currentCoord[0], currentCoord[1])
+                        if lastCubicCtrl:
+                            Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
+                            lastCubicCtrl = QPointF(coord[0], coord[1])
+                            newPat.cubicTo(Ctrl,\
+                                           QPointF(coord[0], coord[1]),\
+                                           QPointF(coord[2], coord[3]))
+                            print('smooth absolute ==============================================================')
                         else:
-                            newPat.cubicTo(currentCoord[0], currentCoord[1], float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]))
-                            currentCoord[0] = float(coord[2])
-                            currentCoord[1] = float(coord[3])
+                            print('smooth absolute without first control ==============================================================')
+                            newPat.cubicTo(newPat.currentPosition().x(),\
+                                           newPat.currentPosition().y(),\
+                                           coord[0], coord[1],\
+                                           coord[2], coord[3])
+                        print(lastCubicCtrl)
+                        print(Ctrl)
                     elif path[0] == 's':        # smooth curveto relative
-                        if lastCtrlPoint:
-                            currentCoord[0] = currentCoord[0] + float(coord[2])
-                            currentCoord[1] = currentCoord[1] + float(coord[3])
-                            newPat.cubicTo(float(lastCtrlPoint[0]), lastCtrlPoint[1], float(coord[0]), float(coord[1]), currentCoord[0], currentCoord[1])
+                        if lastCubicCtrl:
+                            Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
+                            lastCubicCtrl = QPointF(newPat.currentPosition().x()+coord[0],\
+                                                    newPat.currentPosition().y()+coord[1])
+                            newPat.cubicTo(Ctrl.x(),\
+                                           Ctrl.y(),\
+                                           newPat.currentPosition().x()+coord[0],\
+                                           newPat.currentPosition().y()+coord[1],\
+                                           newPat.currentPosition().x()+coord[2],\
+                                           newPat.currentPosition().y()+coord[3])
+                            print('smooth relative ==============================================================')
                         else:
-                            newPat.cubicTo(currentCoord[0], currentCoord[1], float(coord[0]), float(coord[1]), currentCoord[0] + float(coord[2]), currentCoord[0] + float(coord[2]))
-                            currentCoord[0] = currentCoord[0] + float(coord[2])
-                            currentCoord[1] = currentCoord[1] + float(coord[3])
+                            print('smooth relative without first control ==============================================================')
+                            newPat.cubicTo(newPat.currentPosition().x(),\
+                                           newPat.currentPosition().y(),\
+                                           newPat.currentPosition().x()+coord[0],\
+                                           newPat.currentPosition().y()+coord[1],\
+                                           newPat.currentPosition().x()+coord[2],\
+                                           newPat.currentPosition().y()+coord[3])
+                        print(lastCubicCtrl)
+                        print(Ctrl)
                     elif path[0] == 'Q':        # quadratic Bézier curve
-                        pass
+                        newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
+                        lastQuadCtrl = QPointF(coord[0], coord[1])
                     elif path[0] == 'q':        # quadratic Bézier curve relative
-                        pass
+                        newPat.quadTo(newPat.currentPosition()+QPointf(coord[0], coord[1]),\
+                                      newPat.currentPosition()+QPointf(coord[2], coord[3]))
+                        lastQuadCtrl = QPointF(coord[0], coord[1])
                     elif path[0] == 'T':        # smooth quadratic Bézier curveto
-                        pass
+                        if lastQuadCtrl:
+                            Ctrl = newPat.currentPosition() - (lastQuadCtrl-newPat.currentPosition())
+                            newPat.quadTo(Ctrl, QPointF(coord[0], coord[1]))
+                            lastQuadCtrl = Ctrl
+                        else:
+                            newPat.quadTo(newPat.currentPosition(),\
+                                          QPointF(coord[0], coord[1]))
+                            lastQuadCtrl = newPat.currentPosition()
                     elif path[0] == 't':        # smooth quadratic Bézier curveto relative
-                        pass
+                        if lastQuadCtrl:
+                            Ctrl = newPat.currentPosition() - (lastQuadCtrl-newPat.currentPosition())
+                            newPat.quadTo(Ctrl, newPat.currentPosition()+QPointF(coord[0], coord[1]))
+                            lastQuadCtrl = Ctrl
+                        else:
+                            newPat.quadTo(newPat.currentPosition(),\
+                                          newPat.currentPosition()+QPointF(coord[0], coord[1]))
+                            lastQuadCtrl = newPat.currentPosition()
                     elif path[0] == 'A':        # elliptical arc
                         pass
                     elif path[0] == 'a':        # elliptical arc relative
@@ -210,6 +240,9 @@ class parser():
                         newPat.closeSubpath()
                     else:
                         print('Strange Command at path tag in SVG file')
+
+                    print(newPat.currentPosition())
+                    print('\n')
 
                 newCanvasPat.setPath(newPat)
                 listOfItems.append(newCanvasPat)
