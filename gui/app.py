@@ -323,16 +323,17 @@ class AppWindow(QMainWindow):
         pass
 
     def openFile(self):
-        path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)") 
-        if not path:
-            return
+        path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
 
         self.path = str(path[0])
         self.scene.clear()
 
         parsed = self.parser.getElements(self.path)
-        for element in parsed:
-            self.scene.addItem(element)
+        if parsed:
+            self.isSaved = True
+            self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
+            for element in parsed:
+                self.scene.addItem(element)
 
     def newFile(self):
         pass
@@ -371,7 +372,7 @@ class AppWindow(QMainWindow):
             painter.begin(generator)
             self.scene.render(painter)
             painter.end()
-            self.artworkLabel.setText(str(path[0]).split('/')[-1]) # need improvement here: doesn't work for window =(
+            self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
             self.isSaved = True
 
     def saveFileAs(self):
