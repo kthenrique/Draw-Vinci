@@ -61,6 +61,7 @@ Possible commands:
 . #G90$             : Plotter will interprete all subsequent commands as absolute movements.
 . #G91$             : Plotter will interprete all subsequent commands as relative to the current position.
 . #G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.
+. #G01:ZK$          : Plotter's pen will lift up (K = 1) or drop (K = 0).
 . #G02:XA:YB:IC:JD$ : Plotter will move in a circular way to the point (A, B), taking as reference the center at (A+C, B+D) - relative or absolute.
 
 === Error Table

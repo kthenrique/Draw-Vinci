@@ -28,13 +28,22 @@ class parser():
     def __init__(self):
         pass
 
-    def getElements(self, filename):
-        listOfItems = []                      # list of rectangles items
+    def getElements(self, filename, mode = 1):
+        if not mode:
+            g_code_path = filename.replace('.svg', '.gcode')
+            g_code = open(g_code_path, mode ='w', encoding='utf-8')
+            text  = '#G28$\n'+\
+                    '#G90$\n'
+            g_code.write(text)
+
+        listOfItems = []                      # list of items
         doc         = QDomDocument()          # file to parse
         file_       = QFile(filename)         # open svg file
 
         if not file_.open(QIODevice.ReadOnly) or not doc.setContent(file_):    # if couldn't open or failed to make i QDomDocument
-            print("Couldn't open or failed to make th DomDoc")
+            print("Couldn't open or failed to make DomDoc")
+            if not mode:
+                g_code.close()
             return False
 
         # Acquiring viewBox dimenstions
@@ -47,23 +56,39 @@ class parser():
         dy_scale = viewBox[3]-viewBox[1]
         print(dx_scale, dy_scale)
 
-        gList      = doc.elementsByTagName('g')                  # DomNodeList with g tagged elements
+        gList = doc.elementsByTagName('g')
         print(gList.length())
         for index in range(0, gList.length()):
-            gNode = gList.item(index)                            # DomNode
+            gNode = gList.item(index)
 
             # rectangles
-            rect = gNode.firstChildElement('rect')               # DomElement
+            rect = gNode.firstChildElement('rect')
             while not rect.isNull():
                 print("rectangle")
                 newCanvasRect = QGraphicsRectItem()
-                x = float(rect.attribute('x'))
-                y = float(rect.attribute('y'))
-                width = float(rect.attribute('width'))
+                x      = float(rect.attribute('x'))
+                y      = float(rect.attribute('y'))
+                width  = float(rect.attribute('width'))
                 height = float(rect.attribute('height'))
 
                 newCanvasRect.setRect(x, y, width, height)
                 listOfItems.append(newCanvasRect)
+
+                # G-CODE
+                if not mode:
+                    x      = int(x)
+                    y      = int(y)
+                    width  = int(width)
+                    height = int(height)
+                    text  = '#G01:Z0$\n'+\
+                            '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                            '#G01:Z1$\n'+\
+                            '#G01:X{0}:Y{1}\n'.format(x+width,y)+\
+                            '#G01:X{0}:Y{1}\n'.format(x+width,y+height)+\
+                            '#G01:X{0}:Y{1}\n'.format(x,y+height)+\
+                            '#G01:X{0}:Y{1}\n'.format(x,y)
+                    g_code.write(text)
+
                 rect = rect.nextSiblingElement('rect')
 
             # ellipses
@@ -99,6 +124,19 @@ class parser():
 
                 newCanvasLin.setLine(x1, y1, x2, y2)
                 listOfItems.append(newCanvasLin)
+
+                # G-CODE
+                if not mode:
+                    x1      = int(x1)
+                    y1      = int(y1)
+                    x2      = int(x2)
+                    y2      = int(y2)
+                    text  = '#G01:Z0$\n'+\
+                            '#G00:X{0}:Y{1}\n'.format(x1,y1)+\
+                            '#G01:Z1$\n'+\
+                            '#G01:X{0}:Y{1}\n'.format(x2,y2)
+                    g_code.write(text)
+
                 lin = lin.nextSiblingElement('polyline')
 
             # polygons
@@ -114,9 +152,23 @@ class parser():
                     coord = point.split(',')
                     newPoly.append(QPointF(float(coord[0]), float(coord[1])))
 
+                    # G-CODE
+                    if not mode:
+                        x  = int(coord[0])
+                        y  = int(coord[1])
+                        if points.index(point) == 0:
+                            text  = '#G01:Z0$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G01:Z1$\n'
+                            g_code.write(text)
+                        else:
+                            text  = '#G01:X{0}:Y{1}\n'.format(x,y)
+                            g_code.write(text)
 
                 newCanvasPoly.setPolygon(newPoly)
                 listOfItems.append(newCanvasPoly)
+
+
                 poly = poly.nextSiblingElement('polygon')
 
             # path
@@ -149,20 +201,84 @@ class parser():
                         #    coord[index] = (coord[index] / dy_scale) * (CANVAS_HEIGHT/3)
                     if path[0]   == 'M':        # moveTo
                         newPat.moveTo(coord[0], coord[1])
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            y  = int(coord[1])
+                            text  = '#G01:Z0$\n'+\
+                                    '#G90$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G01:Z1$\n'
+                            g_code.write(text)
                     elif path[0] == 'm':        # moveTo relative
                         newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            y  = int(coord[1])
+                            text  = '#G01:Z0$\n'+\
+                                    '#G91$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G01:Z1$\n'
+                            g_code.write(text)
                     elif path[0] == 'L':        # lineTo
                         newPat.lineTo(coord[0], coord[1])
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            y  = int(coord[1])
+                            text  = '#G01:Z1$\n'+\
+                                    '#G90$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                            g_code.write(text)
                     elif path[0] == 'l':        # lineTo relative
                         newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            y  = int(coord[1])
+                            text  = '#G01:Z1$\n'+\
+                                    '#G91$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                            g_code.write(text)
                     elif path[0] == 'H':        # horizontal lineTo
                         newPat.lineTo(coord[0], newPat.currentPosition().y())
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            y  = int(newPat.currentPosition().y())
+                            text  = '#G01:Z1$\n'+\
+                                    '#G90$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                            g_code.write(text)
                     elif path[0] == 'h':        # horizontal lineTo relative
                         newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
+                        # G-CODE
+                        if not mode:
+                            x  = int(coord[0])
+                            text  = '#G01:Z1$\n'+\
+                                    '#G91$\n'+\
+                                    '#G00:X{0}:Y0\n'.format(x)
+                            g_code.write(text)
                     elif path[0] == 'V':        # vertical lineTo
                         newPat.lineTo(newPat.currentPosition().x(), coord[0])
+                        # G-CODE
+                        if not mode:
+                            x  = int(newPat.currentPosition().x())
+                            y  = int(coord[0])
+                            text  = '#G01:Z1$\n'+\
+                                    '#G90$\n'+\
+                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                            g_code.write(text)
                     elif path[0] == 'v':        # vertical lineTo relative
                         newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
+                        # G-CODE
+                        if not mode:
+                            y  = int(coord[0])
+                            text  = '#G01:Z1$\n'+\
+                                    '#G91$\n'+\
+                                    '#G00:X0:Y{0}\n'.format(y)
+                            g_code.write(text)
                     elif path[0] == 'C':        # curveto
                         lastCubicCtrl = QPointF(coord[2], coord[3])
                         newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
@@ -265,4 +381,7 @@ class parser():
 
         file_.close()
 
-        return listOfItems
+        if mode:
+            return listOfItems
+        else:
+            g_code.close()

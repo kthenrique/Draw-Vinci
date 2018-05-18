@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 15
+# -- Last update: 2018 Mai 18
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -235,6 +235,7 @@ class MainScene(QGraphicsScene):
         if e.key() == Qt.Key_Delete:
             if self.item == self.focusItem():
                 self.removeItem(self.tools[7])
+                self.tools[1] = QPainterPath()
                 self.tools[7] = None
                 self.removeItem(self.item)
         # Text Functionality

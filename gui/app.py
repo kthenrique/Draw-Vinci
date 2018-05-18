@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 13
+# -- Last update: 2018 Mai 18
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread, QSize
 from PyQt5.QtGui import QIntValidator, QPainter
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
-        QProgressBar, QFileDialog)
+        QProgressBar, QFileDialog, QMessageBox)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtSvg import QSvgGenerator
 
@@ -236,6 +236,7 @@ class AppWindow(QMainWindow):
                 self.ui.autoButton.setEnabled(False)
                 self.ui.manualButton.setEnabled(False)
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
+                    self.terminalThread.items = self.ui.canvas.items()
                     self.terminalThread.start(QThread.HighestPriority)
                 elif not self.isPlotting:                          # MANUAL MODE
                     self.isPlotting = True
@@ -339,9 +340,6 @@ class AppWindow(QMainWindow):
             for element in parsed:
                 self.scene.addItem(element)
 
-    def newFile(self):
-        pass
-
     def saveFile(self):
         if self.isSaved:
             generator = QSvgGenerator()
@@ -355,6 +353,8 @@ class AppWindow(QMainWindow):
             painter.begin(generator)
             self.scene.render(painter)
             painter.end()
+
+            self.parser.getElements(self.path, 0)      # generate g-code
         else:
             self.saveFileAs()
 
@@ -380,6 +380,8 @@ class AppWindow(QMainWindow):
             self.scene.render(painter)
             painter.end()
             self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
+
+            self.parser.getElements(self.path, 0)      # generate g-code
             self.isSaved = True
 
     def about(self):

@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 10
+# -- Last update: 2018 Mai 18
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
@@ -34,6 +34,8 @@ class Terminal(QThread):
         self.termEdit  = termEdit
         self.statusbar = self.drawingProgress.parentWidget()
         self.pauseButton = pauseButton
+
+        self.items = None
 
         # Connect signals
         self.updateTerm.connect(self.updateTermEdit)
