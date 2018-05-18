@@ -445,10 +445,6 @@ static void AppTaskPwm (void *p_arg){
 //    XMC_GPIO_CONFIG_t gpio_config;
 //    OS_ERR err;
 //    
-//    if(_init_spi()!=SPI_OK)
-//    {
-//        /*Error should never get here*/
-//    }
 //    
 //    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
 //    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;

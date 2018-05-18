@@ -182,12 +182,16 @@ class AppWindow(QMainWindow):
         refreshing the list of available serial ports to connect.
         '''
         self.ui.portsBox.clear()
-        self.ui.portsBox.addItem("Custom")
         apt_ports = QSerialPortInfo.availablePorts()
         for port in apt_ports:
             self.ui.portsBox.addItem(port.portName())
 
         self.port.setPortName(self.ui.portsBox.currentText())
+        if self.ui.portsBox.count() == 0:
+            self.ui.portsBox.addItem("Custom")
+            self.ui.portsBox.setEditable(True)
+        else:
+            self.ui.portsBox.setEditable(False)
 
     def connectPort(self):
         '''
@@ -352,6 +356,9 @@ class AppWindow(QMainWindow):
             self.scene.render(painter)
             painter.end()
         else:
+            self.saveFileAs()
+
+    def saveFileAs(self):
             path = QFileDialog.getSaveFileName(self, 'Save File', '', "SVG files (*.svg)")
 
             if not path:
@@ -374,9 +381,6 @@ class AppWindow(QMainWindow):
             painter.end()
             self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
             self.isSaved = True
-
-    def saveFileAs(self):
-        pass
 
     def about(self):
         pass

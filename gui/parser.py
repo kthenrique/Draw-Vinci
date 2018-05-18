@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
 from PyQt5.QtGui import QPolygonF, QPainterPath, QFont
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
+from constants import CANVAS_HEIGHT, CANVAS_WIDTH
 
 class parser():
     '''
@@ -35,6 +36,16 @@ class parser():
         if not file_.open(QIODevice.ReadOnly) or not doc.setContent(file_):    # if couldn't open or failed to make i QDomDocument
             print("Couldn't open or failed to make th DomDoc")
             return False
+
+        # Acquiring viewBox dimenstions
+        rootElement = doc.documentElement()
+        viewBox = rootElement.attribute('viewBox')
+        viewBox = viewBox.split()
+        for index in range(len(viewBox)):
+            viewBox[index] = float(viewBox[index])
+        dx_scale = viewBox[2]-viewBox[0]
+        dy_scale = viewBox[3]-viewBox[1]
+        print(dx_scale, dy_scale)
 
         gList      = doc.elementsByTagName('g')                  # DomNodeList with g tagged elements
         print(gList.length())
@@ -132,6 +143,10 @@ class parser():
                     coord = coord.split()
                     for index in range(len(coord)):  # Convert str to float
                         coord[index] = float(coord[index])
+                        #if index % 2 == 0:
+                        #    coord[index] = (coord[index] / dx_scale) * (CANVAS_WIDTH/3)
+                        #else:
+                        #    coord[index] = (coord[index] / dy_scale) * (CANVAS_HEIGHT/3)
                     if path[0]   == 'M':        # moveTo
                         newPat.moveTo(coord[0], coord[1])
                     elif path[0] == 'm':        # moveTo relative
@@ -189,12 +204,12 @@ class parser():
                                            newPat.currentPosition().x()+coord[2],\
                                            newPat.currentPosition().y()+coord[3])
                     elif path[0] == 'Q':        # quadratic Bézier curve
-                        newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
                         lastQuadCtrl = QPointF(coord[0], coord[1])
+                        newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
                     elif path[0] == 'q':        # quadratic Bézier curve relative
+                        lastQuadCtrl = newPat.currentPosition()+QPointF(coord[0], coord[1])
                         newPat.quadTo(newPat.currentPosition()+QPointf(coord[0], coord[1]),\
                                       newPat.currentPosition()+QPointf(coord[2], coord[3]))
-                        lastQuadCtrl = QPointF(coord[0], coord[1])
                     elif path[0] == 'T':        # smooth quadratic Bézier curveto
                         if lastQuadCtrl:
                             Ctrl = newPat.currentPosition() - (lastQuadCtrl-newPat.currentPosition())
@@ -249,4 +264,5 @@ class parser():
                 tex = tex.nextSiblingElement('text')
 
         file_.close()
+
         return listOfItems
