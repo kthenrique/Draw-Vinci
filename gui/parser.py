@@ -114,45 +114,106 @@ class parser():
 
             # path
             pat = gNode.firstChildElement('path')
-            if not pat.hasAttributes():
-                pass
-            else:
+            while not pat.isNull():
                 print("path")
                 newPat       = QPainterPath()
                 newCanvasPat = QGraphicsPathItem()
 
                 paths = (pat.attribute('d'))
+
+                # Normalise string
+                for letter in ('m', 'M', 'l',  'L', 'h',  'H', 'v',  'V', 'c',  'C', 's',  'S', 'q',  'Q', 't',  'T', 'a',  'A', 'z', 'Z'):
+                    paths = paths.replace(letter, ' '+letter)
+
+                print(paths)
                 paths = paths.split()
+                currentCoord = [50,50]
+                lastCtrlPoint= None
                 for path in paths:
-                    path = path.upper()
+                    print(path)
                     coord = path[1:]
-                    coord = coord.split(',')
+                    coor = coord.replace('-', ' -')
+                    coor = coor.replace(',', ' ')
+                    coor = coor.split()
+                    coord = coor
+                    print(coord)
+                    print(currentCoord)
                     if path[0]   == 'M':        # moveTo
-                        newPat.moveTo(float(coord[0]), float(coord[1]))
+                        currentCoord[0] = float(coord[0])
+                        currentCoord[1] = float(coord[1])
+                        newPat.moveTo(currentCoord[0], currentCoord[1])
+                    elif path[0] == 'm':        # moveTo relative
+                        currentCoord[0] = currentCoord[0] + float(coord[0])
+                        currentCoord[1] = currentCoord[1] + float(coord[1])
+                        newPat.moveTo(currentCoord[0], currentCoord[1])
                     elif path[0] == 'L':        # lineTo
-                        newPat.lineTo(float(coord[0]), float(coord[1]))
+                        currentCoord[0] = float(coord[0])
+                        currentCoord[1] = float(coord[1])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                    elif path[0] == 'l':        # lineTo relative
+                        currentCoord[0] = currentCoord[0] + float(coord[0])
+                        currentCoord[1] = currentCoord[1] + float(coord[1])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
                     elif path[0] == 'H':        # horizontal lineTo
-                        pass
+                        currentCoord[0] = float(coord[0])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                    elif path[0] == 'h':        # horizontal lineTo relative
+                        currentCoord[0] = currentCoord[0] + float(coord[0])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
                     elif path[0] == 'V':        # vertical lineTo
-                        pass
+                        currentCoord[1] = float(coord[0])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
+                    elif path[0] == 'v':        # vertical lineTo relative
+                        currentCoord[1] = currentCoord[1] + float(coord[0])
+                        newPat.lineTo(currentCoord[0], currentCoord[1])
                     elif path[0] == 'C':        # curveto
-                        pass
+                        currentCoord[0] = float(coord[4])
+                        currentCoord[1] = float(coord[5])
+                        newPat.cubicTo(float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]), currentCoord[0], currentCoord[1])
+                        lastCtrlPoint= [float(coord[2]), float(coord[3])]
+                    elif path[0] == 'c':        # curveto relative
+                        currentCoord[0] = currentCoord[0] + float(coord[4])
+                        currentCoord[1] = currentCoord[1] + float(coord[5])
+                        newPat.cubicTo(float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]), currentCoord[0], currentCoord[1])
+                        lastCtrlPoint= [float(coord[2]), float(coord[3])]
                     elif path[0] == 'S':        # smooth curveto
-                        pass
+                        if lastCtrlPoint:
+                            currentCoord[0] = float(coord[2])
+                            currentCoord[1] = float(coord[3])
+                            newPat.cubicTo(float(lastCtrlPoint[0]), lastCtrlPoint[1], float(coord[0]), float(coord[1]), currentCoord[0], currentCoord[1])
+                        else:
+                            newPat.cubicTo(currentCoord[0], currentCoord[1], float(coord[0]), float(coord[1]), float(coord[2]), float(coord[3]))
+                            currentCoord[0] = float(coord[2])
+                            currentCoord[1] = float(coord[3])
+                    elif path[0] == 's':        # smooth curveto relative
+                        if lastCtrlPoint:
+                            currentCoord[0] = currentCoord[0] + float(coord[2])
+                            currentCoord[1] = currentCoord[1] + float(coord[3])
+                            newPat.cubicTo(float(lastCtrlPoint[0]), lastCtrlPoint[1], float(coord[0]), float(coord[1]), currentCoord[0], currentCoord[1])
+                        else:
+                            newPat.cubicTo(currentCoord[0], currentCoord[1], float(coord[0]), float(coord[1]), currentCoord[0] + float(coord[2]), currentCoord[0] + float(coord[2]))
+                            currentCoord[0] = currentCoord[0] + float(coord[2])
+                            currentCoord[1] = currentCoord[1] + float(coord[3])
                     elif path[0] == 'Q':        # quadratic Bézier curve
+                        pass
+                    elif path[0] == 'q':        # quadratic Bézier curve relative
                         pass
                     elif path[0] == 'T':        # smooth quadratic Bézier curveto
                         pass
+                    elif path[0] == 't':        # smooth quadratic Bézier curveto relative
+                        pass
                     elif path[0] == 'A':        # elliptical arc
                         pass
-                    elif path[0] == 'Z':        # closePath
-                        newPat.closeSubpath()
+                    elif path[0] == 'a':        # elliptical arc relative
                         pass
+                    elif path[0] == 'Z' or path[0] == 'z':        # closePath
+                        newPat.closeSubpath()
                     else:
                         print('Strange Command at path tag in SVG file')
 
                 newCanvasPat.setPath(newPat)
                 listOfItems.append(newCanvasPat)
+                pat = pat.nextSiblingElement('path')
 
             # text
             tex = gNode.firstChildElement('text')
