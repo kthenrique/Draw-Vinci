@@ -34,7 +34,7 @@ class parser():
 
         if not file_.open(QIODevice.ReadOnly) or not doc.setContent(file_):    # if couldn't open or failed to make i QDomDocument
             print("Couldn't open or failed to make th DomDoc")
-            return listOfRect
+            return False
 
         gList      = doc.elementsByTagName('g')                  # DomNodeList with g tagged elements
         print(gList.length())
@@ -43,9 +43,7 @@ class parser():
 
             # rectangles
             rect = gNode.firstChildElement('rect')               # DomElement
-            if not rect.hasAttributes():
-                pass
-            else:
+            while not rect.isNull():
                 print("rectangle")
                 newCanvasRect = QGraphicsRectItem()
                 x = float(rect.attribute('x'))
@@ -55,12 +53,11 @@ class parser():
 
                 newCanvasRect.setRect(x, y, width, height)
                 listOfItems.append(newCanvasRect)
+                rect = rect.nextSiblingElement('rect')
 
             # ellipses
             elli = gNode.firstChildElement('ellipse')
-            if not elli.hasAttributes():
-                pass
-            else:
+            while not elli.isNull():
                 print("ellipse")
                 newCanvasElli = QGraphicsEllipseItem()
                 cx = float(elli.attribute('cx'))
@@ -73,12 +70,11 @@ class parser():
 
                 newCanvasElli.setRect(x, y, width, height)
                 listOfItems.append(newCanvasElli)
+                elli = elli.nextSiblingElement('ellipse')
 
             # polyline
             lin = gNode.firstChildElement('polyline')
-            if not lin.hasAttributes():
-                pass
-            else:
+            while not lin.isNull():
                 print("line")
                 newCanvasLin = QGraphicsLineItem()
                 points = (lin.attribute('points'))
@@ -92,12 +88,11 @@ class parser():
 
                 newCanvasLin.setLine(x1, y1, x2, y2)
                 listOfItems.append(newCanvasLin)
+                lin = lin.nextSiblingElement('polyline')
 
             # polygons
             poly = gNode.firstChildElement('polygon')
-            if not poly.hasAttributes():
-                pass
-            else:
+            while not poly.isNull():
                 print("polygon")
                 newPoly       = QPolygonF()
                 newCanvasPoly = QGraphicsPolygonItem()
@@ -106,11 +101,12 @@ class parser():
                 points = points.split()
                 for point in points:
                     coord = point.split(',')
-                    newPoly.append(float(coord[0]), float(coord[1]))
+                    newPoly.append(QPointF(float(coord[0]), float(coord[1])))
 
 
                 newCanvasPoly.setPolygon(newPoly)
                 listOfItems.append(newCanvasPoly)
+                poly = poly.nextSiblingElement('polygon')
 
             # path
             pat = gNode.firstChildElement('path')
@@ -122,23 +118,20 @@ class parser():
                 paths = (pat.attribute('d'))
 
                 # Normalise string
+                paths = paths.replace(' ', ',')
                 for letter in ('m', 'M', 'l',  'L', 'h',  'H', 'v',  'V', 'c',  'C', 's',  'S', 'q',  'Q', 't',  'T', 'a',  'A', 'z', 'Z'):
                     paths = paths.replace(letter, ' '+letter)
 
-                print(paths)
                 paths = paths.split()
                 lastCubicCtrl = None
                 lastQuadCtrl = None
                 for path in paths:
-                    print(path)
                     coord = path[1:]
                     coord = coord.replace('-', ' -')
                     coord = coord.replace(',', ' ')
                     coord = coord.split()
                     for index in range(len(coord)):  # Convert str to float
-                        print(coord[index])
                         coord[index] = float(coord[index])
-                    print(coord)
                     if path[0]   == 'M':        # moveTo
                         newPat.moveTo(coord[0], coord[1])
                     elif path[0] == 'm':        # moveTo relative
@@ -158,17 +151,13 @@ class parser():
                     elif path[0] == 'C':        # curveto
                         lastCubicCtrl = QPointF(coord[2], coord[3])
                         newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
-                        print(lastCubicCtrl)
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
-                        print(Ctrl)
                     elif path[0] == 'c':        # curveto relative
                         lastCubicCtrl = newPat.currentPosition()+QPointF(coord[2], coord[3])
                         newPat.cubicTo(newPat.currentPosition()+QPointF(coord[0],coord[1]),\
                                        newPat.currentPosition()+QPointF(coord[2],coord[3]),\
                                        newPat.currentPosition()+QPointF(coord[4],coord[5]))
-                        print(lastCubicCtrl)
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
-                        print(Ctrl)
                     elif path[0] == 'S':        # smooth curveto
                         if lastCubicCtrl:
                             Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
@@ -176,15 +165,11 @@ class parser():
                             newPat.cubicTo(Ctrl,\
                                            QPointF(coord[0], coord[1]),\
                                            QPointF(coord[2], coord[3]))
-                            print('smooth absolute ==============================================================')
                         else:
-                            print('smooth absolute without first control ==============================================================')
                             newPat.cubicTo(newPat.currentPosition().x(),\
                                            newPat.currentPosition().y(),\
                                            coord[0], coord[1],\
                                            coord[2], coord[3])
-                        print(lastCubicCtrl)
-                        print(Ctrl)
                     elif path[0] == 's':        # smooth curveto relative
                         if lastCubicCtrl:
                             Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
@@ -196,17 +181,13 @@ class parser():
                                            newPat.currentPosition().y()+coord[1],\
                                            newPat.currentPosition().x()+coord[2],\
                                            newPat.currentPosition().y()+coord[3])
-                            print('smooth relative ==============================================================')
                         else:
-                            print('smooth relative without first control ==============================================================')
                             newPat.cubicTo(newPat.currentPosition().x(),\
                                            newPat.currentPosition().y(),\
                                            newPat.currentPosition().x()+coord[0],\
                                            newPat.currentPosition().y()+coord[1],\
                                            newPat.currentPosition().x()+coord[2],\
                                            newPat.currentPosition().y()+coord[3])
-                        print(lastCubicCtrl)
-                        print(Ctrl)
                     elif path[0] == 'Q':        # quadratic Bézier curve
                         newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
                         lastQuadCtrl = QPointF(coord[0], coord[1])
@@ -241,18 +222,13 @@ class parser():
                     else:
                         print('Strange Command at path tag in SVG file')
 
-                    print(newPat.currentPosition())
-                    print('\n')
-
                 newCanvasPat.setPath(newPat)
                 listOfItems.append(newCanvasPat)
                 pat = pat.nextSiblingElement('path')
 
             # text
             tex = gNode.firstChildElement('text')
-            if not tex.hasAttributes():
-                pass
-            else:
+            while not tex.isNull():
                 print("text")
 
                 x     = float(tex.attribute('x'))
@@ -270,8 +246,7 @@ class parser():
                 newCanvasTex.setPos(x,y)
 
                 listOfItems.append(newCanvasTex)
+                tex = tex.nextSiblingElement('text')
 
         file_.close()
         return listOfItems
-
-
