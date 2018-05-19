@@ -1049,6 +1049,9 @@ background-color: rgb(255, 255, 255);
    <property name="text">
     <string>&amp;New</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionSave">
    <property name="text">

@@ -121,6 +121,7 @@ class AppWindow(QMainWindow):
         self.scene.setIconTool(self.ui.eraserButton)
         self.scene.textTools = (self.ui.fontBox, self.ui.fontSizeBox,\
                 self.ui.italicButton, self.ui.underlineButton)
+        self.scene.changed.connect(self.updateFileState)
         self.ui.canvas.show()
 
         # Menus Initialisation
@@ -156,8 +157,10 @@ class AppWindow(QMainWindow):
         # Connect finishing of thread with toggling of stopButton
         self.terminalThread.finished.connect(self.ui.stopButton.toggle)
 
+        # File state variables
         self.isPlotting = False
         self.isSaved    = False
+        self.hasChanged = False
         self.path       = None
 
         self.parser     = parser()
@@ -325,7 +328,28 @@ class AppWindow(QMainWindow):
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def newFile(self):
-        pass
+        if len(self.ui.canvas.items()) == 0:
+            pass
+        elif not self.isSaved:
+            ret = QMessageBox(QMessageBox.Warning, 'Eita Caramba!',\
+                    'There is work not saved in canvas.\n'+\
+                    'Are you sure you want to discard it?\n',\
+                    QMessageBox.Yes | QMessageBox.Cancel).exec()
+            if ret == QMessageBox.Yes:
+                self.scene.clear()
+                self.hasChanged = False
+                self.path = None
+                self.artworkLabel.setText("UNKNOWN_FILE")
+        elif self.hasChanged:
+            ret = QMessageBox(QMessageBox.Warning, 'Eita Caramba!',\
+                    'The canvas has changed since last save..\n'+\
+                    'Are you sure you want to discard it?\n',\
+                    QMessageBox.Yes | QMessageBox.Cancel).exec()
+            if ret == QMessageBox.Yes:
+                self.scene.clear()
+                self.hasChanged = False
+                self.path = None
+                self.artworkLabel.setText("UNKNOWN_FILE")
 
     def openFile(self):
         path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
@@ -386,6 +410,9 @@ class AppWindow(QMainWindow):
 
     def about(self):
         pass
+
+    def updateFileState(self):
+        hasChanged = True
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
