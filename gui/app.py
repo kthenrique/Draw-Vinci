@@ -327,42 +327,48 @@ class AppWindow(QMainWindow):
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
-    def newFile(self):
-        if len(self.ui.canvas.items()) == 0:
-            pass
-        elif not self.isSaved:
+    def checkCanvas(self):
+        print("checkCanvas")
+        if len(self.ui.canvas.items()) == 0:                   # a blank canvas
+            return True
+        elif not self.isSaved:                                 # a not-saved filled canvas
             ret = QMessageBox(QMessageBox.Warning, 'Eita Caramba!',\
                     'There is work not saved in canvas.\n'+\
                     'Are you sure you want to discard it?\n',\
                     QMessageBox.Yes | QMessageBox.Cancel).exec()
-            if ret == QMessageBox.Yes:
-                self.scene.clear()
-                self.hasChanged = False
-                self.path = None
-                self.artworkLabel.setText("UNKNOWN_FILE")
-        elif self.hasChanged:
+            if ret == QMessageBox.Cancel:
+                return False
+        elif self.hasChanged:                                  # a saved but aftwrwards altered canvas
             ret = QMessageBox(QMessageBox.Warning, 'Eita Caramba!',\
                     'The canvas has changed since last save..\n'+\
                     'Are you sure you want to discard it?\n',\
                     QMessageBox.Yes | QMessageBox.Cancel).exec()
-            if ret == QMessageBox.Yes:
-                self.scene.clear()
-                self.hasChanged = False
-                self.path = None
-                self.artworkLabel.setText("UNKNOWN_FILE")
+            if ret == QMessageBox.Cancel:
+                return False
+        return True
+
+    def newFile(self):
+        if self.checkCanvas():
+            self.scene.clear()
+            self.hasChanged = False
+            self.path = None
+            self.artworkLabel.setText("UNKNOWN_FILE")
 
     def openFile(self):
-        path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
+        if self.checkCanvas():
+            self.scene.clear()
+            self.hasChanged = False
+            self.path = None
 
-        self.path = str(path[0])
-        self.scene.clear()
+            path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
+            self.path = str(path[0])
 
-        parsed = self.parser.getElements(self.path)
-        if parsed:
-            self.isSaved = True
-            self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
-            for element in parsed:
-                self.scene.addItem(element)
+            parsed = self.parser.getElements(self.path)
+            if parsed:
+                self.isSaved = True
+                self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
+                for element in parsed:
+                    self.scene.addItem(element)
 
     def saveFile(self):
         if self.isSaved:
@@ -412,7 +418,7 @@ class AppWindow(QMainWindow):
         pass
 
     def updateFileState(self):
-        hasChanged = True
+        self.hasChanged = True
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
