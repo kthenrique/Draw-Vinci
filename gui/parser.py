@@ -108,6 +108,23 @@ class parser():
                 listOfItems.append(newCanvasElli)
                 elli = elli.nextSiblingElement('ellipse')
 
+            # circles
+            cir = gNode.firstChildElement('circle')
+            while not cir.isNull():
+                print("circle")
+                newCanvasCir = QGraphicsEllipseItem()
+                cx = float(cir.attribute('cx'))
+                cy = float(cir.attribute('cy'))
+                width = 2*float(cir.attribute('r'))
+                height = width
+
+                x = cx - float(cir.attribute('r'))
+                y = cy - float(cir.attribute('r'))
+
+                newCanvasCir.setRect(x, y, width, height)
+                listOfItems.append(newCanvasCir)
+                cir = cir.nextSiblingElement('circle')
+
             # polyline
             lin = gNode.firstChildElement('polyline')
             while not lin.isNull():
