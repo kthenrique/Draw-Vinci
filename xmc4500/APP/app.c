@@ -95,6 +95,7 @@ static void AppTaskCom      (void *p_arg);
 static void AppTaskManMode  (void *p_arg);
 static void AppTaskEndpoints(void *p_arg);
 static void AppTaskAutoMode (void *p_arg);
+static void initspi(void);
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -291,7 +292,18 @@ static void AppTaskStart (void *p_arg){
     }while(err != OS_ERR_NONE);
 
 }
+/*********************************** SPI Initialization */
+static void initspi(void)
+{
+    if(_init_spi() != SPI_OK)
+        APP_TRACE_DBG("Error Initialising SPI\n");
 
+    _mcp23s08_reset();
+
+    _mcp23s08_reset_ss(MCP23S08_SS);
+    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
+    _mcp23s08_set_ss(MCP23S08_SS);
+}
 /*********************************** Communication Application Task */
 /**
  * \function AppTaskCom
@@ -325,6 +337,9 @@ static void AppTaskCom (void *p_arg){
     COORDINATES volatile packet;
 
     (void) p_arg; // Just to silence compiler
+
+    //init the spi interface
+    initspi();
 
     APP_TRACE_INFO ("AppTaskCom Loop...\n");
     while (DEF_ON) {
@@ -406,14 +421,14 @@ static void AppTaskManMode (void *p_arg){
     uint16_t count;
     uint16_t motor_steps;
 
-    if(_init_spi() != SPI_OK)
-        APP_TRACE_DBG("Error Initialising SPI\n");
+/*    if(_init_spi() != SPI_OK)*/
+/*        APP_TRACE_DBG("Error Initialising SPI\n");*/
 
-    _mcp23s08_reset();
+/*    _mcp23s08_reset();*/
 
-    _mcp23s08_reset_ss(MCP23S08_SS);
-    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
-    _mcp23s08_set_ss(MCP23S08_SS);
+/*    _mcp23s08_reset_ss(MCP23S08_SS);*/
+/*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);*/
+/*    _mcp23s08_set_ss(MCP23S08_SS);*/
     
     volatile uint32_t counter = 0xfff;
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
