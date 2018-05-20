@@ -30,15 +30,16 @@
 /************************************************************ TASK PRIORITIES */
 #define  APP_CFG_TASK_START_PRIO        2u
 #define  APP_CFG_TASK_COM_PRIO          6u
-#define  APP_CFG_TASK_PWM_PRIO          5u
-#define  APP_CFG_TASK_ENDPOINTS_PRIO    4u
+#define  APP_CFG_TASK_MAN_MODE_PRIO     5u
+#define  APP_CFG_TASK_ENDPOINTS_PRIO    8u
+#define  APP_CFG_TASK_AUTO_MODE_PRIO    4u
 
 /*********************************************************** TASK STACK SIZES */
 #define  APP_CFG_TASK_START_STK_SIZE        256u
 #define  APP_CFG_TASK_COM_STK_SIZE          256u
-#define  APP_CFG_TASK_PWM_STK_SIZE          128u
+#define  APP_CFG_TASK_MAN_MODE_STK_SIZE     128u
 #define  APP_CFG_TASK_ENDPOINTS_STK_SIZE    128u
-
+#define  APP_CFG_TASK_AUTO_MODE_STK_SIZE    128u
 /************************************************ TRACE / DEBUG CONFIGURATION */
 
 #ifndef TRACE_LEVEL_OFF

@@ -73,12 +73,14 @@
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
-static  OS_TCB   AppTaskPwm1_TCB;
+static  OS_TCB   AppTaskManMode_TCB;
+static  OS_TCB   AppTaskAutoMode_TCB;
 static  OS_TCB   AppTaskEndpoints_TCB;
 
 static  CPU_STK  AppTaskStart_Stk  [APP_CFG_TASK_START_STK_SIZE];
 static  CPU_STK  AppTaskCom_Stk    [APP_CFG_TASK_COM_STK_SIZE];
-static  CPU_STK  AppTaskPwm1_Stk   [APP_CFG_TASK_PWM_STK_SIZE];
+static  CPU_STK  AppTaskManMode_Stk[APP_CFG_TASK_MAN_MODE_STK_SIZE];
+static  CPU_STK  AppTaskAutoMode_Stk[APP_CFG_TASK_AUTO_MODE_STK_SIZE];
 static  CPU_STK  AppTaskEndpoints_Stk[APP_CFG_TASK_ENDPOINTS_STK_SIZE];
 // Memory Block
 OS_MEM      Mem_Partition;
@@ -88,10 +90,11 @@ CPU_CHAR    MyPartitionStorage[NUM_MSG][MAX_MSG_LENGTH]; // +1 to ensure the UAR
 OS_Q        UART_QUEUE;
 
 /************************************************************ FUNCTIONS/TASKS */
-static void AppTaskStart (void *p_arg);
-static void AppTaskCom   (void *p_arg);
-static void AppTaskPwm   (void *p_arg);
+static void AppTaskStart    (void *p_arg);
+static void AppTaskCom      (void *p_arg);
+static void AppTaskManMode  (void *p_arg);
 static void AppTaskEndpoints(void *p_arg);
+static void AppTaskAutoMode (void *p_arg);
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -191,7 +194,7 @@ static void AppTaskStart (void *p_arg){
     CPU_INT32U  cnts;
     OS_ERR      err;
 
-    const uint8_t type[4] = {1, 2, 3, 4}; // To differentiate tasks
+    //const uint8_t type[4] = {1, 2, 3, 4}; // To differentiate tasks
 
     (void) p_arg;
 
@@ -230,22 +233,39 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
 
-    // create AppTaskPwm1
-    OSTaskCreate ((OS_TCB     *) &AppTaskPwm1_TCB,
-                  (CPU_CHAR   *) "TaskLed1",
-                  (OS_TASK_PTR ) AppTaskPwm,
-                  (void       *) &type[0],
-                  (OS_PRIO     ) APP_CFG_TASK_PWM_PRIO,
-                  (CPU_STK    *) &AppTaskPwm1_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_PWM_STK_SIZE,
+    // create AppTaskManMode
+    OSTaskCreate ((OS_TCB     *) &AppTaskManMode_TCB,
+                  (CPU_CHAR   *) "TaskManualMode",
+                  (OS_TASK_PTR ) AppTaskManMode,
+                  (void       *) 0,
+                  (OS_PRIO     ) APP_CFG_TASK_MAN_MODE_PRIO,
+                  (CPU_STK    *) &AppTaskManMode_Stk[0],
+                  (CPU_STK_SIZE) APP_CFG_TASK_MAN_MODE_STK_SIZE / 10u,
+                  (CPU_STK_SIZE) APP_CFG_TASK_MAN_MODE_STK_SIZE,
                   (OS_MSG_QTY  ) 5u,
                   (OS_TICK     ) 0u,
                   (void       *) 0,
                   (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                   (OS_ERR     *) &err);
     if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskPwm1 \n");
+        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskManMode \n");
+
+    // create AppTaskAutoMode
+    OSTaskCreate ((OS_TCB     *) &AppTaskAutoMode_TCB,
+                  (CPU_CHAR   *) "TaskAutoMode",
+                  (OS_TASK_PTR ) AppTaskAutoMode,
+                  (void       *) 0,
+                  (OS_PRIO     ) APP_CFG_TASK_AUTO_MODE_PRIO,
+                  (CPU_STK    *) &AppTaskAutoMode_Stk[0],
+                  (CPU_STK_SIZE) APP_CFG_TASK_AUTO_MODE_STK_SIZE / 10u,
+                  (CPU_STK_SIZE) APP_CFG_TASK_AUTO_MODE_STK_SIZE,
+                  (OS_MSG_QTY  ) 5u,
+                  (OS_TICK     ) 0u,
+                  (void       *) 0,
+                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
+                  (OS_ERR     *) &err);
+    if (err != OS_ERR_NONE)
+        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskAutoMode \n");
 
 //    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
 //                  (CPU_CHAR   *) "TaskEndpoints",
@@ -346,7 +366,7 @@ static void AppTaskCom (void *p_arg){
         }
         
         if (packet.pos_mode == 1){
-            OSTaskQPost((OS_TCB    *) &AppTaskPwm1_TCB,
+            OSTaskQPost((OS_TCB    *) &AppTaskManMode_TCB,
                 (void      *) &packet,
                 (OS_MSG_SIZE) sizeof(packet),
                 (OS_OPT     ) OS_OPT_POST_FIFO,
@@ -355,15 +375,22 @@ static void AppTaskCom (void *p_arg){
             if (err != OS_ERR_NONE){
                 APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
         }
+        else{
+            OSTaskQPost((OS_TCB    *) &AppTaskAutoMode_TCB,
+                (void      *) &packet,
+                (OS_MSG_SIZE) sizeof(packet),
+                (OS_OPT     ) OS_OPT_POST_FIFO,
+                (OS_ERR    *) &err);
+        }
 
         APP_TRACE_INFO ("=======================\n");
     }
 }
 
-/***************************************************** LED Application Task */
+/************************************************************************************/
 /**
- * \function AppTaskPwm
- * \ params p_arg ... argument passed to AppTaskPwm() at creation
+ * \function AppTaskManMode
+ * \ params p_arg ... argument passed to AppTaskManMode() at creation
  * \returns none
  *
  * \brief It waits until a message arrives in its queue.
@@ -371,7 +398,7 @@ static void AppTaskCom (void *p_arg){
  *        in the respective pin.
  */
 
-static void AppTaskPwm (void *p_arg){
+static void AppTaskManMode (void *p_arg){
     OS_ERR      err;
     COORDINATES volatile *packet;
     OS_MSG_SIZE msg_size;
@@ -389,7 +416,7 @@ static void AppTaskPwm (void *p_arg){
     _mcp23s08_set_ss(MCP23S08_SS);
     
     volatile uint32_t counter = 0xfff;
-    APP_TRACE_INFO ("AppTaskPwm Loop...\n");
+    APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
 
         packet = (COORDINATES volatile *)OSTaskQPend (0,
@@ -398,7 +425,7 @@ static void AppTaskPwm (void *p_arg){
                                                       NULL,
                                                       &err);
         if (err != OS_ERR_NONE)
-            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskPwm\n");
+            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskManMode\n");
         
        APP_TRACE_INFO ("Trying to step up...\n");
 
@@ -437,6 +464,36 @@ static void AppTaskPwm (void *p_arg){
                 _mcp23s08_set_ss(MCP23S08_SS);
             }
         }
+    }
+}
+
+/************************************************************************************/
+/**
+ * \function AppTaskAutoMode
+ * \ params p_arg ... argument passed to AppTaskAutoMode() at creation
+ * \returns none
+ *
+ * \brief It waits until a message arrives in its queue.
+ *        After receiving something, it will adjust the duty cycle of the output
+ *        in the respective pin.
+ */
+static void AppTaskAutoMode (void *p_arg){
+    OS_ERR      err;
+    COORDINATES volatile *packet;
+    OS_MSG_SIZE msg_size;
+
+    APP_TRACE_INFO ("AppTaskAutoMode Loop...\n");
+    while (DEF_ON){
+
+        packet = (COORDINATES volatile *)OSTaskQPend (0,
+                                                      OS_OPT_PEND_BLOCKING,
+                                                      &msg_size,
+                                                      NULL,
+                                                      &err);
+        if (err != OS_ERR_NONE)
+            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskAutoMode\n");
+
+        //check out new data and calculate the new position, drive the motors
     }
 }
 
