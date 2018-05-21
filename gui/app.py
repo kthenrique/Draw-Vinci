@@ -330,7 +330,7 @@ class AppWindow(QMainWindow):
     def checkCanvas(self):
         print("checkCanvas")
         if len(self.ui.canvas.items()) == 0:                   # a blank canvas
-            return True
+            pass
         elif not self.isSaved:                                 # a not-saved filled canvas
             ret = QMessageBox(QMessageBox.Warning, 'Eita Caramba!',\
                     'There is work not saved in canvas.\n'+\
@@ -345,20 +345,19 @@ class AppWindow(QMainWindow):
                     QMessageBox.Yes | QMessageBox.Cancel).exec()
             if ret == QMessageBox.Cancel:
                 return False
+
+        self.scene.resetTools()
+        self.scene.clear()
+        self.path = None
         return True
 
     def newFile(self):
         if self.checkCanvas():
-            self.scene.clear()
             self.hasChanged = False
-            self.path = None
             self.artworkLabel.setText("UNKNOWN_FILE")
 
     def openFile(self):
         if self.checkCanvas():
-            self.scene.clear()
-            self.hasChanged = False
-            self.path = None
 
             path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
             self.path = str(path[0])
@@ -369,6 +368,7 @@ class AppWindow(QMainWindow):
                 self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
                 for element in parsed:
                     self.scene.addItem(element)
+                    self.hasChanged = False
 
     def saveFile(self):
         try:
@@ -417,13 +417,17 @@ class AppWindow(QMainWindow):
             self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
 
             self.parser.getElements(self.path, 0)      # generate g-code
+            self.hasChanged = False
             self.isSaved = True
 
     def about(self):
         pass
 
     def updateFileState(self):
-        self.hasChanged = True
+        if self.hasChanged:
+            self.hasChanged = False
+        else:
+            self.hasChanged = True
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

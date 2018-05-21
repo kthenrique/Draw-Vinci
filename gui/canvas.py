@@ -12,7 +12,7 @@
 
 from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QLineF, QRectF, QPointF
-from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsItem
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
         QCursor, QTextCursor, QTransform, QPen, QFont)
 
@@ -34,16 +34,8 @@ class MainScene(QGraphicsScene):
 
         self.toolsButtonGroup.buttonClicked.connect(self.setIconTool)
 
-        # The drawable elements
-        self.tools     = [1,
-                          QPainterPath(),
-                          QLineF(),
-                          '',          # str instead of QString
-                          QRectF(),
-                          QRectF(),
-                          QPolygonF(),
-                          None,
-                          QRectF()]
+        self.tools = []
+        self.resetTools()
 
         # Icons for cursor and toolLabel
         self.pixTools  = (QPixmap("./img/eraser.png"),
@@ -63,10 +55,23 @@ class MainScene(QGraphicsScene):
         self.item       = None     # Item being drawn - last item drawn
         self.itemsDrawn = None     # List of items on canvas
 
+    def resetTools(self):
+        # The drawable elements
+        self.tools     = [1,
+                          QPainterPath(),
+                          QLineF(),
+                          '',          # str instead of QString
+                          QRectF(),
+                          QRectF(),
+                          QPolygonF(),
+                          None,
+                          QRectF()]
+
     # Reimplementing mouse events
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
             if self.tools[7]: # Resetting selection
+                self.setFocusItem(None)
                 self.removeItem(self.tools[7])
                 self.tools[7] = None
             self.isDrawing = True
@@ -116,6 +121,8 @@ class MainScene(QGraphicsScene):
             elif self.index == 7: # select
                 self.item = self.itemAt(self.clickedPos, QTransform())
                 if self.item:
+                    self.item.setFlag(QGraphicsItem.ItemIsFocusable)
+                    self.setFocusItem(self.item)
                     rectangle = self.item.sceneBoundingRect()
                     pen       = QPen(Qt.DotLine)
                     self.tools[self.index] = self.addRect(rectangle, pen)
@@ -209,8 +216,11 @@ class MainScene(QGraphicsScene):
             self.view.fitInView(self.item)
             self.removeItem(self.item)
 
+    def dragMoveEvent(self,e):
+        print('dragMoveEvent')
+
     def wheelEvent(self, e):
-        pass
+        print('wheelEvent')
 
     # Reimplementing keypress events
     def keyPressEvent(self, e):
@@ -225,14 +235,17 @@ class MainScene(QGraphicsScene):
                 self.tools[1]  = QPainterPath()
                 self.tools[6].clear()
             except:
-                self.statusbar.showMessage("There is no item in Canvas", TIMEOUT_STATUS)
+                self.statusbar.showMessage("No item in Canvas", TIMEOUT_STATUS)
         # Delete Functionality
         if e.key() == Qt.Key_Delete:
-            if self.item == self.focusItem():
+            if self.item == self.focusItem() and self.item != None:
                 self.removeItem(self.tools[7])
                 self.tools[1] = QPainterPath()
                 self.tools[7] = None
                 self.removeItem(self.item)
+            else:
+                self.statusbar.showMessage("No item selected to remove", TIMEOUT_STATUS)
+
         # Text Functionality
         if self.isTyping:
             if e.key() == Qt.Key_Backspace:
