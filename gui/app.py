@@ -371,6 +371,10 @@ class AppWindow(QMainWindow):
                     self.scene.addItem(element)
 
     def saveFile(self):
+        try:
+            self.scene.removeItem(self.scene.tools[7])
+        except:
+            print('no selection to remove')
         if self.isSaved:
             generator = QSvgGenerator()
             generator.setFileName(str(self.path))
@@ -384,6 +388,7 @@ class AppWindow(QMainWindow):
             self.scene.render(painter)
             painter.end()
 
+            self.hasChanged = False
             self.parser.getElements(self.path, 0)      # generate g-code
         else:
             self.saveFileAs()

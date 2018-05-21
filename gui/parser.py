@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 18
+# -- Last update: 2018 Mai 21
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -379,6 +379,15 @@ class parser():
             while not tex.isNull():
                 print("text")
 
+                # Taking the transform matrix
+                trafo = gNode.toElement()
+                trafo = trafo.attribute('transform')
+                trafo = trafo.replace('matrix(', '')
+                trafo = trafo.replace(')', '')
+                trafo = trafo.replace(',', ' ')
+                trafo = trafo.split()
+                print(trafo)
+
                 x     = float(tex.attribute('x'))
                 y     = float(tex.attribute('y'))
                 font  = tex.attribute('font-family')
@@ -391,7 +400,8 @@ class parser():
 
                 newCanvasTex = QGraphicsTextItem(tex.text())
                 newCanvasTex.setFont(QFont(font, size, weight, isItalic))
-                newCanvasTex.setPos(x,y)
+                newCanvasTex.setX(float(trafo[4]))
+                newCanvasTex.setY(float(trafo[5]))
 
                 listOfItems.append(newCanvasTex)
                 tex = tex.nextSiblingElement('text')

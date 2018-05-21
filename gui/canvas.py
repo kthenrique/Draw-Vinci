@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 18
+# -- Last update: 2018 Mai 21
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -67,8 +67,6 @@ class MainScene(QGraphicsScene):
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
             if self.tools[7]: # Resetting selection
-                self.setFocus(0)
-                self.item.setFlag(4, False) # set it focusable
                 self.removeItem(self.tools[7])
                 self.tools[7] = None
             self.isDrawing = True
@@ -118,8 +116,6 @@ class MainScene(QGraphicsScene):
             elif self.index == 7: # select
                 self.item = self.itemAt(self.clickedPos, QTransform())
                 if self.item:
-                    self.item.setFlag(4) # set it focusable
-                    self.setFocusItem(self.item)
                     rectangle = self.item.sceneBoundingRect()
                     pen       = QPen(Qt.DotLine)
                     self.tools[self.index] = self.addRect(rectangle, pen)
@@ -189,7 +185,6 @@ class MainScene(QGraphicsScene):
                 self.clickedPos = mousePos
                 if self.item:
                     self.item.moveBy(m.x(), m.y())
-                    mousePos = self.item.mapFromScene(mousePos)
                     self.tools[self.index].moveBy(m.x(), m.y())
             elif self.index == 8: # magnifier
                 if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
