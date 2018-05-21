@@ -203,6 +203,8 @@ class parser():
                     paths = paths.replace(letter, ' '+letter)
 
                 paths = paths.split()
+                while paths.count(','):
+                    paths.remove(',')
                 lastCubicCtrl = None
                 lastQuadCtrl = None
                 for path in paths:
@@ -213,9 +215,9 @@ class parser():
                     for index in range(len(coord)):  # Convert str to float
                         coord[index] = float(coord[index])
                         #if index % 2 == 0:
-                        #    coord[index] = (coord[index] / dx_scale) * (CANVAS_WIDTH/3)
+                        #coord[index] = coord[index]* / (dy_scale*dx_scale)
                         #else:
-                        #    coord[index] = (coord[index] / dy_scale) * (CANVAS_HEIGHT/3)
+                        #coord[index] = (coord[index] / dy_scale) * (CANVAS_HEIGHT/3)
                     if path[0]   == 'M':        # moveTo
                         newPat.moveTo(coord[0], coord[1])
                         # G-CODE
@@ -369,6 +371,7 @@ class parser():
                         newPat.closeSubpath()
                     else:
                         print('Strange Command at path tag in SVG file')
+                        print(path)
 
                 newCanvasPat.setPath(newPat)
                 listOfItems.append(newCanvasPat)
