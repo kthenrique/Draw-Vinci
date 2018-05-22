@@ -5,12 +5,16 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 18
+# -- Last update: 2018 Mai 22
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
 
-from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer
+import os
+import shutil
+
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QIODevice
+from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 
 from constants import TIMEOUT_STATUS
 
@@ -24,27 +28,16 @@ class Terminal(QThread):
     it to XMC4500.
     '''
 
-    updateTerm = pyqtSignal(str) # when the terminal should be written
-
-    def __init__(self, drawingProgress, termEdit, pauseButton):
+    def __init__(self, drawingProgress, pauseButton):
         super().__init__()
         self.setTerminationEnabled(True)
         self.setObjectName("DrawVinci")
         self.drawingProgress = drawingProgress
-        self.termEdit  = termEdit
         self.statusbar = self.drawingProgress.parentWidget()
         self.pauseButton = pauseButton
 
-        self.items = None
-
-        # Connect signals
-        self.updateTerm.connect(self.updateTermEdit)
-
-        # Set a timer
-        self.timer = QTimer()
-        self.timer.setInterval(1000)
-        self.timer.timeout.connect(self.updateProgress)
-        self.counter = 0
+        self.path  = None
+        self.port  = None
 
         self.flag = False
 
@@ -53,22 +46,39 @@ class Terminal(QThread):
 
     @pyqtSlot()
     def run(self):
-        while self.drawingProgress.value() <= 100:
-            self.drawingProgress.setValue(self.counter)
-            if self.isInterruptionRequested():
-                print("thread interrupted")
-                break
-            while self.pauseButton.isChecked():
-                print("thread paused")
-                self.sleep(5)
+        self.path = shutil.copy(self.path, self.path.replace(os.path.basename(self.path), 'toPlotTemp'))
+        file_size = os.path.getsize(self.path)
+        with open(self.path) as code:
+            port = QSerialPort()
+            port.setPortName(self.port)
+            port.setBaudRate(QSerialPort.Baud9600)
+            port.setDataBits(QSerialPort.Data8)
+            port.setParity(QSerialPort.NoParity)
+            port.setStopBits(QSerialPort.OneStop)
+            port.setFlowControl(QSerialPort.NoFlowControl)
+            port.open(QIODevice.ReadWrite)
+            while file_size > code.tell(): #self.drawingProgress.value() <= 100:
+                self.sleep(1)
+                try:
+                    command = code.readline()
+                    command = command.replace('\n','')
+                    print(command)
+                    if port.isOpen():
+                        ret = port.writeData(bytes(command, 'utf-8'))
+                        # Update Progress Bar
+                        self.drawingProgress.setValue(100*(code.tell()/file_size))
+                    else:
+                        self.statusbar.showMessage(self.statusbar.tr("Auto sending interrupted!"), TIMEOUT_STATUS)
+                        print('port problem')
+                        break
+                except:
+                    print('EXCEPT')
+                    break
+                if self.isInterruptionRequested():
+                    print("thread interrupted")
+                    break
+                while self.pauseButton.isChecked():
+                    print("thread paused")
+                    self.sleep(5)
+        os.remove(self.path)
         self.exit()
-
-    def updateProgress(self):
-        if self.pauseButton.isChecked():
-            pass
-        else:
-            self.counter = self.counter + 1
-
-    def updateTermEdit(self, text):
-        self.termEdit.append(text)
-

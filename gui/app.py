@@ -147,8 +147,12 @@ class AppWindow(QMainWindow):
         self.ui.rightButton.clicked.connect(self.goRight)          # right
         self.ui.penButton.toggled.connect(self.togglePen)          # pen
 
+        # Listening to incoming messages
+        self.port.readyRead.connect(self.updateTerm)
+        #self.port.bytesWritten.connect(self.updateTerm)
+
         # Thread for permanent communication with XMC4500
-        self.terminalThread = Terminal(self.drawingProgress, self.ui.termEdit, self.ui.pauseButton)
+        self.terminalThread = Terminal(self.drawingProgress, self.ui.pauseButton)
 
         # Connect thread signals
         self.terminalThread.finished.connect(self.prepFini)
@@ -239,8 +243,17 @@ class AppWindow(QMainWindow):
                 self.ui.autoButton.setEnabled(False)
                 self.ui.manualButton.setEnabled(False)
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
-                    self.terminalThread.items = self.ui.canvas.items()
-                    self.terminalThread.start(QThread.HighestPriority)
+                    if self.isSaved:
+                        g_code_path = self.path.replace('.svg', '.gcode')
+                        self.terminalThread.path = g_code_path
+                        self.terminalThread.port = self.ui.portsBox.currentText()
+                        self.port.close()
+                        self.terminalThread.start(QThread.HighestPriority)
+                    else:
+                        self.ui.statusbar.showMessage(self.ui.statusbar.tr("Save canvas before plotting!"), TIMEOUT_STATUS)
+                        self.ui.stopButton.setChecked(True)
+                        self.ui.autoButton.setEnabled(True)
+                        self.ui.manualButton.setEnabled(True)
                 elif not self.isPlotting:                          # MANUAL MODE
                     self.isPlotting = True
                     self.sendSingleMsg("#G91:$")                      # set relative positioning
@@ -281,7 +294,6 @@ class AppWindow(QMainWindow):
         '''
         print("thread started")
         self.drawingProgress.setVisible(True)
-        self.terminalThread.timer.start()
 
     def prepFini(self):
         '''
@@ -290,9 +302,11 @@ class AppWindow(QMainWindow):
         print("thread finished")
         self.ui.statusbar.showMessage("Plotting finished or interrupted", TIMEOUT_STATUS)
         self.isPlotting = False
-        self.terminalThread.timer.stop()
         self.drawingProgress.setValue(0)
         self.drawingProgress.setVisible(False)
+        self.ui.autoButton.setEnabled(True)
+        self.ui.manualButton.setEnabled(True)
+        self.connectPort()
 
     def goUp(self):
         if self.ui.playButton.isChecked():
