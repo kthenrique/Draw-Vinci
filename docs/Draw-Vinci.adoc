@@ -9,7 +9,16 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 
 == Introduction
 
+[#portErrors]
+.MakeBlock XY Plotter
+image::plotter.jpeg[]
+
 === Project Description
+
+[quote]
+Design and develop both a multi-threaded PC GUI application as well as an XMC RTOS application using uCOS-III to control a MakeBlock XY plotter as shown below. In
+either case you can select a file format (G-Code, Excellon, HPGL or SVG — see below) to determine the content that shall be drawn using the machine. As an
+alternative you could devise a simple drawing application to do the same.
 
 === Formats supported
 
@@ -87,6 +96,8 @@ Hardware::
 
 Operating Systems::
     Linux:::
+        . Ubuntu 16.04
+            * Desktop
         . Ubuntu 17.04
             * Desktop
         . Ubuntu 18.04
@@ -121,4 +132,6 @@ Dependencies::
 
 ==== XMC4500
 
+.Servo Motor Function
+video::servoMotor.mp4[width=640]
 
