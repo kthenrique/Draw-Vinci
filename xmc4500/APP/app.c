@@ -274,7 +274,7 @@ static void AppTaskStart (void *p_arg){
     }while(err != OS_ERR_NONE);
 
 }
-/*********************************** SPI Initialization */
+/*********************************** SPI Initialization --> MAYBE WE SHOULD MAKE IT AN BSP FILE FOR THAT?!?*/ 
 static void initspi(void)
 {
     if(_init_spi() != SPI_OK)
@@ -316,7 +316,7 @@ static void AppTaskCom (void *p_arg){
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
 
     bool volatile valid;
-    COORDINATES volatile packet;
+    CODE volatile packet;
 
     (void) p_arg; // Just to silence compiler
 
@@ -388,113 +388,93 @@ static void AppTaskCom (void *p_arg){
 
 static void AppTaskManMode (void *p_arg){
     OS_ERR      err;
-    COORDINATES volatile *packet;
     OS_MSG_SIZE msg_size;
-    bool volatile isRelative = false;
-    uint8_t motor_direction = 0x02;
-    uint16_t count;
-    uint16_t motor_steps;
+    CODE volatile *packet;
+    bool volatile isRelative = false, penUp = true;
+    uint16_t count_x, step_x, dir_x, count_y, step_y, dir_y;
+    uint16_t pos[2] = {0xd00, 0xd00};
     uint16_t volatile compare;
+    volatile uint16_t counter = 0xfff;
 
-
-/*    if(_init_spi() != SPI_OK)*/
-/*        APP_TRACE_DBG("Error Initialising SPI\n");*/
-
-/*    _mcp23s08_reset();*/
-
-/*    _mcp23s08_reset_ss(MCP23S08_SS);*/
-/*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);*/
-/*    _mcp23s08_set_ss(MCP23S08_SS);*/
-    
-    volatile uint32_t counter = 0xfff;
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
-
-        packet = (COORDINATES volatile *)OSTaskQPend (0,
-                                                      OS_OPT_PEND_BLOCKING,
-                                                      &msg_size,
-                                                      NULL,
-                                                      &err);
+        packet = (CODE volatile *)OSTaskQPend (0,
+                OS_OPT_PEND_BLOCKING,
+                &msg_size,
+                NULL,
+                &err);
         if (err != OS_ERR_NONE)
             APP_TRACE_DBG ("Error OSTaskQPend: AppTaskManMode\n");
-        
-       APP_TRACE_INFO ("Trying to step up...\n");
 
         switch(packet->cmd){
-            case 0:
-                APP_TRACE_DBG ("Command 0\n");
+            case 0:                             // G00 
+                APP_TRACE_DBG ("G00\n");
                 break;
-            case 1:
-                APP_TRACE_DBG ("Command 1\n");
-                switch(packet->z_axis){
-                    case 0:
-                        APP_TRACE_DBG ("Pen down\n");
-                        compare = (uint16_t)((100 - 10) * 93.74);
-                        XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
-                        XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
-                        packet->z_axis = 2;
-                        break;
-                    case 1:
-                        APP_TRACE_DBG ("Pen up\n");
-                        compare = (uint16_t)((100 - 5) * 93.74);
-                        XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
-                        XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
-                        packet->z_axis = 2;
-                        break;
-                    default:
-                        APP_TRACE_DBG ("Default\n");
-                        if ((packet->x_axis != 0) || (packet->y_axis != 0)){
-                            APP_TRACE_INFO ("inside if...\n");
-                            if (packet->x_axis < 0){
-                                motor_direction = X_AXIS_NEG;
-                                motor_steps = -packet->x_axis;
-                            } else
-                                if (packet->x_axis > 0){
-                                motor_direction = X_AXIS_POS;
-                                motor_steps = packet->x_axis;
-                            }
-                            if (packet->y_axis < 0){
-                                    motor_direction = Y_AXIS_NEG;
-                                    motor_steps = -packet->y_axis;
-                                } else
-                                    if (packet->y_axis > 0){
-                                    motor_direction = Y_AXIS_POS;
-                                    motor_steps = packet->y_axis;
-                                }
-                            packet->x_axis = 0;
-                            packet->y_axis = 0;
-
-                            for(count = 0; count < motor_steps; count++){
-
-                                _mcp23s08_reset_ss(MCP23S08_SS);
-                                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
-                                _mcp23s08_set_ss(MCP23S08_SS);
-
-                                while(--counter);
-                                counter = 0xfff;
-
-                                _mcp23s08_reset_ss(MCP23S08_SS);
-                                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-                                _mcp23s08_set_ss(MCP23S08_SS);
-                            }
-                        }
+            case 1:                             // G01
+                APP_TRACE_DBG ("G01\n");
+                // PEN UP X PEN DOWN
+                if(packet->z_axis == 1 && penUp){
+                    APP_TRACE_DBG ("Pen down\n");
+                    compare = (uint16_t)((100 - 10) * 93.74);
+                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                    XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                    packet->z_axis = 2;
                 }
+                if(packet->z_axis == 0 && !penUp){
+                    APP_TRACE_DBG ("Pen up\n");
+                    compare = (uint16_t)((100 - 5) * 93.74);
+                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                    XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                    packet->z_axis = 2;
+                }
+                // MOVE PLOTTER HORIZONTALLY
+                APP_TRACE_DBG ("Default\n");
+                if(!isRelative){                        // ABSOLUTE
+                    // X_AXIS
+                    packet->x_axis -= pos[0];
+                    // Y_AXIS
+                    packet->y_axis -= pos[1];
+                }
+                // X_AXIS
+                if (packet->x_axis < 0) dir_x = X_AXIS_NEG;
+                if (packet->x_axis > 0) dir_x = X_AXIS_POS;
+                step_x = abs(packet->x_axis);
+                // Y_AXIS
+                if (packet->y_axis < 0) dir_y = Y_AXIS_NEG;
+                if (packet->y_axis > 0) dir_y = Y_AXIS_POS;
+                step_y = abs(packet->y_axis);
+                // MOVE!
+                for(count_x = 0, count_y = 0; count_x < step_x || count_y < step_y; count_x++, count_y++){
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    if(count_x < step_x) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
+                    if(count_y < step_y) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+                }
+                packet->x_axis = 0;
+                packet->y_axis = 0;
                 break;
-            case 2:
-                APP_TRACE_DBG ("Command 2\n");
+            case 2:                             // G90
+                APP_TRACE_DBG ("G90\n");
                 isRelative = false;
                 break;
-            case 3:
-                APP_TRACE_DBG ("Command 3\n");
+            case 3:                             // G91
+                APP_TRACE_DBG ("G91\n");
                 isRelative = true;
                 break;
-            case 4:
-                APP_TRACE_DBG ("Command 4\n");
+            case 4:                             // G28
+                APP_TRACE_DBG ("G28\n");
                 break;
-            case 5:
-                APP_TRACE_DBG ("Command 5\n");
+            case 5:                             // G02
+                APP_TRACE_DBG ("G02\n");
                 break;
-            //default:
+                //default:
         }
     }
 }
