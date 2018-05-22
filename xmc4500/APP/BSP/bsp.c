@@ -5,7 +5,7 @@
  * @author Martin Horauer, UAS Technikum Wien                                  *
  *         Modified by: Kelve T. Henrique                                      *
  * @revision 0.1                                                               *
- * @date 04-2018                                                               *
+ * @date 05-2018                                                               *
  *******************************************************************************/
 
 /******************************************************************* INCLUDES */
@@ -16,7 +16,6 @@
 #include  <bsp_uart.h>
 #include  <bsp_gpio.h>
 #include  <bsp_ccu4.h>
-#include  <bsp_ccu8.h>
 
 /********************************************************* FILE LOCAL DEFINES */
 
@@ -41,6 +40,5 @@ void  BSP_Init (void)
 	BSP_UART_Init();
 	BSP_GPIO_Init();
 	BSP_CCU4_Init();
-	BSP_CCU8_Init();
 }
 /** EOF */
