@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 18
+# -- Last update: 2018 Mai 22
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -428,6 +428,13 @@ class AppWindow(QMainWindow):
             self.hasChanged = False
         else:
             self.hasChanged = True
+
+    def updateTerm(self):#, by):
+        '''
+        It is signaled every time there's incoming message from uC
+        '''
+        wasRead = self.port.readAll()
+        self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
