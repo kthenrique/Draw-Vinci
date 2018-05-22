@@ -60,11 +60,6 @@
 #define ENDPOINT_3      81
 #define ENDPOINT_4      97
 
-#define D5 P1_15
-#define D6 P1_13
-#define D7 P1_14
-#define D8 P1_12
-
 #define X_AXIS_POS 0x03
 #define X_AXIS_NEG 0x02
 #define Y_AXIS_POS 0x0C
@@ -470,6 +465,21 @@ static void AppTaskManMode (void *p_arg){
                 break;
             case 4:                             // G28
                 APP_TRACE_DBG ("G28\n");
+                while(P1_15_read() != 0x8000UL || P1_14_read() != 0x4000UL){ // while not on bottom-left
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    if(P1_15_read() != 0x8000UL) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
+                    if(P1_14_read() != 0x4000UL) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+                }
+                pos[0] = 0;
+                pos[1] = 0;
                 break;
             case 5:                             // G02
                 APP_TRACE_DBG ("G02\n");
@@ -480,40 +490,6 @@ static void AppTaskManMode (void *p_arg){
 }
 
 
-//static void AppTaskEndpoints (void *p_arg){
-//    uint8_t reg_val = 0;
-//    XMC_GPIO_CONFIG_t gpio_config;
-//    OS_ERR err;
-//    
-//    
-//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-//
-//    XMC_GPIO_Init(D5, &gpio_config);
-//    XMC_GPIO_SetOutputHigh(D5);
-//
-//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-//
-//    XMC_GPIO_Init(D6, &gpio_config);
-//    XMC_GPIO_SetOutputHigh(D6);
-//
-//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-//
-//    XMC_GPIO_Init(D7, &gpio_config);
-//    XMC_GPIO_SetOutputHigh(D7);
-//
-//    gpio_config.mode = XMC_GPIO_MODE_OUTPUT_PUSH_PULL;
-//    gpio_config.output_level = XMC_GPIO_OUTPUT_LEVEL_HIGH;
-//    gpio_config.output_strength = XMC_GPIO_OUTPUT_STRENGTH_MEDIUM;
-//
-//    XMC_GPIO_Init(D8, &gpio_config);
-//    XMC_GPIO_SetOutputHigh(D8);
-//
 //    _mcp23s08_reset();
 //    
 ///*    _mcp23s08_reset_ss(MCP23S08_SS);*/
@@ -554,13 +530,5 @@ static void AppTaskManMode (void *p_arg){
 //            XMC_GPIO_SetOutputHigh(D7);
 //            XMC_GPIO_SetOutputLow(D8);
 //        }
-//        OSTimeDlyHMSM(0,
-//                      0,
-//                      0,
-//                      10,
-//                      OS_OPT_TIME_HMSM_STRICT,
-//                      &err);
-//    }
-//}
 
 /************************************************************************ EOF */
