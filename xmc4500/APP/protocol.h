@@ -21,9 +21,9 @@ typedef struct{
     int16_t y_axis;
     uint8_t z_axis;         //z_axis = 0 -> pen up (no painting), z_axis = 1 -> pen down (painting)
     uint16_t speed;
-}COORDINATES;
+}CODE;
 
-bool scrutinise(char *str, volatile COORDINATES *packet);
+bool scrutinise(char *str, volatile CODE *packet);
 
 void SendNack(void);
 void SendAck(void);

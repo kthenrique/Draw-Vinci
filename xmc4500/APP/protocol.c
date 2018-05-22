@@ -13,15 +13,13 @@
 #include <xmc_uart.h>
 #include <string.h>
 
-
-bool scrutinise(char *str, volatile COORDINATES *packet){
-    char *endptr = NULL;
-    char *token_ptr = NULL;
+bool scrutinise(char *str, volatile CODE *packet){
+    char *endptr = NULL, *token_ptr = NULL, *sav_p;
     const char delim[] = ":";
+    uint8_t i;
 
-    APP_TRACE_INFO ("Separated in tokens ...\n");
-    token_ptr = strtok(str, delim);
-    while(1){
+    for (i = 0; i != 4; i++, str = NULL){
+        token_ptr = strtok_r(str, delim, &sav_p); // strtok_r preferable for reentrancy
         if (strncmp((const char *)token_ptr,(const char *)"G00",3) == 0){
             packet->cmd    = 0;
             packet->x_axis = 0;
@@ -36,10 +34,10 @@ bool scrutinise(char *str, volatile COORDINATES *packet){
                     packet->cmd    = 2;
                 } else 
                     if (strncmp((const char *)token_ptr,(const char *)"G91",3) == 0){
-                    packet->cmd    = 3;
-                    packet->x_axis = 0;
-                    packet->y_axis = 0;
-                    packet->z_axis = 2;
+                        packet->cmd    = 3;
+                        packet->x_axis = 0;
+                        packet->y_axis = 0;
+                        packet->z_axis = 2;
                     } else
                         if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
                             APP_TRACE_INFO ("Changing value of X...\n");
@@ -51,8 +49,7 @@ bool scrutinise(char *str, volatile COORDINATES *packet){
                                 if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
                                     packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
                                 } else
-                                      return false;
-        token_ptr = strtok(NULL, delim);
+                                    return false;
         if (token_ptr == NULL){
             break;
         }
