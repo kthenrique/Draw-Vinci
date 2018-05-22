@@ -16,10 +16,10 @@
 #include <stdlib.h>
 
 typedef struct{
+    uint8_t cmd; // G00:0 G01:1 G90:2 G91:3 G28:4 G02:5
     int16_t x_axis;
     int16_t y_axis;
     uint8_t z_axis;         //z_axis = 0 -> pen up (no painting), z_axis = 1 -> pen down (painting)
-    uint8_t pos_mode;       //pos_mode = 0 -> absolute positioning, pos_mode = 1 -> relative addressing
     uint16_t speed;
 }COORDINATES;
 

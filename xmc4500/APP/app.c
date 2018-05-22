@@ -22,7 +22,6 @@
 #include <bsp_int.h>
 
 #include <bsp_gpio.h>
-#include <bsp_ccu8.h>
 #include <bsp_ccu4.h>
 
 #include <string.h>
@@ -53,7 +52,7 @@
 
 /******************************************************************** DEFINES */
 
-#define MAX_MSG_LENGTH         8
+#define MAX_MSG_LENGTH         12
 #define NUM_MSG                32
 
 #define ENDPOINT_1      113
@@ -251,23 +250,6 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskManMode \n");
 
-    // create AppTaskAutoMode
-    OSTaskCreate ((OS_TCB     *) &AppTaskAutoMode_TCB,
-                  (CPU_CHAR   *) "TaskAutoMode",
-                  (OS_TASK_PTR ) AppTaskAutoMode,
-                  (void       *) 0,
-                  (OS_PRIO     ) APP_CFG_TASK_AUTO_MODE_PRIO,
-                  (CPU_STK    *) &AppTaskAutoMode_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_AUTO_MODE_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_AUTO_MODE_STK_SIZE,
-                  (OS_MSG_QTY  ) 5u,
-                  (OS_TICK     ) 0u,
-                  (void       *) 0,
-                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-                  (OS_ERR     *) &err);
-    if (err != OS_ERR_NONE)
-        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskAutoMode \n");
-
 //    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
 //                  (CPU_CHAR   *) "TaskEndpoints",
 //                  (OS_TASK_PTR ) AppTaskEndpoints,
@@ -379,23 +361,14 @@ static void AppTaskCom (void *p_arg){
             SendNack();
             continue;
         }
-        
-        if (packet.pos_mode == 1){
-            OSTaskQPost((OS_TCB    *) &AppTaskManMode_TCB,
+
+        OSTaskQPost((OS_TCB    *) &AppTaskManMode_TCB,
                 (void      *) &packet,
                 (OS_MSG_SIZE) sizeof(packet),
                 (OS_OPT     ) OS_OPT_POST_FIFO,
                 (OS_ERR    *) &err);
-        }
-            if (err != OS_ERR_NONE){
-                APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
-        }
-        else{
-            OSTaskQPost((OS_TCB    *) &AppTaskAutoMode_TCB,
-                (void      *) &packet,
-                (OS_MSG_SIZE) sizeof(packet),
-                (OS_OPT     ) OS_OPT_POST_FIFO,
-                (OS_ERR    *) &err);
+        if (err != OS_ERR_NONE){
+            APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
         }
 
         APP_TRACE_INFO ("=======================\n");
@@ -417,9 +390,12 @@ static void AppTaskManMode (void *p_arg){
     OS_ERR      err;
     COORDINATES volatile *packet;
     OS_MSG_SIZE msg_size;
+    bool volatile isRelative = false;
     uint8_t motor_direction = 0x02;
     uint16_t count;
     uint16_t motor_steps;
+    uint16_t volatile compare;
+
 
 /*    if(_init_spi() != SPI_OK)*/
 /*        APP_TRACE_DBG("Error Initialising SPI\n");*/
@@ -444,73 +420,85 @@ static void AppTaskManMode (void *p_arg){
         
        APP_TRACE_INFO ("Trying to step up...\n");
 
-        if ((packet->x_axis != 0) || (packet->y_axis != 0)){
-            APP_TRACE_INFO ("inside if...\n");
-            if (packet->x_axis < 0){
-                motor_direction = X_AXIS_NEG;
-                motor_steps = -packet->x_axis;
-            } else
-                if (packet->x_axis > 0){
-                motor_direction = X_AXIS_POS;
-                motor_steps = packet->x_axis;
-            }
-            if (packet->y_axis < 0){
-                    motor_direction = Y_AXIS_NEG;
-                    motor_steps = -packet->y_axis;
-                } else
-                    if (packet->y_axis > 0){
-                    motor_direction = Y_AXIS_POS;
-                    motor_steps = packet->y_axis;
+        switch(packet->cmd){
+            case 0:
+                APP_TRACE_DBG ("Command 0\n");
+                break;
+            case 1:
+                APP_TRACE_DBG ("Command 1\n");
+                switch(packet->z_axis){
+                    case 0:
+                        APP_TRACE_DBG ("Pen down\n");
+                        compare = (uint16_t)((100 - 10) * 93.74);
+                        XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                        XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                        packet->z_axis = 2;
+                        break;
+                    case 1:
+                        APP_TRACE_DBG ("Pen up\n");
+                        compare = (uint16_t)((100 - 5) * 93.74);
+                        XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                        XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                        packet->z_axis = 2;
+                        break;
+                    default:
+                        APP_TRACE_DBG ("Default\n");
+                        if ((packet->x_axis != 0) || (packet->y_axis != 0)){
+                            APP_TRACE_INFO ("inside if...\n");
+                            if (packet->x_axis < 0){
+                                motor_direction = X_AXIS_NEG;
+                                motor_steps = -packet->x_axis;
+                            } else
+                                if (packet->x_axis > 0){
+                                motor_direction = X_AXIS_POS;
+                                motor_steps = packet->x_axis;
+                            }
+                            if (packet->y_axis < 0){
+                                    motor_direction = Y_AXIS_NEG;
+                                    motor_steps = -packet->y_axis;
+                                } else
+                                    if (packet->y_axis > 0){
+                                    motor_direction = Y_AXIS_POS;
+                                    motor_steps = packet->y_axis;
+                                }
+                            packet->x_axis = 0;
+                            packet->y_axis = 0;
+
+                            for(count = 0; count < motor_steps; count++){
+
+                                _mcp23s08_reset_ss(MCP23S08_SS);
+                                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
+                                _mcp23s08_set_ss(MCP23S08_SS);
+
+                                while(--counter);
+                                counter = 0xfff;
+
+                                _mcp23s08_reset_ss(MCP23S08_SS);
+                                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                                _mcp23s08_set_ss(MCP23S08_SS);
+                            }
+                        }
                 }
-            packet->x_axis = 0;
-            packet->y_axis = 0;
-
-            for(count = 0; count < motor_steps; count++){
-
-                _mcp23s08_reset_ss(MCP23S08_SS);
-                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,motor_direction,MCP23S08_WR);
-                _mcp23s08_set_ss(MCP23S08_SS);
-
-                while(--counter);
-                counter = 0xfff;
-
-                _mcp23s08_reset_ss(MCP23S08_SS);
-                _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-                _mcp23s08_set_ss(MCP23S08_SS);
-            }
+                break;
+            case 2:
+                APP_TRACE_DBG ("Command 2\n");
+                isRelative = false;
+                break;
+            case 3:
+                APP_TRACE_DBG ("Command 3\n");
+                isRelative = true;
+                break;
+            case 4:
+                APP_TRACE_DBG ("Command 4\n");
+                break;
+            case 5:
+                APP_TRACE_DBG ("Command 5\n");
+                break;
+            //default:
         }
     }
 }
 
-/************************************************************************************/
-/**
- * \function AppTaskAutoMode
- * \ params p_arg ... argument passed to AppTaskAutoMode() at creation
- * \returns none
- *
- * \brief It waits until a message arrives in its queue.
- *        After receiving something, it will adjust the duty cycle of the output
- *        in the respective pin.
- */
-static void AppTaskAutoMode (void *p_arg){
-    OS_ERR      err;
-    COORDINATES volatile *packet;
-    OS_MSG_SIZE msg_size;
-
-    APP_TRACE_INFO ("AppTaskAutoMode Loop...\n");
-    while (DEF_ON){
-
-        packet = (COORDINATES volatile *)OSTaskQPend (0,
-                                                      OS_OPT_PEND_BLOCKING,
-                                                      &msg_size,
-                                                      NULL,
-                                                      &err);
-        if (err != OS_ERR_NONE)
-            APP_TRACE_DBG ("Error OSTaskQPend: AppTaskAutoMode\n");
-
-        //check out new data and calculate the new position, drive the motors
-    }
-}
 
 //static void AppTaskEndpoints (void *p_arg){
 //    uint8_t reg_val = 0;
