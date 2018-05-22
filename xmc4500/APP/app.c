@@ -65,15 +65,12 @@
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
-static  OS_TCB   AppTaskManMode_TCB;
-static  OS_TCB   AppTaskAutoMode_TCB;
-static  OS_TCB   AppTaskEndpoints_TCB;
+static  OS_TCB   AppTaskPlot_TCB;
 
 static  CPU_STK  AppTaskStart_Stk  [APP_CFG_TASK_START_STK_SIZE];
 static  CPU_STK  AppTaskCom_Stk    [APP_CFG_TASK_COM_STK_SIZE];
-static  CPU_STK  AppTaskManMode_Stk[APP_CFG_TASK_MAN_MODE_STK_SIZE];
-static  CPU_STK  AppTaskAutoMode_Stk[APP_CFG_TASK_AUTO_MODE_STK_SIZE];
-static  CPU_STK  AppTaskEndpoints_Stk[APP_CFG_TASK_ENDPOINTS_STK_SIZE];
+static  CPU_STK  AppTaskPlot_Stk   [APP_CFG_TASK_PLOT_STK_SIZE];
+
 // Memory Block
 OS_MEM      Mem_Partition;
 CPU_CHAR    MyPartitionStorage[NUM_MSG][MAX_MSG_LENGTH]; // +1 to ensure the UART_ISR gets first error at post
@@ -84,9 +81,8 @@ OS_Q        UART_QUEUE;
 /************************************************************ FUNCTIONS/TASKS */
 static void AppTaskStart    (void *p_arg);
 static void AppTaskCom      (void *p_arg);
-static void AppTaskManMode  (void *p_arg);
-static void AppTaskEndpoints(void *p_arg);
-static void AppTaskAutoMode (void *p_arg);
+static void AppTaskPlot     (void *p_arg);
+
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -225,16 +221,16 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
 
-    // create AppTaskManMode
-    OSTaskCreate ((OS_TCB     *) &AppTaskManMode_TCB,
-                  (CPU_CHAR   *) "TaskManualMode",
-                  (OS_TASK_PTR ) AppTaskManMode,
+    // create AppTaskPlot
+    OSTaskCreate ((OS_TCB     *) &AppTaskPlot_TCB,
+                  (CPU_CHAR   *) "TaskPlot",
+                  (OS_TASK_PTR ) AppTaskPlot,
                   (void       *) 0,
-                  (OS_PRIO     ) APP_CFG_TASK_MAN_MODE_PRIO,
-                  (CPU_STK    *) &AppTaskManMode_Stk[0],
-                  (CPU_STK_SIZE) APP_CFG_TASK_MAN_MODE_STK_SIZE / 10u,
-                  (CPU_STK_SIZE) APP_CFG_TASK_MAN_MODE_STK_SIZE,
-                  (OS_MSG_QTY  ) 5u,
+                  (OS_PRIO     ) APP_CFG_TASK_PLOT_PRIO,
+                  (CPU_STK    *) &AppTaskPlot_Stk[0],
+                  (CPU_STK_SIZE) APP_CFG_TASK_PLOT_STK_SIZE / 10u,
+                  (CPU_STK_SIZE) APP_CFG_TASK_PLOT_STK_SIZE,
+                  (OS_MSG_QTY  ) 10u,
                   (OS_TICK     ) 0u,
                   (void       *) 0,
                   (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
@@ -242,22 +238,6 @@ static void AppTaskStart (void *p_arg){
     if (err != OS_ERR_NONE)
         APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskManMode \n");
 
-//    OSTaskCreate ((OS_TCB     *) &AppTaskEndpoints_TCB,
-//                  (CPU_CHAR   *) "TaskEndpoints",
-//                  (OS_TASK_PTR ) AppTaskEndpoints,
-//                  (void       *) 0,
-//                  (OS_PRIO     ) APP_CFG_TASK_ENDPOINTS_PRIO,
-//                  (CPU_STK    *) &AppTaskEndpoints_Stk[0],
-//                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE / 10u,
-//                  (CPU_STK_SIZE) APP_CFG_TASK_ENDPOINTS_STK_SIZE,
-//                  (OS_MSG_QTY  ) 0u,
-//                  (OS_TICK     ) 0u,
-//                  (void       *) 0,
-//                  (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
-//                  (OS_ERR     *) &err);
-//    if (err != OS_ERR_NONE)
-//        APP_TRACE_DBG ("Error OSTaskCreate: AppTaskCreate : AppTaskCom\n");
-    
     APP_TRACE_DBG ("Deleting AppTaskStart ...\n");
     do {
         OSTaskDel((OS_TCB *)0, &err); // SCHEDULING POINT
@@ -340,7 +320,7 @@ static void AppTaskCom (void *p_arg){
             continue;
         }
 
-        OSTaskQPost((OS_TCB    *) &AppTaskManMode_TCB,
+        OSTaskQPost((OS_TCB    *) &AppTaskPlot_TCB,
                 (void      *) &packet,
                 (OS_MSG_SIZE) sizeof(packet),
                 (OS_OPT     ) OS_OPT_POST_FIFO,
@@ -364,7 +344,7 @@ static void AppTaskCom (void *p_arg){
  *        in the respective pin.
  */
 
-static void AppTaskManMode (void *p_arg){
+static void AppTaskPlot(void *p_arg){
     OS_ERR      err;
     OS_MSG_SIZE msg_size;
     CODE volatile *packet;

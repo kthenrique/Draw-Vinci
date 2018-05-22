@@ -8,10 +8,19 @@
  *
  */
 
-#include <protocol.h>
 #include <app_cfg.h>
+#include <protocol.h>
 #include <xmc_uart.h>
 #include <string.h>
+
+#if SEMI_HOSTING
+#include <debug_lib.h>
+#endif
+
+#if JLINK_RTT
+#include <SEGGER_RTT.h>
+#include <SEGGER_RTT_Conf.h>
+#endif
 
 bool scrutinise(char *str, volatile CODE *packet){
     char *endptr = NULL, *token_ptr = NULL, *sav_p;
@@ -27,7 +36,7 @@ bool scrutinise(char *str, volatile CODE *packet){
             packet->z_axis = 2;
         } else
             if (strncmp((const char *)token_ptr,(const char *)"G01",3) == 0){
-                APP_TRACE_INFO ("G01...\n");
+                APP_TRACE_DBG ("G01...\n");
                 packet->cmd    = 1;
             } else
                 if (strncmp((const char *)token_ptr,(const char *)"G90",3) == 0){
@@ -40,7 +49,7 @@ bool scrutinise(char *str, volatile CODE *packet){
                         packet->z_axis = 2;
                     } else
                         if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
-                            APP_TRACE_INFO ("Changing value of X...\n");
+                            APP_TRACE_DBG ("Changing value of X...\n");
                             packet->x_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
                         } else
                             if ((token_ptr[0] == 'y') || (token_ptr[0] == 'Y')){
