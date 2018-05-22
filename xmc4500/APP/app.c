@@ -23,6 +23,7 @@
 
 #include <bsp_gpio.h>
 #include <bsp_ccu4.h>
+#include <bsp_spi.h>
 
 #include <string.h>
 #include <stdbool.h>
@@ -38,9 +39,6 @@
 
 #include <protocol.h>
 
-#include "xmc4500_spi_lib.h"
-#include "mcp23s08_drv.h"
-
 #if SEMI_HOSTING
 #include <debug_lib.h>
 #endif
@@ -51,7 +49,6 @@
 #endif
 
 /******************************************************************** DEFINES */
-
 #define MAX_MSG_LENGTH         12
 #define NUM_MSG                32
 
@@ -64,6 +61,7 @@
 #define X_AXIS_NEG 0x02
 #define Y_AXIS_POS 0x0C
 #define Y_AXIS_NEG 0x08
+
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
@@ -89,7 +87,6 @@ static void AppTaskCom      (void *p_arg);
 static void AppTaskManMode  (void *p_arg);
 static void AppTaskEndpoints(void *p_arg);
 static void AppTaskAutoMode (void *p_arg);
-static void initspi(void);
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -269,18 +266,7 @@ static void AppTaskStart (void *p_arg){
     }while(err != OS_ERR_NONE);
 
 }
-/*********************************** SPI Initialization --> MAYBE WE SHOULD MAKE IT AN BSP FILE FOR THAT?!?*/ 
-static void initspi(void)
-{
-    if(_init_spi() != SPI_OK)
-        APP_TRACE_DBG("Error Initialising SPI\n");
 
-    _mcp23s08_reset();
-
-    _mcp23s08_reset_ss(MCP23S08_SS);
-    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x00,MCP23S08_WR);
-    _mcp23s08_set_ss(MCP23S08_SS);
-}
 /*********************************** Communication Application Task */
 /**
  * \function AppTaskCom
@@ -314,9 +300,6 @@ static void AppTaskCom (void *p_arg){
     CODE volatile packet;
 
     (void) p_arg; // Just to silence compiler
-
-    //init the spi interface
-    initspi();
 
     APP_TRACE_INFO ("AppTaskCom Loop...\n");
     while (DEF_ON) {

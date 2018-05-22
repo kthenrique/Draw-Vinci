@@ -16,6 +16,7 @@
 #include  <bsp_uart.h>
 #include  <bsp_gpio.h>
 #include  <bsp_ccu4.h>
+#include  <bsp_spi.h>
 
 /********************************************************* FILE LOCAL DEFINES */
 
@@ -40,5 +41,6 @@ void  BSP_Init (void)
 	BSP_UART_Init();
 	BSP_GPIO_Init();
 	BSP_CCU4_Init();
+    BSP_SPI_Init();
 }
 /** EOF */

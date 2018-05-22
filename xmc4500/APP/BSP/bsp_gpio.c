@@ -8,7 +8,7 @@
 
 #include <bsp_gpio.h>
 
-_Bool BSP_GPIO_Init (void){
+_Bool BSP_GPIO_Init(void){
 
     // Initialise Pen Motor Pin
     P1_3_set_mode(OUTPUT_PP_AF3);
