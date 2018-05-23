@@ -71,6 +71,12 @@ class parser():
                 width  = float(rect.attribute('width'))
                 height = float(rect.attribute('height'))
 
+                # Scaling
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
+
                 newCanvasRect.setRect(x, y, width, height)
                 listOfItems.append(newCanvasRect)
 
@@ -104,6 +110,12 @@ class parser():
                 x = cx - float(elli.attribute('rx'))
                 y = cy - float(elli.attribute('ry'))
 
+                # Scaling
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
+
                 newCanvasElli.setRect(x, y, width, height)
                 listOfItems.append(newCanvasElli)
                 elli = elli.nextSiblingElement('ellipse')
@@ -120,6 +132,12 @@ class parser():
 
                 x = cx - float(cir.attribute('r'))
                 y = cy - float(cir.attribute('r'))
+
+                # Scaling
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
 
                 newCanvasCir.setRect(x, y, width, height)
                 listOfItems.append(newCanvasCir)
@@ -138,6 +156,12 @@ class parser():
                 y1 = float(coord1[1])
                 x2 = float(coord2[0])
                 y2 = float(coord2[1])
+
+                # Scaling
+                x1     = 100 * x1/dy_scale
+                y1     = 100 * y1/dy_scale
+                x2     = 100 * x2/dy_scale
+                y2     = 100 * y2/dy_scale
 
                 newCanvasLin.setLine(x1, y1, x2, y2)
                 listOfItems.append(newCanvasLin)
@@ -167,7 +191,14 @@ class parser():
                 points = points.split()
                 for point in points:
                     coord = point.split(',')
-                    newPoly.append(QPointF(float(coord[0]), float(coord[1])))
+                    coord[0] = float(coord[0])
+                    coord[1] = float(coord[1])
+
+                    # Scaling
+                    coord[0] = 100 * (coord[0] / (dy_scale))
+                    coord[1] = 100 * (coord[1] / (dy_scale))
+
+                    newPoly.append(QPointF(coord[0], coord[1]))
 
                     # G-CODE
                     if not mode:
@@ -214,10 +245,8 @@ class parser():
                     coord = coord.split()
                     for index in range(len(coord)):  # Convert str to float
                         coord[index] = float(coord[index])
-                        #if index % 2 == 0:
-                        #coord[index] = coord[index]* / (dy_scale*dx_scale)
-                        #else:
-                        #coord[index] = (coord[index] / dy_scale) * (CANVAS_HEIGHT/3)
+                        # Scaling
+                        coord[index] = 100 * (coord[index] / (dy_scale))
                     if path[0]   == 'M':        # moveTo
                         newPat.moveTo(coord[0], coord[1])
                         # G-CODE
