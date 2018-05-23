@@ -137,6 +137,7 @@ class AppWindow(QMainWindow):
 
         # Control Buttons Initialisation
         self.ui.connectButton.clicked.connect(self.connectPort)    # connect
+        self.ui.clearTermButton.clicked.connect(self.clearTerm)    # clear terminal
         self.ui.playButton.toggled.connect(self.playIt)            # play
         self.ui.stopButton.clicked.connect(self.stopIt)            # stop
         self.ui.pauseButton.clicked.connect(self.pauseIt)          # pause
@@ -202,6 +203,9 @@ class AppWindow(QMainWindow):
             self.ui.portsBox.setEditable(True)
         else:
             self.ui.portsBox.setEditable(False)
+
+    def clearTerm(self):
+        self.ui.termEdit.clear()
 
     def connectPort(self):
         '''
