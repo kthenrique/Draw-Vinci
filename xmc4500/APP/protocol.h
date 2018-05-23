@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 typedef struct{
+    bool isFree;
     uint8_t cmd; // G00:0 G01:1 G90:2 G91:3 G28:4 G02:5
     int16_t x_axis;
     int16_t y_axis;

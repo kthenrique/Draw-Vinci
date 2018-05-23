@@ -27,6 +27,7 @@ bool scrutinise(char *str, volatile CODE *packet){
     const char delim[] = ":";
     uint8_t i;
 
+    packet->isFree = false;
     for (i = 0; i != 4; i++, str = NULL){
         token_ptr = strtok_r(str, delim, &sav_p); // strtok_r preferable for reentrancy
         if (strncmp((const char *)token_ptr,(const char *)"G00",3) == 0){

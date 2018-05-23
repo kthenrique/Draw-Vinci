@@ -49,18 +49,13 @@
 #endif
 
 /******************************************************************** DEFINES */
-#define MAX_MSG_LENGTH         12
+#define MAX_MSG_LENGTH         20
 #define NUM_MSG                32
 
-#define ENDPOINT_1      113
-#define ENDPOINT_2      49
-#define ENDPOINT_3      81
-#define ENDPOINT_4      97
-
-#define X_AXIS_POS 0x03
-#define X_AXIS_NEG 0x02
-#define Y_AXIS_POS 0x0C
-#define Y_AXIS_NEG 0x08
+#define Y_AXIS_POS 0x02
+#define Y_AXIS_NEG 0x03
+#define X_AXIS_POS 0x0C
+#define X_AXIS_NEG 0x08
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
@@ -213,7 +208,7 @@ static void AppTaskStart (void *p_arg){
                   (CPU_STK    *) &AppTaskCom_Stk[0],
                   (CPU_STK_SIZE) APP_CFG_TASK_COM_STK_SIZE / 10u,
                   (CPU_STK_SIZE) APP_CFG_TASK_COM_STK_SIZE,
-                  (OS_MSG_QTY  ) 0u,
+                  (OS_MSG_QTY  ) NUM_MSG,
                   (OS_TICK     ) 0u,
                   (void       *) 0,
                   (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
@@ -230,7 +225,7 @@ static void AppTaskStart (void *p_arg){
                   (CPU_STK    *) &AppTaskPlot_Stk[0],
                   (CPU_STK_SIZE) APP_CFG_TASK_PLOT_STK_SIZE / 10u,
                   (CPU_STK_SIZE) APP_CFG_TASK_PLOT_STK_SIZE,
-                  (OS_MSG_QTY  ) 10u,
+                  (OS_MSG_QTY  ) NUM_MSG,
                   (OS_TICK     ) 0u,
                   (void       *) 0,
                   (OS_OPT      ) (OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
@@ -277,7 +272,8 @@ static void AppTaskCom (void *p_arg){
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
 
     bool volatile valid;
-    CODE volatile packet;
+    CODE volatile packet[NUM_MSG];
+    uint8_t volatile current = 0;
 
     (void) p_arg; // Just to silence compiler
 
@@ -312,7 +308,7 @@ static void AppTaskCom (void *p_arg){
 
         // scrutinise received msg for compliance with protocol
         APP_TRACE_INFO ("Calling scrutinise() ...\n");
-        valid = scrutinise(msg, &packet);
+        valid = scrutinise(msg, &packet[current]);
         if (!valid){
              APP_TRACE_INFO ("NO COMPLIANCE\n");
             // send NACK in return
@@ -321,14 +317,19 @@ static void AppTaskCom (void *p_arg){
         }
 
         OSTaskQPost((OS_TCB    *) &AppTaskPlot_TCB,
-                (void      *) &packet,
-                (OS_MSG_SIZE) sizeof(packet),
+                (void      *) &packet[current],
+                (OS_MSG_SIZE) sizeof(packet[current]),
                 (OS_OPT     ) OS_OPT_POST_FIFO,
                 (OS_ERR    *) &err);
         if (err != OS_ERR_NONE){
             APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
+            continue;
         }
 
+        while(!packet[current].isFree){
+            current++;
+            current %= NUM_MSG;
+        }
         APP_TRACE_INFO ("=======================\n");
     }
 }
@@ -350,7 +351,7 @@ static void AppTaskPlot(void *p_arg){
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
     uint16_t count_x, step_x, dir_x, count_y, step_y, dir_y;
-    uint16_t pos[2] = {0xd00, 0xd00};
+    uint16_t pos[4] = {0xd00, 0xd00, 0xd00, 0xd00};
     uint16_t volatile compare;
     volatile uint16_t counter = 0xfff;
 
@@ -390,10 +391,15 @@ static void AppTaskPlot(void *p_arg){
                 // MOVE PLOTTER HORIZONTALLY
                 APP_TRACE_DBG ("Default\n");
                 if(!isRelative){                        // ABSOLUTE
+                    pos[2] = pos[0];
+                    pos[3] = pos[1];
+                    pos[0] = packet->x_axis;
+                    pos[1] = packet->y_axis;
                     // X_AXIS
-                    packet->x_axis -= pos[0];
+                    packet->x_axis -= pos[2];
                     // Y_AXIS
-                    packet->y_axis -= pos[1];
+                    packet->y_axis -= pos[3];
+
                 }
                 // X_AXIS
                 if (packet->x_axis < 0) dir_x = X_AXIS_NEG;
@@ -404,10 +410,9 @@ static void AppTaskPlot(void *p_arg){
                 if (packet->y_axis > 0) dir_y = Y_AXIS_POS;
                 step_y = abs(packet->y_axis);
                 // MOVE!
-                for(count_x = 0, count_y = 0; count_x < step_x || count_y < step_y; count_x++, count_y++){
+                for(count_x = 0, count_y = 0; count_x < step_x && count_y < step_y; count_x++, count_y++){
                     _mcp23s08_reset_ss(MCP23S08_SS);
-                    if(count_x < step_x) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
-                    if(count_y < step_y) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(dir_x | dir_y),MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
                     while(--counter);
@@ -417,8 +422,41 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
                 }
+
+                while(count_x < step_x){
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    count_x++;
+                }
+
+                while(count_y < step_y){
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    count_y++;
+                }
+
                 packet->x_axis = 0;
                 packet->y_axis = 0;
+                step_x         = 0;
+                step_y         = 0;
                 break;
             case 2:                             // G90
                 APP_TRACE_DBG ("G90\n");
@@ -430,20 +468,39 @@ static void AppTaskPlot(void *p_arg){
                 break;
             case 4:                             // G28
                 APP_TRACE_DBG ("G28\n");
-                //here we should rise the pen up
+                // raise the pen
                 compare = (uint16_t)((5) * 93.74);
                 XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                 XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                penUp = true;
 
-                while(P1_15_read() != 0x8000UL || P1_14_read() != 0x4000UL){ // while not on bottom-left
+                while(ENDLEFT != 0 && ENDBOTTOM != 0){
                     _mcp23s08_reset_ss(MCP23S08_SS);
-                    if ((P1_15_read() != 0x8000UL) && (P1_14_read() != 0x4000UL))
-                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x0A,MCP23S08_WR);
-                    else if (P1_15_read() != 0x8000UL)
-                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
-                    else if(P1_14_read() != 0x4000UL)
-                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
 
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+                }
+                while(ENDBOTTOM != 0){
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+
+                    while(--counter);
+                    counter = 0xfff;
+
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                    _mcp23s08_set_ss(MCP23S08_SS);
+                }
+                while(ENDLEFT != 0){
+                    _mcp23s08_reset_ss(MCP23S08_SS);
+                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
                     while(--counter);
@@ -461,49 +518,8 @@ static void AppTaskPlot(void *p_arg){
                 break;
                 //default:
         }
+        packet->isFree = true;
     }
 }
-
-
-//    _mcp23s08_reset();
-//    
-///*    _mcp23s08_reset_ss(MCP23S08_SS);*/
-///*    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_IODIR,0x01,MCP23S08_WR);*/
-///*    _mcp23s08_set_ss(MCP23S08_SS);*/
-//    
-//    APP_TRACE_INFO ("AppTaskEndpoints Loop...\n");
-//    while(DEF_ON){
-//        _mcp23s08_reset_ss(MCP23S08_SS);
-//        reg_val = _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0,MCP23S08_RD);
-//        _mcp23s08_set_ss(MCP23S08_SS);
-//
-//        if(reg_val == ENDPOINT_1)
-//        {
-//            XMC_GPIO_SetOutputHigh(D5);
-//            XMC_GPIO_SetOutputLow(D6);
-//            XMC_GPIO_SetOutputHigh(D7);
-//            XMC_GPIO_SetOutputHigh(D8);
-//        }
-//        if(reg_val == ENDPOINT_2)
-//        {
-//            XMC_GPIO_SetOutputLow(D5);
-//            XMC_GPIO_SetOutputHigh(D6);
-//            XMC_GPIO_SetOutputHigh(D7);
-//            XMC_GPIO_SetOutputHigh(D8);
-//        }
-//        if(reg_val == ENDPOINT_3)
-//        {
-//            XMC_GPIO_SetOutputHigh(D5);
-//            XMC_GPIO_SetOutputHigh(D6);
-//            XMC_GPIO_SetOutputLow(D7);
-//            XMC_GPIO_SetOutputHigh(D8);
-//        }
-//        if(reg_val == ENDPOINT_4)
-//        {
-//            XMC_GPIO_SetOutputHigh(D5);
-//            XMC_GPIO_SetOutputHigh(D6);
-//            XMC_GPIO_SetOutputHigh(D7);
-//            XMC_GPIO_SetOutputLow(D8);
-//        }
 
 /************************************************************************ EOF */
