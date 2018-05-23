@@ -15,8 +15,10 @@ from PyQt5.QtCore import QLineF, QRectF, QPointF
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsItem
 from PyQt5.QtGui import (QPainter, QPixmap, QColor, QPolygonF, QPainterPath,
         QCursor, QTextCursor, QTransform, QPen, QFont)
+from PyQt5.QtSvg import QGraphicsSvgItem
 
 from constants import *
+from parser import getElements
 
 class MainScene(QGraphicsScene):
     ''' THE CANVAS
@@ -147,10 +149,11 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addRect(self.tools[self.index])
             elif self.index == 11: # import
-                parsed = self.parser.getElements(SVG[self.svg_index])
+                parsed = getElements(SVG[self.svg_index])
                 if parsed:
                     for element in parsed:
-                        self.addItem(element)
+                        self.item = self.addItem(element)
+                        element.setPos(self.clickedPos)
         else:
             if self.index == 8:               # magnifier
                 self.view.resetTransform()
