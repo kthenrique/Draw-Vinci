@@ -244,10 +244,10 @@ class AppWindow(QMainWindow):
                 self.ui.manualButton.setEnabled(False)
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
                     if self.isSaved:
+                        self.port.close()
                         g_code_path = self.path.replace('.svg', '.gcode')
                         self.terminalThread.path = g_code_path
                         self.terminalThread.port = self.ui.portsBox.currentText()
-                        self.port.close()
                         self.terminalThread.start(QThread.HighestPriority)
                     else:
                         self.ui.statusbar.showMessage(self.ui.statusbar.tr("Save canvas before plotting!"), TIMEOUT_STATUS)
@@ -256,7 +256,11 @@ class AppWindow(QMainWindow):
                         self.ui.manualButton.setEnabled(True)
                 elif not self.isPlotting:                          # MANUAL MODE
                     self.isPlotting = True
-                    self.sendSingleMsg("#G91:$")                      # set relative positioning
+                    self.sendSingleMsg("#G91$")                      # set relative positioning
+                    if self.ui.penButton.isChecked():
+                        self.sendSingleMsg('#G01:Z1$')
+                    else:
+                        self.sendSingleMsg('#G01:Z0$')
             else:
                 self.ui.statusbar.showMessage(self.ui.statusbar.tr("Not Connected!"), TIMEOUT_STATUS)
                 self.ui.stopButton.setChecked(True)
@@ -311,25 +315,25 @@ class AppWindow(QMainWindow):
 
     def goUp(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:Y50$')
+            self.sendSingleMsg('#G01:Y1000$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goDown(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:Y-50$')
+            self.sendSingleMsg('#G01:Y-1000$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goLeft(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:X-50$')
+            self.sendSingleMsg('#G01:X-1000$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goRight(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:X50$')
+            self.sendSingleMsg('#G01:X1000$')
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
@@ -448,8 +452,9 @@ class AppWindow(QMainWindow):
         '''
         It is signaled every time there's incoming message from uC
         '''
-        wasRead = self.port.readAll()
-        self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
+        if self.port.isOpen():
+            wasRead = self.port.readAll()
+            self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

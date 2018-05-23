@@ -12,6 +12,7 @@
 
 import os
 import shutil
+import serial
 
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QIODevice
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
@@ -38,6 +39,7 @@ class Terminal(QThread):
 
         self.path  = None
         self.port  = None
+        self.auto_port = None
 
         self.flag = False
 
@@ -49,37 +51,41 @@ class Terminal(QThread):
         self.path = shutil.copy(self.path, self.path.replace(os.path.basename(self.path), 'toPlotTemp'))
         file_size = os.path.getsize(self.path)
         with open(self.path) as code:
-            port = QSerialPort()
-            port.setPortName(self.port)
-            port.setBaudRate(QSerialPort.Baud9600)
-            port.setDataBits(QSerialPort.Data8)
-            port.setParity(QSerialPort.NoParity)
-            port.setStopBits(QSerialPort.OneStop)
-            port.setFlowControl(QSerialPort.NoFlowControl)
-            if not port.open(QIODevice.ReadWrite):
-                print('NOT CONNECTED')
-            while file_size > code.tell():
-                self.sleep(1)
-                try:
-                    command = code.readline()
-                    command = command.replace('\n','')
-                    if port.isOpen():
-                        ret = port.writeData(bytes(command, 'utf-8'))
+            #self.auto_port = serial.Serial('/dev/ttyUSB0', 115200, timeout=0.0)
+            #self.auto_port = QSerialPort(self.port)
+            #self.auto_port.setBaudRate(QSerialPort.Baud9600)
+            #self.auto_port.setDataBits(QSerialPort.Data8)
+            #self.auto_port.setParity(QSerialPort.NoParity)
+            #self.auto_port.setStopBits(QSerialPort.OneStop)
+            #self.auto_port.setFlowControl(QSerialPort.NoFlowControl)
+            #if not self.auto_port.open(QIODevice.WriteOnly):
+            #    print('NOT CONNECTED')
+            #self.auto_port.clear()
+            with serial.Serial('/dev/ttyUSB0') as ser:
+                while file_size > code.tell():
+                    self.sleep(1)
+                    try:
+                        command = code.readline()
+                        command = command.replace('\n','')
+                        #if self.auto_port.isOpen():
+                        ret = ser.write(bytes(command, 'utf-8'))
                         print('{0} char sent -> msg: {1}'.format(ret, command))
                         # Update Progress Bar
                         self.drawingProgress.setValue(100*(code.tell()/file_size))
-                    else:
-                        self.statusbar.showMessage(self.statusbar.tr("Auto sending interrupted!"), TIMEOUT_STATUS)
-                        print('port problem')
+                        #else:
+                        #    self.statusbar.showMessage(self.statusbar.tr("Auto sending interrupted!"), TIMEOUT_STATUS)
+                        #    print('self.auto_port problem')
+                        #    break
+                    except:
+                        print('EXCEPT')
                         break
-                except:
-                    print('EXCEPT')
-                    break
-                if self.isInterruptionRequested():
-                    print("thread interrupted")
-                    break
-                while self.pauseButton.isChecked():
-                    print("thread paused")
-                    self.sleep(5)
+                    if self.isInterruptionRequested():
+                        print("thread interrupted")
+                        break
+                    while self.pauseButton.isChecked():
+                        print("thread paused")
+                        self.sleep(5)
+
+        #self.auto_port.close()
         os.remove(self.path)
         self.exit()

@@ -56,6 +56,7 @@
 #define Y_AXIS_NEG 0x03
 #define X_AXIS_POS 0x0C
 #define X_AXIS_NEG 0x08
+#define DONT_MOVE 0
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
@@ -377,7 +378,6 @@ static void AppTaskPlot(void *p_arg){
                     compare = (uint16_t)((10) * 93.74);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
-                    packet->z_axis = 2;
                     penUp = false;
                 }
                 if(packet->z_axis == 0 && !penUp){
@@ -385,12 +385,11 @@ static void AppTaskPlot(void *p_arg){
                     compare = (uint16_t)((5) * 93.74);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
-                    packet->z_axis = 2;
                     penUp = true;
                 }
                 // MOVE PLOTTER HORIZONTALLY
-                APP_TRACE_DBG ("Default\n");
                 if(!isRelative){                        // ABSOLUTE
+                    APP_TRACE_DBG ("Absolute Positioning\n");
                     pos[2] = pos[0];
                     pos[3] = pos[1];
                     pos[0] = packet->x_axis;
@@ -402,12 +401,14 @@ static void AppTaskPlot(void *p_arg){
 
                 }
                 // X_AXIS
-                if (packet->x_axis < 0) dir_x = X_AXIS_NEG;
-                if (packet->x_axis > 0) dir_x = X_AXIS_POS;
+                dir_x = DONT_MOVE;
+                if (packet->x_axis < 0 && ENDLEFT != 0) dir_x = X_AXIS_NEG;
+                if (packet->x_axis > 0 && ENDRIGHT != 0) dir_x = X_AXIS_POS;
                 step_x = abs(packet->x_axis);
                 // Y_AXIS
-                if (packet->y_axis < 0) dir_y = Y_AXIS_NEG;
-                if (packet->y_axis > 0) dir_y = Y_AXIS_POS;
+                dir_y = DONT_MOVE;
+                if (packet->y_axis < 0 && ENDBOTTOM != 0) dir_y = Y_AXIS_NEG;
+                if (packet->y_axis > 0 && ENDTOP != 0) dir_y = Y_AXIS_POS;
                 step_y = abs(packet->y_axis);
                 // MOVE!
                 for(count_x = 0, count_y = 0; count_x < step_x && count_y < step_y; count_x++, count_y++){
@@ -453,8 +454,13 @@ static void AppTaskPlot(void *p_arg){
                     count_y++;
                 }
 
-                packet->x_axis = 0;
-                packet->y_axis = 0;
+                if(!isRelative){
+                    packet->x_axis = pos[0];
+                    packet->y_axis = pos[1];
+                } else{
+                    packet->x_axis = 0;
+                    packet->y_axis = 0;
+                }
                 step_x         = 0;
                 step_y         = 0;
                 break;
@@ -472,6 +478,7 @@ static void AppTaskPlot(void *p_arg){
                 compare = (uint16_t)((5) * 93.74);
                 XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                 XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+                packet->z_axis = 0;
                 penUp = true;
 
                 while(ENDLEFT != 0 && ENDBOTTOM != 0){
