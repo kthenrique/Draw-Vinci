@@ -23,10 +23,10 @@ from pyudev import Context, Monitor
 from pyudev.pyqt5 import MonitorObserver
 
 from draw_vinci import Ui_MainWindow
-from parser import parser
+from parser import getElements
 from canvas import MainScene
 from terminal import Terminal
-from constants import TIMEOUT_STATUS, FONT_SIZES
+from constants import TIMEOUT_STATUS, FONT_SIZES, SVG
 
 class AppWindow(QMainWindow):
     '''
@@ -53,6 +53,7 @@ class AppWindow(QMainWindow):
         self.ui.fontSizeBox.addItems([str(size) for size in FONT_SIZES])
         self.ui.fontSizeBox.setValidator(QIntValidator())
 
+        # Draw Buttons
         # Tools Group of buttons
         self.toolsButtonGroup = QButtonGroup()
         self.toolsButtonGroup.setExclusive(True)
@@ -170,8 +171,6 @@ class AppWindow(QMainWindow):
         self.isSaved    = False
         self.hasChanged = False
         self.path       = None
-
-        self.parser     = parser()
 
         self.show()
 
@@ -388,7 +387,7 @@ class AppWindow(QMainWindow):
             path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
             self.path = str(path[0])
 
-            parsed = self.parser.getElements(self.path)
+            parsed = getElements(self.path)
             if parsed:
                 self.isSaved = True
                 self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
@@ -415,7 +414,7 @@ class AppWindow(QMainWindow):
             painter.end()
 
             self.hasChanged = False
-            self.parser.getElements(self.path, 0)      # generate g-code
+            getElements(self.path, 0)      # generate g-code
         else:
             self.saveFileAs()
 
@@ -431,8 +430,8 @@ class AppWindow(QMainWindow):
 
             generator = QSvgGenerator()
             generator.setFileName(self.path)
-            generator.setSize(QSize(self.scene.width(), self.scene.height()))
-            generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
+            generator.setSize(QSize(self.scene.width()/50, self.scene.height())/50)
+            generator.setViewBox(self.scene.sceneRect())
             generator.setTitle("Title for SVG file")
             generator.setDescription("Description for SVG file");
 
@@ -442,7 +441,7 @@ class AppWindow(QMainWindow):
             painter.end()
             self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
 
-            self.parser.getElements(self.path, 0)      # generate g-code
+            #self.parser.getElements(self.path, 0)      # generate g-code
             self.hasChanged = False
             self.isSaved = True
 
