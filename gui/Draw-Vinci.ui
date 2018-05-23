@@ -6,20 +6,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>410</width>
-    <height>535</height>
+    <width>660</width>
+    <height>669</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>410</width>
-    <height>535</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>410</width>
-    <height>535</height>
+    <width>1000</width>
+    <height>1000</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -35,72 +41,13 @@
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>160</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="autoButton">
-       <property name="minimumSize">
-        <size>
-         <width>10</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Auto</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="manualButton">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>Manual</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="autoExclusive">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGraphicsView" name="canvas">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>390</width>
-      <height>310</height>
+      <y>0</y>
+      <width>640</width>
+      <height>460</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -117,8 +64,8 @@
     </property>
     <property name="maximumSize">
      <size>
-      <width>390</width>
-      <height>310</height>
+      <width>1000</width>
+      <height>1000</height>
      </size>
     </property>
     <property name="mouseTracking">
@@ -131,7 +78,7 @@
      <string notr="true">background-color: rgb(255, 255, 255);</string>
     </property>
     <property name="frameShape">
-     <enum>QFrame::StyledPanel</enum>
+     <enum>QFrame::Box</enum>
     </property>
     <property name="frameShadow">
      <enum>QFrame::Plain</enum>
@@ -139,11 +86,17 @@
     <property name="lineWidth">
      <number>1</number>
     </property>
+    <property name="midLineWidth">
+     <number>0</number>
+    </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
     </property>
     <property name="horizontalScrollBarPolicy">
      <enum>Qt::ScrollBarAlwaysOff</enum>
+    </property>
+    <property name="sizeAdjustPolicy">
+     <enum>QAbstractScrollArea::AdjustToContents</enum>
     </property>
     <property name="sceneRect">
      <rectf>
@@ -158,9 +111,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
-      <width>390</width>
-      <height>151</height>
+      <y>470</y>
+      <width>640</width>
+      <height>150</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -171,14 +124,14 @@
     </property>
     <property name="minimumSize">
      <size>
-      <width>390</width>
-      <height>151</height>
+      <width>0</width>
+      <height>0</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>390</width>
-      <height>151</height>
+      <width>1000</width>
+      <height>1000</height>
      </size>
     </property>
     <property name="styleSheet">
@@ -258,8 +211,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="textButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>10</y>
+        <x>110</x>
+        <y>60</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -284,7 +237,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="selectButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>10</x>
         <y>60</y>
         <width>41</width>
         <height>41</height>
@@ -336,8 +289,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="polygonButton">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>60</y>
+        <x>260</x>
+        <y>10</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -391,7 +344,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="ellipseButton">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>160</x>
         <y>60</y>
         <width>41</width>
         <height>41</height>
@@ -417,8 +370,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="rectangleButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>60</y>
+        <x>210</x>
+        <y>10</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -466,7 +419,7 @@ QTabBar::tab:only-one {
      <widget class="QFontComboBox" name="fontBox">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>460</x>
         <y>10</y>
         <width>170</width>
         <height>25</height>
@@ -482,7 +435,7 @@ QTabBar::tab:only-one {
      <widget class="QComboBox" name="fontSizeBox">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>460</x>
         <y>40</y>
         <width>55</width>
         <height>25</height>
@@ -520,7 +473,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="underlineButton">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>600</x>
         <y>40</y>
         <width>25</width>
         <height>25</height>
@@ -540,7 +493,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="italicButton">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>570</x>
         <y>40</y>
         <width>25</width>
         <height>25</height>
@@ -560,10 +513,10 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="magnifierButton">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>70</y>
-        <width>31</width>
-        <height>31</height>
+        <x>60</x>
+        <y>60</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
@@ -577,6 +530,83 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="circleButton">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>60</y>
+        <width>41</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/circle.png</normaloff>img/circle.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="squareButton">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>41</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/square.png</normaloff>img/square.png</iconset>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="nextSVGButton">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>10</y>
+        <width>101</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="importButton">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>60</y>
+        <width>41</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/import.png</normaloff>img/import.png</iconset>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>10</y>
+        <width>16</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="controlTab">
      <attribute name="title">
@@ -585,10 +615,10 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="upButton">
       <property name="geometry">
        <rect>
-        <x>45</x>
+        <x>40</x>
         <y>10</y>
-        <width>31</width>
-        <height>21</height>
+        <width>41</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -611,10 +641,10 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="leftButton">
       <property name="geometry">
        <rect>
-        <x>25</x>
-        <y>30</y>
-        <width>21</width>
-        <height>31</height>
+        <x>10</x>
+        <y>40</y>
+        <width>31</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -637,10 +667,10 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="rightButton">
       <property name="geometry">
        <rect>
-        <x>75</x>
-        <y>30</y>
-        <width>21</width>
-        <height>31</height>
+        <x>80</x>
+        <y>40</y>
+        <width>31</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -663,10 +693,10 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="downButton">
       <property name="geometry">
        <rect>
-        <x>45</x>
-        <y>60</y>
-        <width>31</width>
-        <height>21</height>
+        <x>40</x>
+        <y>80</y>
+        <width>41</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -689,14 +719,14 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="penButton">
       <property name="geometry">
        <rect>
-        <x>45</x>
-        <y>30</y>
-        <width>31</width>
-        <height>31</height>
+        <x>40</x>
+        <y>40</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Pen Up&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Pen&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -729,9 +759,9 @@ QTabBar::tab:only-one {
      <widget class="QTextEdit" name="termEdit">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>450</x>
         <y>10</y>
-        <width>131</width>
+        <width>181</width>
         <height>101</height>
        </rect>
       </property>
@@ -789,7 +819,7 @@ QScrollBar:vertical {
      <widget class="QComboBox" name="portsBox">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>330</x>
         <y>10</y>
         <width>111</width>
         <height>27</height>
@@ -802,9 +832,9 @@ QScrollBar:vertical {
      <widget class="QPushButton" name="connectButton">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>330</x>
         <y>40</y>
-        <width>111</width>
+        <width>71</width>
         <height>27</height>
        </rect>
       </property>
@@ -815,7 +845,7 @@ QScrollBar:vertical {
      <widget class="QLineEdit" name="promptEdit">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>330</x>
         <y>80</y>
         <width>113</width>
         <height>27</height>
@@ -836,10 +866,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="playButton">
       <property name="geometry">
        <rect>
-        <x>50</x>
-        <y>90</y>
-        <width>21</width>
-        <height>21</height>
+        <x>200</x>
+        <y>70</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -873,10 +903,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="stopButton">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>90</y>
-        <width>21</width>
-        <height>21</height>
+        <x>240</x>
+        <y>70</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -913,10 +943,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="speedUpButton">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>90</y>
-        <width>21</width>
-        <height>21</height>
+        <x>280</x>
+        <y>70</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -942,10 +972,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="pauseButton">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>90</y>
-        <width>21</width>
-        <height>21</height>
+        <x>160</x>
+        <y>70</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -979,10 +1009,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="slowDownButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>21</width>
-        <height>21</height>
+        <x>120</x>
+        <y>70</y>
+        <width>41</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1004,6 +1034,98 @@ background-color: rgb(255, 255, 255);
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="clearTermButton">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>40</y>
+        <width>31</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;clear terminal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>img/clear.png</normaloff>img/clear.png</iconset>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>10</y>
+        <width>201</width>
+        <height>29</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="autoButton">
+         <property name="minimumSize">
+          <size>
+           <width>10</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>Auto</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="manualButton">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>Manual</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>50</y>
+        <width>201</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -1012,7 +1134,7 @@ background-color: rgb(255, 255, 255);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>410</width>
+     <width>660</width>
      <height>27</height>
     </rect>
    </property>
