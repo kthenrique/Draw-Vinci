@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 21
+# -- Last update: 2018 Mai 23
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -81,12 +81,12 @@ class parser():
                     width  = int(width)
                     height = int(height)
                     text  = '#G01:Z0$\n'+\
-                            '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                            '#G00:X{0}:Y{1}$\n'.format(x,y)+\
                             '#G01:Z1$\n'+\
-                            '#G01:X{0}:Y{1}\n'.format(x+width,y)+\
-                            '#G01:X{0}:Y{1}\n'.format(x+width,y+height)+\
-                            '#G01:X{0}:Y{1}\n'.format(x,y+height)+\
-                            '#G01:X{0}:Y{1}\n'.format(x,y)
+                            '#G01:X{0}:Y{1}$\n'.format(x+width,y)+\
+                            '#G01:X{0}:Y{1}$\n'.format(x+width,y+height)+\
+                            '#G01:X{0}:Y{1}$\n'.format(x,y+height)+\
+                            '#G01:X{0}:Y{1}$\n'.format(x,y)
                     g_code.write(text)
 
                 rect = rect.nextSiblingElement('rect')
@@ -149,9 +149,9 @@ class parser():
                     x2      = int(x2)
                     y2      = int(y2)
                     text  = '#G01:Z0$\n'+\
-                            '#G00:X{0}:Y{1}\n'.format(x1,y1)+\
+                            '#G00:X{0}:Y{1}$\n'.format(x1,y1)+\
                             '#G01:Z1$\n'+\
-                            '#G01:X{0}:Y{1}\n'.format(x2,y2)
+                            '#G01:X{0}:Y{1}$\n'.format(x2,y2)
                     g_code.write(text)
 
                 lin = lin.nextSiblingElement('polyline')
@@ -175,11 +175,11 @@ class parser():
                         y  = int(coord[1])
                         if points.index(point) == 0:
                             text  = '#G01:Z0$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)+\
                                     '#G01:Z1$\n'
                             g_code.write(text)
                         else:
-                            text  = '#G01:X{0}:Y{1}\n'.format(x,y)
+                            text  = '#G01:X{0}:Y{1}$\n'.format(x,y)
                             g_code.write(text)
 
                 newCanvasPoly.setPolygon(newPoly)
@@ -226,7 +226,7 @@ class parser():
                             y  = int(coord[1])
                             text  = '#G01:Z0$\n'+\
                                     '#G90$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)+\
                                     '#G01:Z1$\n'
                             g_code.write(text)
                     elif path[0] == 'm':        # moveTo relative
@@ -237,7 +237,7 @@ class parser():
                             y  = int(coord[1])
                             text  = '#G01:Z0$\n'+\
                                     '#G91$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)+\
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)+\
                                     '#G01:Z1$\n'
                             g_code.write(text)
                     elif path[0] == 'L':        # lineTo
@@ -248,7 +248,7 @@ class parser():
                             y  = int(coord[1])
                             text  = '#G01:Z1$\n'+\
                                     '#G90$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)
                             g_code.write(text)
                     elif path[0] == 'l':        # lineTo relative
                         newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
@@ -258,7 +258,7 @@ class parser():
                             y  = int(coord[1])
                             text  = '#G01:Z1$\n'+\
                                     '#G91$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)
                             g_code.write(text)
                     elif path[0] == 'H':        # horizontal lineTo
                         newPat.lineTo(coord[0], newPat.currentPosition().y())
@@ -268,7 +268,7 @@ class parser():
                             y  = int(newPat.currentPosition().y())
                             text  = '#G01:Z1$\n'+\
                                     '#G90$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)
                             g_code.write(text)
                     elif path[0] == 'h':        # horizontal lineTo relative
                         newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
@@ -277,7 +277,7 @@ class parser():
                             x  = int(coord[0])
                             text  = '#G01:Z1$\n'+\
                                     '#G91$\n'+\
-                                    '#G00:X{0}:Y0\n'.format(x)
+                                    '#G00:X{0}:Y0$\n'.format(x)
                             g_code.write(text)
                     elif path[0] == 'V':        # vertical lineTo
                         newPat.lineTo(newPat.currentPosition().x(), coord[0])
@@ -287,7 +287,7 @@ class parser():
                             y  = int(coord[0])
                             text  = '#G01:Z1$\n'+\
                                     '#G90$\n'+\
-                                    '#G00:X{0}:Y{1}\n'.format(x,y)
+                                    '#G00:X{0}:Y{1}$\n'.format(x,y)
                             g_code.write(text)
                     elif path[0] == 'v':        # vertical lineTo relative
                         newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
@@ -296,7 +296,7 @@ class parser():
                             y  = int(coord[0])
                             text  = '#G01:Z1$\n'+\
                                     '#G91$\n'+\
-                                    '#G00:X0:Y{0}\n'.format(y)
+                                    '#G00:X0:Y{0}$\n'.format(y)
                             g_code.write(text)
                     elif path[0] == 'C':        # curveto
                         lastCubicCtrl = QPointF(coord[2], coord[3])
