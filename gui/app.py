@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 22
+# -- Last update: 2018 Mai 23
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -65,6 +65,9 @@ class AppWindow(QMainWindow):
         self.toolsButtonGroup.addButton(self.ui.polygonButton, 6)
         self.toolsButtonGroup.addButton(self.ui.selectButton, 7)
         self.toolsButtonGroup.addButton(self.ui.magnifierButton, 8)
+        self.toolsButtonGroup.addButton(self.ui.circleButton, 9)
+        self.toolsButtonGroup.addButton(self.ui.squareButton, 10)
+        self.toolsButtonGroup.addButton(self.ui.importButton, 11)
 
         # Configuring UART Port
         self.port = QSerialPort()

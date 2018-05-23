@@ -231,7 +231,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="selectButton">
@@ -283,7 +283,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="polygonButton">
@@ -309,7 +309,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="eraserButton">
@@ -338,7 +338,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="ellipseButton">
@@ -364,7 +364,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="rectangleButton">
@@ -390,7 +390,7 @@ QTabBar::tab:only-one {
        <bool>true</bool>
       </property>
       <property name="autoExclusive">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="freehandButton">
@@ -413,6 +413,9 @@ QTabBar::tab:only-one {
         <normaloff>img/freehand.png</normaloff>img/freehand.png</iconset>
       </property>
       <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
        <bool>true</bool>
       </property>
      </widget>
@@ -529,6 +532,9 @@ QTabBar::tab:only-one {
       <property name="checkable">
        <bool>true</bool>
       </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="circleButton">
       <property name="geometry">
@@ -539,12 +545,21 @@ QTabBar::tab:only-one {
         <height>41</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;circle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
       <property name="icon">
        <iconset>
         <normaloff>img/circle.png</normaloff>img/circle.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="squareButton">
@@ -556,12 +571,21 @@ QTabBar::tab:only-one {
         <height>41</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;square&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
       <property name="icon">
        <iconset>
         <normaloff>img/square.png</normaloff>img/square.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="nextSVGButton">
@@ -586,12 +610,21 @@ QTabBar::tab:only-one {
         <height>41</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;import&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
       <property name="icon">
        <iconset>
         <normaloff>img/import.png</normaloff>img/import.png</iconset>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="Line" name="line_2">

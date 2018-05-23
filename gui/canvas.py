@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 21
+# -- Last update: 2018 Mai 23
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -46,7 +46,10 @@ class MainScene(QGraphicsScene):
                           QPixmap("./img/ellipse.png"),
                           QPixmap("./img/polygon.png"),
                           QPixmap("./img/select.png"),
-                          QPixmap("./img/magnifier.png"))
+                          QPixmap("./img/magnifier.png"),
+                          QPixmap("./img/circle.png"),
+                          QPixmap("./img/square.png"),
+                          QPixmap("./img/import.png"))
 
         self.index      = 0        # According to the tools buttons
         self.isDrawing  = False    # While drawing
@@ -65,7 +68,10 @@ class MainScene(QGraphicsScene):
                           QRectF(),
                           QPolygonF(),
                           None,
-                          QRectF()]
+                          QRectF(),
+                          QRectF(),
+                          QRectF(),
+                          None]
 
     # Reimplementing mouse events
     def mousePressEvent(self, e):
@@ -131,6 +137,14 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 pen       = QPen(Qt.DotLine)
                 self.item = self.addRect(self.tools[self.index], pen)
+            elif self.index == 9: # circle
+                self.tools[self.index].setTopLeft(self.clickedPos)
+                self.tools[self.index].setBottomRight(self.clickedPos)
+                self.item = self.addEllipse(self.tools[self.index])
+            elif self.index == 10: # square
+                self.tools[self.index].setTopLeft(self.clickedPos)
+                self.tools[self.index].setBottomRight(self.clickedPos)
+                self.item = self.addRect(self.tools[self.index])
         else:
             if self.index == 8:               # magnifier
                 self.view.resetTransform()
@@ -207,9 +221,71 @@ class MainScene(QGraphicsScene):
                     self.tools[self.index].setBottomRight(mousePos)
 
                 self.item.setRect(self.tools[self.index])
+            elif self.index == 9: # circle
+                Xclick = self.clickedPos.x()
+                Yclick = self.clickedPos.y()
+                Xcurrent = mousePos.x()
+                Ycurrent = mousePos.y()
+                if Xclick > Xcurrent and Yclick > Ycurrent:   # Second quadrant
+                    if (Xclick - Xcurrent) >= (Yclick - Ycurrent):
+                        self.tools[self.index].setTopLeft(self.clickedPos-QPointF((Xclick-Xcurrent),(Xclick-Xcurrent)))
+                    else:
+                        self.tools[self.index].setTopLeft(self.clickedPos-QPointF((Yclick-Ycurrent),(Yclick-Ycurrent)))
+                    self.tools[self.index].setBottomRight(self.clickedPos)
+                elif Yclick > Ycurrent:                       # First quadrant
+                    self.tools[self.index].setBottomLeft(self.clickedPos)
+                    if (-Xclick + Xcurrent) >= (Yclick - Ycurrent):
+                        self.tools[self.index].setTopRight(self.clickedPos+QPointF((-Xclick+Xcurrent),(Xclick-Xcurrent)))
+                    else:
+                        self.tools[self.index].setTopRight(self.clickedPos+QPointF((Yclick-Ycurrent),(-Yclick+Ycurrent)))
+                elif Xclick > Xcurrent:                       # Third quadrant
+                    self.tools[self.index].setTopRight(self.clickedPos)
+                    if (Xclick - Xcurrent) >= (-Yclick + Ycurrent):
+                        self.tools[self.index].setBottomLeft(self.clickedPos-QPointF((Xclick-Xcurrent),(-Xclick+Xcurrent)))
+                    else:
+                        self.tools[self.index].setBottomLeft(self.clickedPos-QPointF((-Yclick+Ycurrent),(Yclick-Ycurrent)))
+                else:                                         # Fourth quadrant
+                    self.tools[self.index].setTopLeft(self.clickedPos)
+                    if (-Xclick + Xcurrent) >= (-Yclick + Ycurrent):
+                        self.tools[self.index].setBottomRight(self.clickedPos+QPointF((-Xclick+Xcurrent),(-Xclick+Xcurrent)))
+                    else:
+                        self.tools[self.index].setBottomRight(self.clickedPos+QPointF((-Yclick+Ycurrent),(-Yclick+Ycurrent)))
+
+                self.item.setRect(self.tools[self.index])
+            elif self.index == 10: # square
+                Xclick = self.clickedPos.x()
+                Yclick = self.clickedPos.y()
+                Xcurrent = mousePos.x()
+                Ycurrent = mousePos.y()
+                if Xclick > Xcurrent and Yclick > Ycurrent:   # Second quadrant
+                    if (Xclick - Xcurrent) >= (Yclick - Ycurrent):
+                        self.tools[self.index].setTopLeft(self.clickedPos-QPointF((Xclick-Xcurrent),(Xclick-Xcurrent)))
+                    else:
+                        self.tools[self.index].setTopLeft(self.clickedPos-QPointF((Yclick-Ycurrent),(Yclick-Ycurrent)))
+                    self.tools[self.index].setBottomRight(self.clickedPos)
+                elif Yclick > Ycurrent:                       # First quadrant
+                    self.tools[self.index].setBottomLeft(self.clickedPos)
+                    if (-Xclick + Xcurrent) >= (Yclick - Ycurrent):
+                        self.tools[self.index].setTopRight(self.clickedPos+QPointF((-Xclick+Xcurrent),(Xclick-Xcurrent)))
+                    else:
+                        self.tools[self.index].setTopRight(self.clickedPos+QPointF((Yclick-Ycurrent),(-Yclick+Ycurrent)))
+                elif Xclick > Xcurrent:                       # Third quadrant
+                    self.tools[self.index].setTopRight(self.clickedPos)
+                    if (Xclick - Xcurrent) >= (-Yclick + Ycurrent):
+                        self.tools[self.index].setBottomLeft(self.clickedPos-QPointF((Xclick-Xcurrent),(-Xclick+Xcurrent)))
+                    else:
+                        self.tools[self.index].setBottomLeft(self.clickedPos-QPointF((-Yclick+Ycurrent),(Yclick-Ycurrent)))
+                else:                                         # Fourth quadrant
+                    self.tools[self.index].setTopLeft(self.clickedPos)
+                    if (-Xclick + Xcurrent) >= (-Yclick + Ycurrent):
+                        self.tools[self.index].setBottomRight(self.clickedPos+QPointF((-Xclick+Xcurrent),(-Xclick+Xcurrent)))
+                    else:
+                        self.tools[self.index].setBottomRight(self.clickedPos+QPointF((-Yclick+Ycurrent),(-Yclick+Ycurrent)))
+
+                self.item.setRect(self.tools[self.index])
 
     def mouseReleaseEvent(self, e):
-        if self.index in (0,1,2,4,5,7): # except polygon, text, magnifier
+        if self.index in (0,1,2,4,5,7,9,10): # except polygon, text, magnifier
             self.isDrawing = False
         if self.index == 8 and self.isDrawing:
             self.isDrawing = False
