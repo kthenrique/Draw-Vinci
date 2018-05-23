@@ -106,9 +106,6 @@ int main (void){
     BSP_IntEn (BSP_INT_ID_USIC1_01); //**
     BSP_IntEn (BSP_INT_ID_USIC1_00); //**
 
-    // init the CCU4
-    BSP_CCU4_Init();
-
     // init SEMI Hosting DEBUG Support
 #if SEMI_HOSTING      // 1
     initRetargetSwo();
@@ -198,6 +195,9 @@ static void AppTaskStart (void *p_arg){
 
     Mem_Init();
     Math_Init();
+
+    // init the CCU4
+    //BSP_CCU4_Init();
 
     // compute CPU capacity with no task running
 #if (OS_CFG_STAT_TASK_EN > 0u)
@@ -376,7 +376,7 @@ static void AppTaskPlot(void *p_arg){
                 // PEN UP X PEN DOWN
                 if(packet->z_axis == 1 && penUp){
                     APP_TRACE_DBG ("Pen down\n");
-                    compare = (uint16_t)((100 - 10) * 93.74);
+                    compare = (uint16_t)((10) * 93.74);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     packet->z_axis = 2;
@@ -384,7 +384,7 @@ static void AppTaskPlot(void *p_arg){
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
-                    compare = (uint16_t)((100 - 5) * 93.74);
+                    compare = (uint16_t)((5) * 93.74);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     packet->z_axis = 2;
