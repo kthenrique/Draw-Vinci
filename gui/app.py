@@ -265,6 +265,7 @@ class AppWindow(QMainWindow):
         '''
         Interrupt terminal thread when it is running
         '''
+        self.isPlotting = False
         self.ui.autoButton.setEnabled(True)
         self.ui.manualButton.setEnabled(True)
         if self.terminalThread.isRunning():

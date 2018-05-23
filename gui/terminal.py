@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 22
+# -- Last update: 2018 Mai 23
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
@@ -56,15 +56,16 @@ class Terminal(QThread):
             port.setParity(QSerialPort.NoParity)
             port.setStopBits(QSerialPort.OneStop)
             port.setFlowControl(QSerialPort.NoFlowControl)
-            port.open(QIODevice.ReadWrite)
-            while file_size > code.tell(): #self.drawingProgress.value() <= 100:
+            if not port.open(QIODevice.ReadWrite):
+                print('NOT CONNECTED')
+            while file_size > code.tell():
                 self.sleep(1)
                 try:
                     command = code.readline()
                     command = command.replace('\n','')
-                    print(command)
                     if port.isOpen():
                         ret = port.writeData(bytes(command, 'utf-8'))
+                        print('{0} char sent -> msg: {1}'.format(ret, command))
                         # Update Progress Bar
                         self.drawingProgress.setValue(100*(code.tell()/file_size))
                     else:
