@@ -48,6 +48,9 @@ bool scrutinise(char *str, volatile CODE *packet){
                         packet->y_axis = 0;
                         packet->z_axis = 2;
                     } else
+                        if (strncmp((const char *)token_ptr,(const char *)"G28",3) == 0){
+                            packet->cmd = 4;
+                        }
                         if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
                             APP_TRACE_DBG ("Changing value of X...\n");
                             packet->x_axis = strtol((const char *)&token_ptr[1], &endptr, 10);

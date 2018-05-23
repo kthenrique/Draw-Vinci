@@ -196,9 +196,6 @@ static void AppTaskStart (void *p_arg){
     Mem_Init();
     Math_Init();
 
-    // init the CCU4
-    //BSP_CCU4_Init();
-
     // compute CPU capacity with no task running
 #if (OS_CFG_STAT_TASK_EN > 0u)
     OSStatTaskCPUUsageInit (&err);
@@ -433,10 +430,20 @@ static void AppTaskPlot(void *p_arg){
                 break;
             case 4:                             // G28
                 APP_TRACE_DBG ("G28\n");
+                //here we should rise the pen up
+                compare = (uint16_t)((5) * 93.74);
+                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+
                 while(P1_15_read() != 0x8000UL || P1_14_read() != 0x4000UL){ // while not on bottom-left
                     _mcp23s08_reset_ss(MCP23S08_SS);
-                    if(P1_15_read() != 0x8000UL) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
-                    if(P1_14_read() != 0x4000UL) _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+                    if ((P1_15_read() != 0x8000UL) && (P1_14_read() != 0x4000UL))
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x0A,MCP23S08_WR);
+                    else if (P1_15_read() != 0x8000UL)
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
+                    else if(P1_14_read() != 0x4000UL)
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+
                     _mcp23s08_set_ss(MCP23S08_SS);
 
                     while(--counter);
