@@ -13,7 +13,7 @@
 import sys
 from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread, QSize
-from PyQt5.QtGui import QIntValidator, QPainter
+from PyQt5.QtGui import QIntValidator, QPainter, QPixmap, QIcon
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
         QProgressBar, QFileDialog, QMessageBox)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
@@ -70,6 +70,10 @@ class AppWindow(QMainWindow):
         self.toolsButtonGroup.addButton(self.ui.squareButton, 10)
         self.toolsButtonGroup.addButton(self.ui.importButton, 11)
 
+        # Initialise import tool
+        self.svg_index = 0
+        self.ui.nextSVGButton.clicked.connect(self.nextSVG)
+
         # Configuring UART Port
         self.port = QSerialPort()
         self.port.setBaudRate(QSerialPort.Baud9600)
@@ -119,7 +123,7 @@ class AppWindow(QMainWindow):
                 </span></p></body></html>')
 
         # Creating and initialising canvas
-        self.scene = MainScene(self.toolsButtonGroup, self.toolLabel)
+        self.scene = MainScene(self.toolsButtonGroup, self.toolLabel, self.svg_index)
         self.ui.canvas.setScene(self.scene)
         self.scene.view = self.ui.canvas
         self.scene.setIconTool(self.ui.eraserButton)
@@ -127,6 +131,8 @@ class AppWindow(QMainWindow):
                 self.ui.italicButton, self.ui.underlineButton)
         self.scene.changed.connect(self.updateFileState)
         self.ui.canvas.show()
+
+        self.nextSVG()
 
         # Menus Initialisation
         self.ui.actionNew.triggered.connect(self.newFile)         # New
@@ -459,8 +465,16 @@ class AppWindow(QMainWindow):
         It is signaled every time there's incoming message from uC
         '''
         if self.port.isOpen():
-            wasRead = self.port.readAll()
+            wasRead = self.port.readLine()
+            self.ui.termEdit.append('<')
             self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
+
+    def nextSVG(self):
+        self.svg_index += 1
+        self.svg_index = self.svg_index % len(SVG)
+        self.scene.svg_index = self.svg_index
+        pix = QPixmap(SVG[self.svg_index])
+        self.ui.nextSVGButton.setIcon(QIcon(pix))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

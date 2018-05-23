@@ -23,12 +23,13 @@ class MainScene(QGraphicsScene):
     Implementation of tools for drawing, updating the statusbar and keeping
     of the current image being edited
     '''
-    def __init__(self, toolsButtonGroup, toolLabel):
+    def __init__(self, toolsButtonGroup, toolLabel, svg_index):
         super().__init__()
         self.setSceneRect(VIEW_X, VIEW_Y, CANVAS_WIDTH, CANVAS_HEIGHT)
         self.toolsButtonGroup = toolsButtonGroup
         self.toolLabel = toolLabel
         self.statusbar = self.toolLabel.parentWidget()
+        self.svg_index = svg_index
         self.textTools = None
         self.view      = None
 
@@ -145,6 +146,11 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setTopLeft(self.clickedPos)
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addRect(self.tools[self.index])
+            elif self.index == 11: # import
+                parsed = self.parser.getElements(SVG[self.svg_index])
+                if parsed:
+                    for element in parsed:
+                        self.addItem(element)
         else:
             if self.index == 8:               # magnifier
                 self.view.resetTransform()
@@ -166,8 +172,6 @@ class MainScene(QGraphicsScene):
             elif self.index == 2: # line
                 self.tools[self.index].setP2(mousePos)
                 self.item.setLine(self.tools[self.index])
-            elif self.index == 3: # text
-                pass
             elif self.index == 4: # rectangle
                 if self.clickedPos.x() > mousePos.x() and self.clickedPos.y() > mousePos.y():
                     self.tools[self.index].setBottomRight(self.clickedPos)
@@ -285,7 +289,7 @@ class MainScene(QGraphicsScene):
                 self.item.setRect(self.tools[self.index])
 
     def mouseReleaseEvent(self, e):
-        if self.index in (0,1,2,4,5,7,9,10): # except polygon, text, magnifier
+        if self.index in (0,1,2,4,5,7,9,10,11): # except polygon, text, magnifier
             self.isDrawing = False
         if self.index == 8 and self.isDrawing:
             self.isDrawing = False

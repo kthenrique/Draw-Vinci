@@ -257,6 +257,7 @@ class Ui_MainWindow(object):
         self.nextSVGButton = QtWidgets.QPushButton(self.drawTab)
         self.nextSVGButton.setGeometry(QtCore.QRect(320, 10, 101, 101))
         self.nextSVGButton.setText("")
+        self.nextSVGButton.setIconSize(QtCore.QSize(50, 50))
         self.nextSVGButton.setObjectName("nextSVGButton")
         self.importButton = QtWidgets.QPushButton(self.drawTab)
         self.importButton.setGeometry(QtCore.QRect(260, 60, 41, 41))
