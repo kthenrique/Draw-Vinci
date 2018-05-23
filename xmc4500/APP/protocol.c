@@ -57,8 +57,8 @@ bool scrutinise(char *str, volatile CODE *packet){
                             } else
                                 if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
                                     packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
-                                } else
-                                    return false;
+                                } //else
+                                    //return false;
         if (token_ptr == NULL){
             break;
         }

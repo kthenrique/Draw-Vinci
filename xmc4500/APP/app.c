@@ -106,6 +106,9 @@ int main (void){
     BSP_IntEn (BSP_INT_ID_USIC1_01); //**
     BSP_IntEn (BSP_INT_ID_USIC1_00); //**
 
+    // init the CCU4
+    BSP_CCU4_Init();
+
     // init SEMI Hosting DEBUG Support
 #if SEMI_HOSTING      // 1
     initRetargetSwo();
@@ -377,6 +380,7 @@ static void AppTaskPlot(void *p_arg){
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     packet->z_axis = 2;
+                    penUp = false;
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
@@ -384,6 +388,7 @@ static void AppTaskPlot(void *p_arg){
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     packet->z_axis = 2;
+                    penUp = true;
                 }
                 // MOVE PLOTTER HORIZONTALLY
                 APP_TRACE_DBG ("Default\n");
