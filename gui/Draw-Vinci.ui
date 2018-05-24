@@ -979,7 +979,7 @@ background-color: rgb(255, 255, 255);
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="speedUpButton">
+     <widget class="QPushButton" name="nextComButton">
       <property name="geometry">
        <rect>
         <x>280</x>
@@ -1045,7 +1045,7 @@ background-color: rgb(255, 255, 255);
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="slowDownButton">
+     <widget class="QPushButton" name="prevComButton">
       <property name="geometry">
        <rect>
         <x>120</x>

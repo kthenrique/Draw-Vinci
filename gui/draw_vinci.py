@@ -459,9 +459,9 @@ class Ui_MainWindow(object):
         self.stopButton.setChecked(True)
         self.stopButton.setAutoExclusive(True)
         self.stopButton.setObjectName("stopButton")
-        self.speedUpButton = QtWidgets.QPushButton(self.controlTab)
-        self.speedUpButton.setGeometry(QtCore.QRect(280, 70, 41, 41))
-        self.speedUpButton.setStyleSheet(" QPushButton {\n"
+        self.nextComButton = QtWidgets.QPushButton(self.controlTab)
+        self.nextComButton.setGeometry(QtCore.QRect(280, 70, 41, 41))
+        self.nextComButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/speed_up.svg) 0;\n"
 " }\n"
 "\n"
@@ -472,9 +472,9 @@ class Ui_MainWindow(object):
 " QPushButton:pressed  {\n"
 "    border-image: url(./img/speed_up_pressed.svg) 0;\n"
 " }")
-        self.speedUpButton.setText("")
-        self.speedUpButton.setCheckable(False)
-        self.speedUpButton.setObjectName("speedUpButton")
+        self.nextComButton.setText("")
+        self.nextComButton.setCheckable(False)
+        self.nextComButton.setObjectName("nextComButton")
         self.pauseButton = QtWidgets.QPushButton(self.controlTab)
         self.pauseButton.setGeometry(QtCore.QRect(160, 70, 41, 41))
         self.pauseButton.setStyleSheet(" QPushButton {\n"
@@ -497,9 +497,9 @@ class Ui_MainWindow(object):
         self.pauseButton.setCheckable(True)
         self.pauseButton.setAutoExclusive(True)
         self.pauseButton.setObjectName("pauseButton")
-        self.slowDownButton = QtWidgets.QPushButton(self.controlTab)
-        self.slowDownButton.setGeometry(QtCore.QRect(120, 70, 41, 41))
-        self.slowDownButton.setStyleSheet(" QPushButton {\n"
+        self.prevComButton = QtWidgets.QPushButton(self.controlTab)
+        self.prevComButton.setGeometry(QtCore.QRect(120, 70, 41, 41))
+        self.prevComButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/slow_down.svg) 0;\n"
 " }\n"
 "\n"
@@ -512,8 +512,8 @@ class Ui_MainWindow(object):
 " }\n"
 "\n"
 "")
-        self.slowDownButton.setText("")
-        self.slowDownButton.setObjectName("slowDownButton")
+        self.prevComButton.setText("")
+        self.prevComButton.setObjectName("prevComButton")
         self.clearTermButton = QtWidgets.QPushButton(self.controlTab)
         self.clearTermButton.setGeometry(QtCore.QRect(410, 40, 31, 27))
         self.clearTermButton.setText("")

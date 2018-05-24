@@ -147,9 +147,9 @@ class AppWindow(QMainWindow):
         self.ui.clearTermButton.clicked.connect(self.clearTerm)    # clear terminal
         self.ui.playButton.toggled.connect(self.playIt)            # play
         self.ui.stopButton.clicked.connect(self.stopIt)            # stop
-        self.ui.pauseButton.clicked.connect(self.pauseIt)          # pause
-        self.ui.slowDownButton.clicked.connect(self.slowItDown)    # slow down
-        self.ui.speedUpButton.clicked.connect(self.speedItUp)      # speed up
+        self.ui.pauseButton.toggled.connect(self.pauseIt)          # pause
+        self.ui.prevComButton.clicked.connect(self.prevCom)        # previous command
+        self.ui.nextComButton.clicked.connect(self.nextCom)        # next command
 
         # Directional Buttons Initialisation
         self.ui.upButton.clicked.connect(self.goUp)                # up
@@ -288,22 +288,29 @@ class AppWindow(QMainWindow):
             print("trying to interrupt thread")
             self.terminalThread.requestInterruption()
 
-    def pauseIt(self):
-        if self.ui.autoButton.isChecked() and not self.terminalThread.isRunning():
+    def pauseIt(self, isChecked):
+        if self.ui.autoButton.isChecked() and not self.terminalThread.isRunning() and isChecked:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Nothing's being plotted ..."), TIMEOUT_STATUS)
             self.ui.stopButton.setChecked(True)
+        elif self.terminalThread.isRunning() and not isChecked:
+            self.terminalThread.com = 0
+            self.terminalThread.nav.wakeOne()
 
-    def slowItDown(self):
+    def prevCom(self):
         '''
-        send G-CODE to slow the plotter motors down
+        send next g-code in auto mode
         '''
-        self.sendSingleMsg("G-CODE to slow down")
+        if self.ui.pauseButton.isChecked():
+            self.terminalThread.com = -1
+            self.terminalThread.nav.wakeOne()
 
-    def speedItUp(self):
+    def nextCom(self):
         '''
-        send G-CODE to speed the plotter motors up
+        send previous g-code in auto mode
         '''
-        self.sendSingleMsg("G-CODE to slow down")
+        if self.ui.pauseButton.isChecked():
+            self.terminalThread.com = 1
+            self.terminalThread.nav.wakeOne()
 
     def prepInit(self):
         '''
