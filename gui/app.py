@@ -143,6 +143,11 @@ class AppWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.close)          # Quit
 
         # Control Buttons Initialisation
+        self.controlButtonGroup = QButtonGroup()
+        self.controlButtonGroup.setExclusive(True)
+        self.controlButtonGroup.addButton(self.ui.pauseButton, 0)
+        self.controlButtonGroup.addButton(self.ui.playButton, 1)
+        self.controlButtonGroup.addButton(self.ui.stopButton, 2)
         self.ui.connectButton.clicked.connect(self.connectPort)    # connect
         self.ui.clearTermButton.clicked.connect(self.clearTerm)    # clear terminal
         self.ui.playButton.toggled.connect(self.playIt)            # play
@@ -369,6 +374,9 @@ class AppWindow(QMainWindow):
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def checkCanvas(self):
+        '''
+        Checking to avoid loss of data
+        '''
         print("checkCanvas")
         if len(self.ui.canvas.items()) == 0:                   # a blank canvas
             pass

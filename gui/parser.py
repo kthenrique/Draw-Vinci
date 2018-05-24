@@ -43,7 +43,7 @@ def getElements(filename, writeCode = False, toScale = False):
             g_code.close()
         return False
 
-    # Acquiring viewBox dimenstions
+    # Acquiring dimensions & viewBox parameters
     rootElement = doc.documentElement()
     svg_width  = rootElement.attribute('width')
     svg_height = rootElement.attribute('height')
@@ -54,10 +54,9 @@ def getElements(filename, writeCode = False, toScale = False):
         viewBox[index] = float(viewBox[index])
     dx_scale = viewBox[2]-viewBox[0]
     dy_scale = viewBox[3]-viewBox[1]
-    print(dx_scale, dy_scale)
+    print('viewbox delta: ({0}, {1})'.format(dx_scale, dy_scale))
 
     gList = doc.elementsByTagName('g')
-    print(gList.length())
     for index in range(0, gList.length()):
         gNode = gList.item(index)
 
@@ -439,7 +438,6 @@ def getElements(filename, writeCode = False, toScale = False):
             tex = tex.nextSiblingElement('text')
 
     file_.close()
-
     if writeCode:
         g_code.close()
         return True
