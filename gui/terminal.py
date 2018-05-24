@@ -11,13 +11,13 @@
 # ----------------------------------------------------------------------------
 
 import os
-import shutil
 import serial
 
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QIODevice, QWaitCondition, QMutex
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 
 from constants import TIMEOUT_STATUS
+from parser import getElements
 
 class Terminal(QThread):
     '''
@@ -54,7 +54,8 @@ class Terminal(QThread):
     @pyqtSlot()
     def run(self):
         self.fileLines = []
-        self.path = shutil.copy(self.path, self.path.replace(os.path.basename(self.path), 'toPlotTemp'))
+        getElements(self.path, writeCode = True, toScale = False)
+        self.path = self.path.replace('.svg', '.gcode')
         file_size = os.path.getsize(self.path)
         with open(self.path) as code:
             #self.auto_port = serial.Serial('/dev/ttyUSB0', 115200, timeout=0.0)
@@ -94,34 +95,40 @@ class Terminal(QThread):
                         self.mutex.lock()
                         self.nav.wait(self.mutex)
                         if self.com == 1:
+                            self.com = 0
                             print("next command")
                             self.fileLines.append(code.tell())
                             command = code.readline()
-                            command = command.replace('\n','')
-                            if ser.is_open:
-                                ret = ser.write(bytes(command, 'utf-8'))
-                                print('{0} char sent -> msg: {1}'.format(ret, command))
-                                # Update Progress Bar
-                                self.drawingProgress.setValue(100*(code.tell()/file_size))
+                            if command:
+                                command = command.replace('\n','')
+                                if ser.is_open:
+                                    ret = ser.write(bytes(command, 'utf-8'))
+                                    print('{0} char sent -> msg: {1}'.format(ret, command))
+                                    # Update Progress Bar
+                                    self.drawingProgress.setValue(100*(code.tell()/file_size))
+                                else:
+                                    self.statusbar.showMessage(self.statusbar.tr("Serial port disconnected!"), TIMEOUT_STATUS)
+                                    print('serial port problem')
+                                    break
                             else:
-                                self.statusbar.showMessage(self.statusbar.tr("Serial port disconnected!"), TIMEOUT_STATUS)
-                                print('serial port problem')
                                 break
-                            self.com = 0
                         elif self.com == -1:
                             print("previous command")
-                            code.seek(self.fileLines.pop())
-                            command = code.readline()
-                            command = command.replace('\n','')
-                            if ser.is_open:
-                                ret = ser.write(bytes(command, 'utf-8'))
-                                print('{0} char sent -> msg: {1}'.format(ret, command))
-                                # Update Progress Bar
-                                self.drawingProgress.setValue(100*(code.tell()/file_size))
+                            if self.fileLines:
+                                code.seek(self.fileLines.pop())
+                                command = code.readline()
+                                command = command.replace('\n','')
+                                if ser.is_open:
+                                    ret = ser.write(bytes(command, 'utf-8'))
+                                    print('{0} char sent -> msg: {1}'.format(ret, command))
+                                    # Update Progress Bar
+                                    self.drawingProgress.setValue(100*(code.tell()/file_size))
+                                else:
+                                    self.statusbar.showMessage(self.statusbar.tr("Serial port disconnected!"), TIMEOUT_STATUS)
+                                    print('serial port problem')
+                                    break
                             else:
-                                self.statusbar.showMessage(self.statusbar.tr("Serial port disconnected!"), TIMEOUT_STATUS)
-                                print('serial port problem')
-                                break
+                                self.statusbar.showMessage(self.statusbar.tr("Already at first G-CODE!"), TIMEOUT_STATUS)
                             self.com = 0
                         self.mutex.unlock()
 
