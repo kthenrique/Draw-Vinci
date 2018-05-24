@@ -351,10 +351,14 @@ static void AppTaskPlot(void *p_arg){
     OS_MSG_SIZE msg_size;
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
-    uint16_t count_x, step_x, dir_x, count_y, step_y, dir_y;
-    uint16_t pos[4] = {0xd00, 0xd00, 0xd00, 0xd00};
+    uint16_t step_x, dir_x, step_y, dir_y;
+    uint32_t error, error_;
+    uint8_t s_x, s_y;
+    uint16_t current_position[2] = {0xd00, 0xd00};
+    uint16_t next_position[2]    = {0xd00, 0xd00};
+    uint16_t end_position[2]     = {0xd00, 0xd00};
     uint16_t volatile compare;
-    volatile uint16_t counter = 0xfff;
+    volatile uint8_t counter = 0xf;
 
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
@@ -388,75 +392,75 @@ static void AppTaskPlot(void *p_arg){
                     penUp = true;
                 }
                 // MOVE PLOTTER HORIZONTALLY
+                // beginning position
+                next_position[0] = current_position[0];
+                next_position[1] = current_position[1];
+                // End position
+                end_position[0] += packet->x_axis;
+                end_position[1] += packet->y_axis;
                 if(!isRelative){                        // ABSOLUTE
                     APP_TRACE_DBG ("Absolute Positioning\n");
-                    pos[2] = pos[0];
-                    pos[3] = pos[1];
-                    pos[0] = packet->x_axis;
-                    pos[1] = packet->y_axis;
+                    end_position[0] = packet->x_axis;
+                    end_position[1] = packet->y_axis;
                     // X_AXIS
-                    packet->x_axis -= pos[2];
+                    packet->x_axis -= current_position[0];
                     // Y_AXIS
-                    packet->y_axis -= pos[3];
+                    packet->y_axis -= current_position[1];
 
                 }
                 // X_AXIS
                 dir_x = DONT_MOVE;
-                if (packet->x_axis < 0 && ENDLEFT != 0) dir_x = X_AXIS_NEG;
-                if (packet->x_axis > 0 && ENDRIGHT != 0) dir_x = X_AXIS_POS;
+                if (packet->x_axis < 0 && ENDLEFT != 0){dir_x = X_AXIS_NEG; s_x = -1;}
+                if (packet->x_axis > 0 && ENDRIGHT != 0){dir_x = X_AXIS_POS; s_x = 1;}
                 step_x = abs(packet->x_axis);
                 // Y_AXIS
                 dir_y = DONT_MOVE;
-                if (packet->y_axis < 0 && ENDBOTTOM != 0) dir_y = Y_AXIS_NEG;
-                if (packet->y_axis > 0 && ENDTOP != 0) dir_y = Y_AXIS_POS;
-                step_y = abs(packet->y_axis);
+                if (packet->y_axis < 0 && ENDBOTTOM != 0){dir_y = Y_AXIS_NEG; s_y = -1;}
+                if (packet->y_axis > 0 && ENDTOP != 0){dir_y = Y_AXIS_POS; s_y = 1;}
+                step_y = -abs(packet->y_axis);
+                error = step_x + step_y;
+
                 // MOVE!
-                for(count_x = 0, count_y = 0; count_x < step_x && count_y < step_y; count_x++, count_y++){
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(dir_x | dir_y),MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
+                while(1){
+                    //setPixel(x0,y0);
+                    while(current_position[0] != next_position[0]){
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
 
-                    while(--counter);
-                    counter = 0xfff;
+                        while(--counter);
+                        counter = 0xf;
 
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
-                }
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
 
-                while(count_x < step_x){
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
+                        current_position[0] += s_x;
+                    }
+                    while(current_position[1] != next_position[1]){
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
 
-                    while(--counter);
-                    counter = 0xfff;
+                        while(--counter);
+                        counter = 0xf;
 
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
 
-                    count_x++;
-                }
+                        current_position[1] += s_y;
+                    }
 
-                while(count_y < step_y){
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
-
-                    while(--counter);
-                    counter = 0xfff;
-
-                    _mcp23s08_reset_ss(MCP23S08_SS);
-                    _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
-                    _mcp23s08_set_ss(MCP23S08_SS);
-
-                    count_y++;
+                    if(current_position[0] == end_position[0] || current_position[1] == end_position[1]) break;
+                    error_ = 2 * error;
+                    if(error_ >= step_y){ error += step_y; next_position[0] += s_x;}
+                    if(error_ <= step_x){ error += step_x; next_position[1] += s_y;}
                 }
 
                 if(!isRelative){
-                    packet->x_axis = pos[0];
-                    packet->y_axis = pos[1];
+                    packet->x_axis = current_position[0];
+                    packet->y_axis = current_position[1];
                 } else{
                     packet->x_axis = 0;
                     packet->y_axis = 0;
@@ -486,8 +490,8 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    while(--counter);
-                    counter = 0xfff;
+                    //while(--counter);
+                    //counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -498,8 +502,8 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    while(--counter);
-                    counter = 0xfff;
+                    //while(--counter);
+                    //counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -510,15 +514,15 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    while(--counter);
-                    counter = 0xfff;
+                    //while(--counter);
+                    //counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
                 }
-                pos[0] = 0;
-                pos[1] = 0;
+                current_position[0] = 0;
+                current_position[1] = 0;
                 break;
             case 5:                             // G02
                 APP_TRACE_DBG ("G02\n");
