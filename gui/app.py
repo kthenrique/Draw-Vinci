@@ -300,7 +300,7 @@ class AppWindow(QMainWindow):
         '''
         send next g-code in auto mode
         '''
-        if self.ui.pauseButton.isChecked():
+        if self.terminalThread.isRunning() and self.ui.pauseButton.isChecked():
             self.terminalThread.com = -1
             self.terminalThread.nav.wakeOne()
 
@@ -308,7 +308,7 @@ class AppWindow(QMainWindow):
         '''
         send previous g-code in auto mode
         '''
-        if self.ui.pauseButton.isChecked():
+        if self.terminalThread.isRunning() and self.ui.pauseButton.isChecked():
             self.terminalThread.com = 1
             self.terminalThread.nav.wakeOne()
 
