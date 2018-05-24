@@ -257,8 +257,7 @@ class AppWindow(QMainWindow):
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
                     if self.isSaved:
                         self.port.close()
-                        g_code_path = self.path.replace('.svg', '.gcode')
-                        self.terminalThread.path = g_code_path
+                        self.terminalThread.path = self.path
                         self.terminalThread.port = self.ui.portsBox.currentText()
                         self.terminalThread.start(QThread.HighestPriority)
                     else:
@@ -268,6 +267,7 @@ class AppWindow(QMainWindow):
                         self.ui.manualButton.setEnabled(True)
                 elif not self.isPlotting:                          # MANUAL MODE
                     self.isPlotting = True
+                    self.sendSingleMsg("#G28$")                      # housing plotter
                     self.sendSingleMsg("#G91$")                      # set relative positioning
                     if self.ui.penButton.isChecked():
                         self.sendSingleMsg('#G01:Z1$')
@@ -289,6 +289,9 @@ class AppWindow(QMainWindow):
             self.terminalThread.requestInterruption()
 
     def pauseIt(self, isChecked):
+        '''
+        Button Pause action when toggled
+        '''
         if self.ui.autoButton.isChecked() and not self.terminalThread.isRunning() and isChecked:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Nothing's being plotted ..."), TIMEOUT_STATUS)
             self.ui.stopButton.setChecked(True)
@@ -298,7 +301,7 @@ class AppWindow(QMainWindow):
 
     def prevCom(self):
         '''
-        send next g-code in auto mode
+        Wake terminal thread to read previous line of g-code
         '''
         if self.terminalThread.isRunning() and self.ui.pauseButton.isChecked():
             self.terminalThread.com = -1
@@ -306,7 +309,7 @@ class AppWindow(QMainWindow):
 
     def nextCom(self):
         '''
-        send previous g-code in auto mode
+        Wake terminal thread to read next line of g-code
         '''
         if self.terminalThread.isRunning() and self.ui.pauseButton.isChecked():
             self.terminalThread.com = 1
@@ -399,7 +402,7 @@ class AppWindow(QMainWindow):
             path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
             self.path = str(path[0])
 
-            parsed = getElements(self.path)
+            parsed = getElements(self.path, toScale = True)
             if parsed:
                 self.isSaved = True
                 self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
@@ -426,7 +429,6 @@ class AppWindow(QMainWindow):
             painter.end()
 
             self.hasChanged = False
-            getElements(self.path, 0)      # generate g-code
         else:
             self.saveFileAs()
 
@@ -453,7 +455,6 @@ class AppWindow(QMainWindow):
             painter.end()
             self.artworkLabel.setText(((self.path.replace('/', ' ')).replace('\\', ' ')).split()[-1])
 
-            #self.parser.getElements(self.path, 0)      # generate g-code
             self.hasChanged = False
             self.isSaved = True
 

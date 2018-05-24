@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 23
+# -- Last update: 2018 Mai 24
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -22,11 +22,11 @@ from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 from constants import CANVAS_HEIGHT, CANVAS_WIDTH
 
 
-def getElements(filename, mode = 1):
+def getElements(filename, writeCode = False, toScale = False):
     '''
     SVG Parser
     '''
-    if not mode:
+    if writeCode:
         g_code_path = filename.replace('.svg', '.gcode')
         g_code = open(g_code_path, mode ='w', encoding='utf-8')
         text  = '#G28$\n'+\
@@ -39,7 +39,7 @@ def getElements(filename, mode = 1):
 
     if not file_.open(QIODevice.ReadOnly) or not doc.setContent(file_):    # if couldn't open or failed to make i QDomDocument
         print("Couldn't open or failed to make DomDoc")
-        if not mode:
+        if writeCode:
             g_code.close()
         return False
 
@@ -71,17 +71,17 @@ def getElements(filename, mode = 1):
             width  = float(rect.attribute('width'))
             height = float(rect.attribute('height'))
 
-            # Scaling
-            x      = 100 * x/dy_scale
-            y      = 100 * y/dy_scale
-            width  = 100 * width/dy_scale
-            height = 100 * height/dy_scale
+            if toScale:
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
 
             newCanvasRect.setRect(x, y, width, height)
             listOfItems.append(newCanvasRect)
 
             # G-CODE
-            if not mode:
+            if writeCode:
                 x      = int(x)
                 y      = int(y)
                 width  = int(width)
@@ -110,11 +110,11 @@ def getElements(filename, mode = 1):
             x = cx - float(elli.attribute('rx'))
             y = cy - float(elli.attribute('ry'))
 
-            # Scaling
-            x      = 100 * x/dy_scale
-            y      = 100 * y/dy_scale
-            width  = 100 * width/dy_scale
-            height = 100 * height/dy_scale
+            if toScale:
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
 
             newCanvasElli.setRect(x, y, width, height)
             listOfItems.append(newCanvasElli)
@@ -133,11 +133,11 @@ def getElements(filename, mode = 1):
             x = cx - float(cir.attribute('r'))
             y = cy - float(cir.attribute('r'))
 
-            # Scaling
-            x      = 100 * x/dy_scale
-            y      = 100 * y/dy_scale
-            width  = 100 * width/dy_scale
-            height = 100 * height/dy_scale
+            if toScale:
+                x      = 100 * x/dy_scale
+                y      = 100 * y/dy_scale
+                width  = 100 * width/dy_scale
+                height = 100 * height/dy_scale
 
             newCanvasCir.setRect(x, y, width, height)
             listOfItems.append(newCanvasCir)
@@ -157,17 +157,17 @@ def getElements(filename, mode = 1):
             x2 = float(coord2[0])
             y2 = float(coord2[1])
 
-            # Scaling
-            x1     = 100 * x1/dy_scale
-            y1     = 100 * y1/dy_scale
-            x2     = 100 * x2/dy_scale
-            y2     = 100 * y2/dy_scale
+            if toScale:
+                x1     = 100 * x1/dy_scale
+                y1     = 100 * y1/dy_scale
+                x2     = 100 * x2/dy_scale
+                y2     = 100 * y2/dy_scale
 
             newCanvasLin.setLine(x1, y1, x2, y2)
             listOfItems.append(newCanvasLin)
 
             # G-CODE
-            if not mode:
+            if writeCode:
                 x1      = int(x1)
                 y1      = int(y1)
                 x2      = int(x2)
@@ -194,14 +194,14 @@ def getElements(filename, mode = 1):
                 coord[0] = float(coord[0])
                 coord[1] = float(coord[1])
 
-                # Scaling
-                coord[0] = 100 * (coord[0] / (dy_scale))
-                coord[1] = 100 * (coord[1] / (dy_scale))
+                if toScale:
+                    coord[0] = 100 * (coord[0] / (dy_scale))
+                    coord[1] = 100 * (coord[1] / (dy_scale))
 
                 newPoly.append(QPointF(coord[0], coord[1]))
 
                 # G-CODE
-                if not mode:
+                if writeCode:
                     x  = int(coord[0])
                     y  = int(coord[1])
                     if points.index(point) == 0:
@@ -245,12 +245,12 @@ def getElements(filename, mode = 1):
                 coord = coord.split()
                 for index in range(len(coord)):  # Convert str to float
                     coord[index] = float(coord[index])
-                    # Scaling
-                    coord[index] = 100 * (coord[index] / (dy_scale))
+                    if toScale:
+                        coord[index] = 100 * (coord[index] / (dy_scale))
                 if path[0]   == 'M':        # moveTo
                     newPat.moveTo(coord[0], coord[1])
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         y  = int(coord[1])
                         text  = '#G01:Z0$\n'+\
@@ -261,7 +261,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'm':        # moveTo relative
                     newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         y  = int(coord[1])
                         text  = '#G01:Z0$\n'+\
@@ -272,7 +272,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'L':        # lineTo
                     newPat.lineTo(coord[0], coord[1])
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         y  = int(coord[1])
                         text  = '#G01:Z1$\n'+\
@@ -282,7 +282,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'l':        # lineTo relative
                     newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         y  = int(coord[1])
                         text  = '#G01:Z1$\n'+\
@@ -292,7 +292,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'H':        # horizontal lineTo
                     newPat.lineTo(coord[0], newPat.currentPosition().y())
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         y  = int(newPat.currentPosition().y())
                         text  = '#G01:Z1$\n'+\
@@ -302,7 +302,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'h':        # horizontal lineTo relative
                     newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(coord[0])
                         text  = '#G01:Z1$\n'+\
                                 '#G91$\n'+\
@@ -311,7 +311,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'V':        # vertical lineTo
                     newPat.lineTo(newPat.currentPosition().x(), coord[0])
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         x  = int(newPat.currentPosition().x())
                         y  = int(coord[0])
                         text  = '#G01:Z1$\n'+\
@@ -321,7 +321,7 @@ def getElements(filename, mode = 1):
                 elif path[0] == 'v':        # vertical lineTo relative
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     # G-CODE
-                    if not mode:
+                    if writeCode:
                         y  = int(coord[0])
                         text  = '#G01:Z1$\n'+\
                                 '#G91$\n'+\
@@ -440,7 +440,8 @@ def getElements(filename, mode = 1):
 
     file_.close()
 
-    if mode:
-        return listOfItems
-    else:
+    if writeCode:
         g_code.close()
+        return True
+    else:
+        return listOfItems

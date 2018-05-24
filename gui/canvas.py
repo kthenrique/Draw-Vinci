@@ -149,7 +149,7 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addRect(self.tools[self.index])
             elif self.index == 11: # import
-                parsed = getElements(SVG[self.svg_index])
+                parsed = getElements(SVG[self.svg_index], toScale = True)
                 if parsed:
                     for element in parsed:
                         self.item = self.addItem(element)
