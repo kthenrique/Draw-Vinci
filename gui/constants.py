@@ -28,3 +28,9 @@ FONT_SIZES    = [4, 6, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20,
 # SVG's path
 SVG_DIR = './svg'
 SVG     = [os.path.join(SVG_DIR, f) for f in os.listdir(SVG_DIR)]
+
+# Step length for manual mode
+GODOWN = '#G01:Y-100$'
+GOUP   = '#G01:Y100$'
+GOLEFT = '#G01:X-100$'
+GORIGHT= '#G01:X100$'

@@ -45,6 +45,9 @@ def getElements(filename, mode = 1):
 
     # Acquiring viewBox dimenstions
     rootElement = doc.documentElement()
+    svg_width  = rootElement.attribute('width')
+    svg_height = rootElement.attribute('height')
+    print('width:{0} height:{1}'.format(svg_width, svg_height))
     viewBox = rootElement.attribute('viewBox')
     viewBox = viewBox.split()
     for index in range(len(viewBox)):

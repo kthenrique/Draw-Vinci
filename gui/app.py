@@ -26,7 +26,7 @@ from draw_vinci import Ui_MainWindow
 from parser import getElements
 from canvas import MainScene
 from terminal import Terminal
-from constants import TIMEOUT_STATUS, FONT_SIZES, SVG
+from constants import *
 
 class AppWindow(QMainWindow):
     '''
@@ -327,25 +327,25 @@ class AppWindow(QMainWindow):
 
     def goUp(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:Y1000$')
+            self.sendSingleMsg(GOUP)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goDown(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:Y-1000$')
+            self.sendSingleMsg(GODOWN)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goLeft(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:X-1000$')
+            self.sendSingleMsg(GOLEFT)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goRight(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg('#G01:X1000$')
+            self.sendSingleMsg(GORIGHT)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
@@ -389,7 +389,6 @@ class AppWindow(QMainWindow):
 
     def openFile(self):
         if self.checkCanvas():
-
             path = QFileDialog.getOpenFileName(self, "Open SVG Image", '', "SVG files (*.svg)")
             self.path = str(path[0])
 
@@ -408,9 +407,9 @@ class AppWindow(QMainWindow):
             print('no selection to remove')
         if self.isSaved:
             generator = QSvgGenerator()
-            generator.setFileName(str(self.path))
+            generator.setFileName(self.path)
             generator.setSize(QSize(self.scene.width(), self.scene.height()))
-            generator.setViewBox(QRect(0, 0, self.scene.width(), self.scene.height()))
+            generator.setViewBox((self.scene.itemsBoundingRect()).toRect())
             generator.setTitle("Title for SVG file")
             generator.setDescription("Description for SVG file");
 
@@ -436,8 +435,8 @@ class AppWindow(QMainWindow):
 
             generator = QSvgGenerator()
             generator.setFileName(self.path)
-            generator.setSize(QSize(self.scene.width()/50, self.scene.height())/50)
-            generator.setViewBox(self.scene.sceneRect())
+            generator.setSize(QSize(self.scene.width(), self.scene.height()))
+            generator.setViewBox((self.scene.itemsBoundingRect()).toRect())
             generator.setTitle("Title for SVG file")
             generator.setDescription("Description for SVG file");
 

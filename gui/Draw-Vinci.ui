@@ -344,7 +344,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="ellipseButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>210</x>
         <y>60</y>
         <width>41</width>
         <height>41</height>
@@ -539,7 +539,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="circleButton">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>160</x>
         <y>60</y>
         <width>41</width>
         <height>41</height>
@@ -593,8 +593,8 @@ QTabBar::tab:only-one {
        <rect>
         <x>320</x>
         <y>10</y>
-        <width>101</width>
-        <height>101</height>
+        <width>91</width>
+        <height>91</height>
        </rect>
       </property>
       <property name="text">
