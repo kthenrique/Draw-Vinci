@@ -587,7 +587,6 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionQuit)
         self.menuSetup.addAction(self.actionPreferences)
-        self.menuAbout.addAction(self.actionLicense)
         self.menuAbout.addAction(self.actionAbout)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSetup.menuAction())

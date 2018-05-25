@@ -141,7 +141,6 @@ class AppWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.saveFile)       # Save
         self.ui.actionSave_As.triggered.connect(self.saveFileAs)  # Save as
         self.ui.actionAbout.triggered.connect(self.about)         # About
-        self.ui.actionLicense.triggered.connect(self.license)     # License
         self.ui.actionQuit.triggered.connect(self.close)          # Quit
 
         # Control Buttons Initialisation
@@ -466,9 +465,6 @@ class AppWindow(QMainWindow):
 
             self.hasChanged = False
             self.isSaved = True
-
-    def license(self):
-        pass
 
     def about(self):
         ret = QMessageBox(QMessageBox.NoIcon, 'Draw-Vinci',\

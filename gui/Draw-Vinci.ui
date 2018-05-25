@@ -1198,7 +1198,6 @@ background-color: rgb(255, 255, 255);
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionLicense"/>
     <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
