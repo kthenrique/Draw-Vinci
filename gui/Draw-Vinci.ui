@@ -1225,6 +1225,9 @@ background-color: rgb(255, 255, 255);
    <property name="text">
     <string>Sa&amp;ve As ...</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="actionQuit">
    <property name="text">
@@ -1239,6 +1242,9 @@ background-color: rgb(255, 255, 255);
   <action name="actionAbout">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+?</string>
    </property>
   </action>
   <action name="actionPreferences">
