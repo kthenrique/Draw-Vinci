@@ -20,33 +20,132 @@ Design and develop both a multi-threaded PC GUI application as well as an XMC RT
 either case you can select a file format (G-Code, Excellon, HPGL or SVG — see below) to determine the content that shall be drawn using the machine. As an
 alternative you could devise a simple drawing application to do the same.
 
+== GUI
+
+[#GUI]
+.Main Window
+image::gui_main.png[]
+
+=== Functionalities
+
+==== Draw Tab
+
+Tools::
+    Eraser:::
+        Increase opacity of item clicked upon. If clicking until item dissapear, it will make the item invisible.
+    Freehand:::
+        Permits to draw in a free style.
+    Line:::
+        Used to draw lines.
+    Square:::
+        Used to draw squares.
+    Rectangle:::
+        Used to draw rectangles.
+    Polygone:::
+        Used to draw polygones.
+    Select:::
+        Permits to select items on canvas. When selected, an item can be removed clicking 'del' on the keyboard.
+    Magnifier:::
+        Permits zoom in using a user-defined rectangle. With the left button of the mouse, the user can define a rectangle to zoom in and with the right click of
+the mouse, the user can zoom out completely to the default scale.
+    Text:::
+        Used to write a text on canvas. Although this still cannot be plotted!
+    Circle:::
+        Used to draw circles.
+    Ellipse:::
+        Used to draw ellipses.
+    Import:::
+        Used to import to canvas the current image on the nextSVGButton.
+
+Key Combinations::
+    Ctrl+N:::
+        Clear canvas for new work.
+    Ctrl+O:::
+        Opens new SVG file.
+    Ctrl+S:::
+        Save current canvas.
+    Ctrl+Shift+S:::
+        Save current canvas with a new name.
+    Ctrl+?:::
+        Opens about dialog.
+    Ctrl+Z:::
+        Remove last added item from canvas. 
+    Del:::
+        Remove selected item from canvas.
+
+==== Control Tab
+
+===== Connection
+
+PromptEdit::
+    Terminal:::
+        Say something about terminal
+
+===== Mode
+
+Manual::
+    Directional & Pen Buttons:::
+        Say something about manual mode
+
+Auto:::
+    Flow Control Buttons:::
+        Say something about auto mode
+
+=== XMC4500
+
+.Servo Motor Function
+video::servoMotor.mp4[width=640]
+
+
 === Formats supported
 
-== Functionalities
+=== Images
 
-=== Tools
+Here is the subset of SVG parameters supported and recognised when opening, importing or saving:
 
-==== Eraser
+[cols="^.1s,<.3m"]
+|===
+| width    | Width of display
+| height   | Height of display
+| viewbox  | Dimensions of view
+| rect     | Rectangles
+| ellipse  | Ellipses
+| circle   | Circles
+| polyline | Group of lines
+| polygone | Polygones
+| path     | Paths
+| text     | Texts
 
-==== Line
+|===
 
-==== Freehand
+[NOTE]
+====
+Colors not supported!
 
-==== Text
-
-==== Rectangle
-
-==== Ellipse
-
-==== Select
-
-=== Key Combinations
-
-==== Undoing
-
-==== Deleting selection
+====
 
 == Communication
+
+The communication between GUI and the uC XMC4500 happens through UART, using the followins scheme as protocol:
+
+[protocol_frame]
+.Protocol Frame
+image::frame.png[Frame of Protocol]
+
+Where:
+
+[lowerroman]
+ . *#*: Beginn of message;
+ . *G COMMAND*: One of the supported G-Code commands [vide following section];
+ . *ARG{1}*: a apropriate argument to the G command;
+ . *ARG{2}*: another apropriate argument to the G command;
+ . *$*: End of message;
+
+[NOTE]
+====
+The number of arguments in a message should conform to the G command
+
+====
 
 === G-CODE Specification
 
@@ -78,9 +177,6 @@ Possible commands:
 [#portErrors]
 .Possible errors codes by connection
 image::portErrorsTable.png[]
-
-=== Protocol
-
 
 === Building the App
 The software comprising this project was built and tested using the following environment:
@@ -125,13 +221,4 @@ Dependencies::
         . https://launchpad.net/gcc-arm-embedded/5.0/5-2016-q3-update/+download/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
     SEGGER J-Link:::
         . https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
-
-=== Algorithms
-
-==== GUI
-
-==== XMC4500
-
-.Servo Motor Function
-video::servoMotor.mp4[width=640]
 

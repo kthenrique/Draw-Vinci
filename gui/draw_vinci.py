@@ -607,6 +607,7 @@ class Ui_MainWindow(object):
         self.ellipseButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">ellipse</p></body></html>"))
         self.rectangleButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">rectangle</p></body></html>"))
         self.freehandButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">freehand</p></body></html>"))
+        self.magnifierButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">magnifier</p></body></html>"))
         self.circleButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">circle</p></body></html>"))
         self.squareButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">square</p></body></html>"))
         self.importButton.setToolTip(_translate("MainWindow", "<html><head/><body><p align=\"center\">import</p></body></html>"))
