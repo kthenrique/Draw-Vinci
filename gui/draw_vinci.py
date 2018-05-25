@@ -578,6 +578,8 @@ class Ui_MainWindow(object):
         self.actionPreferences.setObjectName("actionPreferences")
         self.actionOpen = QtWidgets.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
+        self.actionDocs = QtWidgets.QAction(MainWindow)
+        self.actionDocs.setObjectName("actionDocs")
         self.menuFile.addAction(self.actionNew)
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionSave)
@@ -630,4 +632,5 @@ class Ui_MainWindow(object):
         self.actionPreferences.setText(_translate("MainWindow", "&Preferences"))
         self.actionOpen.setText(_translate("MainWindow", "Open ..."))
         self.actionOpen.setShortcut(_translate("MainWindow", "Ctrl+O"))
+        self.actionDocs.setText(_translate("MainWindow", "Docs"))
 

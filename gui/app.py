@@ -15,7 +15,7 @@ from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread, QSize
 from PyQt5.QtGui import QIntValidator, QPainter, QPixmap, QIcon
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
-        QProgressBar, QFileDialog, QMessageBox)
+        QProgressBar, QFileDialog, QMessageBox, QWidget)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtSvg import QSvgGenerator
 
@@ -27,6 +27,7 @@ from parser import getElements
 from canvas import MainScene
 from terminal import Terminal
 from constants import *
+
 
 class AppWindow(QMainWindow):
     '''
@@ -140,6 +141,7 @@ class AppWindow(QMainWindow):
         self.ui.actionSave.triggered.connect(self.saveFile)       # Save
         self.ui.actionSave_As.triggered.connect(self.saveFileAs)  # Save as
         self.ui.actionAbout.triggered.connect(self.about)         # About
+        self.ui.actionLicense.triggered.connect(self.license)     # License
         self.ui.actionQuit.triggered.connect(self.close)          # Quit
 
         # Control Buttons Initialisation
@@ -165,7 +167,6 @@ class AppWindow(QMainWindow):
 
         # Listening to incoming messages
         self.port.readyRead.connect(self.updateTerm)
-        #self.port.bytesWritten.connect(self.updateTerm)
 
         # Thread for permanent communication with XMC4500
         self.terminalThread = Terminal(self.drawingProgress, self.ui.pauseButton)
@@ -466,8 +467,22 @@ class AppWindow(QMainWindow):
             self.hasChanged = False
             self.isSaved = True
 
-    def about(self):
+    def license(self):
         pass
+
+    def about(self):
+        ret = QMessageBox(QMessageBox.NoIcon, 'Draw-Vinci',\
+                '<html><head/><body><p align="center"><span style=" font-size:16pt; font-weight:600;">Draw-Vinci</span></p><p align="center"><span style="\
+                font-size:16pt; font-weight:600;">V0.1</span></p><p align="center"><span style=" font-size:10pt;">A drawing tool to edit and create SVG files and\
+                generate its G-Code.</span></p><p align="center"><span style=" font-size:10pt;">It is supposed to be used with a plotter.</span></p><p\
+                align="center"><span style=" font-style:italic; color:#0c5099;">© </span><a href="andreas.hofschweiger@technikum-wien.at"><span style="\
+                text-decoration: underline; color:#0000ff;">Andreas Hofschweiger</span></a></p><p align="center"><span style=" font-style:italic; color:#0c5099;">©\
+                </span><a href="kelvehenrique@pm.me"><span style=" text-decoration: underline; color:#0000ff;">Kelve T. Henrique</span></a></p><p\
+                align="center"><span style=" font-size:7pt; font-style:italic; color:#582f34;">This program comes with absolutely no warranty.</span></p><p\
+                align="center"><a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"><span style=" font-size:7pt; text-decoration: underline;\
+                color:#582f34;">See the GNU General Public License</span></a><span style=" font-size:7pt; font-style:italic; color:#582f34;">, version 2 or later\
+                for details.</span></p></body></html>',
+                QMessageBox.Close).exec()
 
     def updateFileState(self):
         if self.hasChanged:

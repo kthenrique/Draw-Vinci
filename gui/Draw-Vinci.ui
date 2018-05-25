@@ -1255,6 +1255,11 @@ background-color: rgb(255, 255, 255);
     <string>Ctrl+O</string>
    </property>
   </action>
+  <action name="actionDocs">
+   <property name="text">
+    <string>Docs</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
