@@ -26,12 +26,13 @@ def getElements(filename, writeCode = False, toScale = False):
     '''
     SVG Parser
     '''
+    print('getElements CALLED')
     if writeCode:
         g_code_path = filename.replace('.svg', '.gcode')
         g_code = open(g_code_path, mode ='w', encoding='utf-8')
+        print('Initializing G-CODE')
         text  = '#G28$\n'+\
                 '#G90$\n'
-        g_code.write(text)
         isRelative = False
         penUp = True
 
@@ -91,13 +92,15 @@ def getElements(filename, writeCode = False, toScale = False):
                     text += '#G01:Z0$\n'
                     penUp = True
 
-                text += '#G01:X{0}:Y{1}$\n'.format(x,y)+\
-                        '#G01:Z1$\n'+\
-                        '#G01:X{0}:Y{1}$\n'.format(x+width,y)+\
+                text += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                if penUp:
+                    text += '#G01:Z1$\n'
+                    penUp = False
+
+                text += '#G01:X{0}:Y{1}$\n'.format(x+width,y)+\
                         '#G01:X{0}:Y{1}$\n'.format(x+width,y+height)+\
                         '#G01:X{0}:Y{1}$\n'.format(x,y+height)+\
                         '#G01:X{0}:Y{1}$\n'.format(x,y)
-                g_code.write(text)
 
             rect = rect.nextSiblingElement('rect')
 
@@ -172,18 +175,20 @@ def getElements(filename, writeCode = False, toScale = False):
 
             # G-CODE
             if writeCode:
-                x1      = int(x1)
-                y1      = int(y1)
-                x2      = int(x2)
-                y2      = int(y2)
+                x1      = int(x1) - viewBox[0]
+                y1      = int(y1) - viewBox[1]
+                x2      = int(x2) - viewBox[0]
+                y2      = int(y2) - viewBox[1]
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
 
-                text  += '#G01:X{0}:Y{1}$\n'.format(x1,y1)+\
-                        '#G01:Z1$\n'+\
-                        '#G01:X{0}:Y{1}$\n'.format(x2,y2)
-                g_code.write(text)
+                text  += '#G01:X{0}:Y{1}$\n'.format(x1,y1)
+                if penUp:
+                    text += '#G01:Z1$\n'
+                    penUp = False
+
+                text += '#G01:X{0}:Y{1}$\n'.format(x2,y2)
 
             lin = lin.nextSiblingElement('polyline')
 
@@ -209,19 +214,20 @@ def getElements(filename, writeCode = False, toScale = False):
 
                 # G-CODE
                 if writeCode:
-                    x  = int(coord[0])
-                    y  = int(coord[1])
+                    x  = int(coord[0]) - viewBox[0]
+                    y  = int(coord[1]) - viewBox[1]
                     if points.index(point) == 0:
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
 
-                        text  = '#G01:X{0}:Y{1}$\n'.format(x,y)+\
-                                '#G01:Z1$\n'
-                        g_code.write(text)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+
                     else:
                         text  = '#G01:X{0}:Y{1}$\n'.format(x,y)
-                        g_code.write(text)
 
             newCanvasPoly.setPolygon(newPoly)
             listOfItems.append(newCanvasPoly)
@@ -261,8 +267,8 @@ def getElements(filename, writeCode = False, toScale = False):
                     newPat.moveTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
-                        y  = int(coord[1])
+                        x  = int(coord[0]) - viewBox[0]
+                        y  = int(coord[1]) - viewBox[1]
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
@@ -273,13 +279,12 @@ def getElements(filename, writeCode = False, toScale = False):
 
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)+\
                                 '#G01:Z1$\n'
-                        g_code.write(text)
                 elif path[0] == 'm':        # moveTo relative
                     newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
-                        y  = int(coord[1])
+                        x  = int(coord[0]) - viewBox[0]
+                        y  = int(coord[1]) - viewBox[1]
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
@@ -287,25 +292,31 @@ def getElements(filename, writeCode = False, toScale = False):
                         if not isRelative:
                             text += '#G91$\n'
 
-                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)+\
-                                '#G01:Z1$\n'
-                        g_code.write(text)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+
                 elif path[0] == 'L':        # lineTo
                     newPat.lineTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
-                        y  = int(coord[1])
-                        text  += '#G01:Z1$\n'+\
-                                '#G90$\n'+\
-                                '#G01:X{0}:Y{1}$\n'.format(x,y)
-                        g_code.write(text)
+                        x  = int(coord[0]) - viewBox[0]
+                        y  = int(coord[1]) - viewBox[1]
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+
+                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
                 elif path[0] == 'l':        # lineTo relative
                     newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
-                        y  = int(coord[1])
+                        x  = int(coord[0]) - viewBox[0]
+                        y  = int(coord[1]) - viewBox[1]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -315,13 +326,12 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
 
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
-                        g_code.write(text)
                 elif path[0] == 'H':        # horizontal lineTo
                     newPat.lineTo(coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
-                        y  = int(newPat.currentPosition().y())
+                        x  = int(coord[0]) - viewBox[0]
+                        y  = int(newPat.currentPosition().y()) - viewBox[1]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -331,12 +341,11 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
 
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
-                        g_code.write(text)
                 elif path[0] == 'h':        # horizontal lineTo relative
                     newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0])
+                        x  = int(coord[0]) - viewBox[0]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -346,13 +355,12 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
 
                         text  += '#G01:X{0}:Y0$\n'.format(x)
-                        g_code.write(text)
                 elif path[0] == 'V':        # vertical lineTo
                     newPat.lineTo(newPat.currentPosition().x(), coord[0])
                     # G-CODE
                     if writeCode:
-                        x  = int(newPat.currentPosition().x())
-                        y  = int(coord[0])
+                        x  = int(newPat.currentPosition().x()) - viewBox[0]
+                        y  = int(coord[0]) - viewBox[1]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -362,12 +370,11 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
 
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
-                        g_code.write(text)
                 elif path[0] == 'v':        # vertical lineTo relative
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     # G-CODE
                     if writeCode:
-                        y  = int(coord[0])
+                        y  = int(coord[0]) - viewBox[1]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -377,7 +384,6 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
 
                         text  += '#G01:X0:Y{0}$\n'.format(y)
-                        g_code.write(text)
                 elif path[0] == 'C':        # curveto
                     lastCubicCtrl = QPointF(coord[2], coord[3])
                     newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
@@ -489,6 +495,8 @@ def getElements(filename, writeCode = False, toScale = False):
             listOfItems.append(newCanvasTex)
             tex = tex.nextSiblingElement('text')
 
+    if writeCode:
+        g_code.write(text)
     file_.close()
     if writeCode:
         g_code.close()

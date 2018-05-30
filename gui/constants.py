@@ -30,7 +30,7 @@ SVG_DIR = './svg'
 SVG     = [os.path.join(SVG_DIR, f) for f in os.listdir(SVG_DIR)]
 
 # Step length for manual mode
-GODOWN = '#G01:Y-100$'
-GOUP   = '#G01:Y100$'
+GODOWN = '#G01:Y100$'
+GOUP   = '#G01:Y-100$'
 GOLEFT = '#G01:X-100$'
 GORIGHT= '#G01:X100$'

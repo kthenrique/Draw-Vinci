@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 23
+# -- Last update: 2018 Mai 30
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -403,6 +403,7 @@ class AppWindow(QMainWindow):
     def newFile(self):
         if self.checkCanvas():
             self.hasChanged = False
+            self.isSaved    = False
             self.artworkLabel.setText("UNKNOWN_FILE")
 
     def openFile(self):

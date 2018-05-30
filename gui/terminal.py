@@ -133,5 +133,5 @@ class Terminal(QThread):
                         self.mutex.unlock()
 
         #self.auto_port.close()
-        os.remove(self.path)
+        #os.remove(self.path)
         self.exit()
