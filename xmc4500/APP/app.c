@@ -58,6 +58,9 @@
 #define X_AXIS_NEG 0x08
 #define DONT_MOVE 0
 
+#define PEN_DOWN  (uint16_t)((7.5) * 93.74)
+#define PEN_UP    (uint16_t)((5) * 93.74)
+
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
@@ -356,13 +359,14 @@ static void AppTaskPlot(void *p_arg){
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
     uint16_t step_x, dir_x, step_y, dir_y;
-    uint32_t error, error_;
+    int error = 0, error_ = 0;
     uint8_t s_x, s_y;
-    uint16_t current_position[2] = {0xd00, 0xd00};
-    uint16_t next_position[2]    = {0xd00, 0xd00};
-    uint16_t end_position[2]     = {0xd00, 0xd00};
-    uint16_t volatile compare;
-    volatile uint8_t counter = 0xf;
+    int current_position[2] = {0x0, 0x0};
+    int next_position[2]    = {0x0, 0x0};
+    int end_position[2]     = {0x0, 0x0};
+    volatile uint16_t counter = 0xfff;
+
+CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
 
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
@@ -383,8 +387,7 @@ static void AppTaskPlot(void *p_arg){
                 // PEN UP X PEN DOWN
                 if(packet->z_axis == 1 && penUp){
                     APP_TRACE_DBG ("Pen down\n");
-                    compare = (uint16_t)((7.5) * 93.74);
-                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_DOWN);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
                     // delay to lower the pen
@@ -392,8 +395,7 @@ static void AppTaskPlot(void *p_arg){
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
-                    compare = (uint16_t)((5) * 93.74);
-                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_UP);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
                     // delay to raise the pen
@@ -417,27 +419,41 @@ static void AppTaskPlot(void *p_arg){
 
                 }
                 // X_AXIS
-                dir_x = DONT_MOVE;
-                if (packet->x_axis < 0 && ENDLEFT != 0){dir_x = X_AXIS_NEG; s_x = -1;}
-                if (packet->x_axis > 0 && ENDRIGHT != 0){dir_x = X_AXIS_POS; s_x = 1;}
+                if (packet->x_axis < 0){dir_x = X_AXIS_NEG; s_x = -1;}
+                if (packet->x_axis > 0){dir_x = X_AXIS_POS; s_x = 1;}
                 step_x = abs(packet->x_axis);
                 // Y_AXIS
-                dir_y = DONT_MOVE;
-                if (packet->y_axis < 0 && ENDBOTTOM != 0){dir_y = Y_AXIS_NEG; s_y = -1;}
-                if (packet->y_axis > 0 && ENDTOP != 0){dir_y = Y_AXIS_POS; s_y = 1;}
+                if (packet->y_axis < 0){dir_y = Y_AXIS_NEG; s_y = -1;}
+                if (packet->y_axis > 0){dir_y = Y_AXIS_POS; s_y = 1;}
                 step_y = -abs(packet->y_axis);
                 error = step_x + step_y;
 
+sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
+        current_position[0], current_position[1],\
+        next_position[0], next_position[1],\
+        end_position[0], end_position[1],\
+        error, error_);
+APP_TRACE_INFO (debug_msg);
                 // MOVE!
                 while(1){
+sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
+        current_position[0], current_position[1],\
+        next_position[0], next_position[1],\
+        end_position[0], end_position[1],\
+        error, error_);
+APP_TRACE_INFO (debug_msg);
+
+OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_HMSM_STRICT, &err);
+                    APP_TRACE_DBG ("moving G01\n");
                     //setPixel(x0,y0);
                     while(current_position[0] != next_position[0]){
+                        APP_TRACE_DBG ("moving G01: x axis\n");
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
                         while(--counter);
-                        counter = 0xf;
+                        counter = 0xffff;
 
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -446,12 +462,13 @@ static void AppTaskPlot(void *p_arg){
                         current_position[0] += s_x;
                     }
                     while(current_position[1] != next_position[1]){
+                        APP_TRACE_DBG ("moving G01: y axis\n");
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
                         while(--counter);
-                        counter = 0xf;
+                        counter = 0xffff;
 
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -466,13 +483,6 @@ static void AppTaskPlot(void *p_arg){
                     if(error_ <= step_x){ error += step_x; next_position[1] += s_y;}
                 }
 
-                if(!isRelative){
-                    packet->x_axis = current_position[0];
-                    packet->y_axis = current_position[1];
-                } else{
-                    packet->x_axis = 0;
-                    packet->y_axis = 0;
-                }
                 step_x         = 0;
                 step_y         = 0;
                 break;
@@ -487,8 +497,7 @@ static void AppTaskPlot(void *p_arg){
             case 4:                             // G28
                 APP_TRACE_DBG ("G28\n");
                 // raise the pen
-                compare = (uint16_t)((5) * 93.74);
-                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
+                XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_UP);
                 XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                 packet->z_axis = 0;
                 penUp = true;
@@ -499,8 +508,8 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    //while(--counter);
-                    //counter = 0xff;
+                    while(--counter);
+                    counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -511,8 +520,8 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    //while(--counter);
-                    //counter = 0xff;
+                    while(--counter);
+                    counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -523,8 +532,8 @@ static void AppTaskPlot(void *p_arg){
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
 
-                    //while(--counter);
-                    //counter = 0xff;
+                    while(--counter);
+                    counter = 0xff;
 
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -538,6 +547,17 @@ static void AppTaskPlot(void *p_arg){
                 break;
                 //default:
         }
+
+        if(!isRelative){
+            packet->x_axis = current_position[0];
+            packet->y_axis = current_position[1];
+        } else{
+            packet->x_axis = 0;
+            packet->y_axis = 0;
+        }
+        step_x         = 0;
+        step_y         = 0;
+
         packet->isFree = true;
     }
 }
