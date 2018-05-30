@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : constants.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 23
+# -- Last update: 2018 Mai 30
 # ----------------------------------------------------------------------------
 # -- Description: All relevant constants for the GUI
 # ----------------------------------------------------------------------------
@@ -34,3 +34,6 @@ GODOWN = '#G01:Y100$'
 GOUP   = '#G01:Y-100$'
 GOLEFT = '#G01:X-100$'
 GORIGHT= '#G01:X100$'
+
+# Scale of SVG
+SCALE = 100
