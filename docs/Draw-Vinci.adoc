@@ -30,32 +30,25 @@ image::gui_main.png[]
 
 ==== Draw Tab
 
-Tools::
-    Eraser:::
-        Increase opacity of item clicked upon. If clicking until item dissapear, it will make the item invisible.
-    Freehand:::
-        Permits to draw in a free style.
-    Line:::
-        Used to draw lines.
-    Square:::
-        Used to draw squares.
-    Rectangle:::
-        Used to draw rectangles.
-    Polygone:::
-        Used to draw polygones.
-    Select:::
-        Permits to select items on canvas. When selected, an item can be removed clicking 'del' on the keyboard.
-    Magnifier:::
-        Permits zoom in using a user-defined rectangle. With the left button of the mouse, the user can define a rectangle to zoom in and with the right click of
+===== Tools
+
+[cols="^.1s,<.3m"]
+|===
+| Eraser     | Increase opacity of item clicked upon. If clicking until item dissapear, it will make the item invisible.
+| Freehand   | Permits to draw in a free style.
+| Line       | Used to draw lines.
+| Square     | Used to draw squares.
+| Rectangle  | Used to draw rectangles.
+| Polygone   | Used to draw polygones.
+| Select     | Permits to select items on canvas. When selected, an item can be removed clicking 'del' on the keyboard.
+| Magnifier  | Permits zoom in using a user-defined rectangle. With the left button of the mouse, the user can define a rectangle to zoom in and with the right click of
 the mouse, the user can zoom out completely to the default scale.
-    Text:::
-        Used to write a text on canvas. Although this still cannot be plotted!
-    Circle:::
-        Used to draw circles.
-    Ellipse:::
-        Used to draw ellipses.
-    Import:::
-        Used to import to canvas the current image on the nextSVGButton.
+| Text       | Used to write a text on canvas. Although this still cannot be plotted!
+| Circle     | Used to draw circles.
+| Ellipse    | Used to draw ellipses.
+| Import     | Used to import to canvas the current image on the nextSVGButton.
+
+|===
 
 Key Combinations::
     Ctrl+N:::
@@ -91,7 +84,7 @@ Auto:::
     Flow Control Buttons:::
         Say something about auto mode
 
-=== XMC4500
+== XMC4500
 
 .Servo Motor Function
 video::servoMotor.mp4[width=640]
