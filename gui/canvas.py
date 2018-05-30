@@ -299,12 +299,6 @@ class MainScene(QGraphicsScene):
             self.view.fitInView(self.item)
             self.removeItem(self.item)
 
-    def dragMoveEvent(self,e):
-        print('dragMoveEvent')
-
-    def wheelEvent(self, e):
-        print('wheelEvent')
-
     # Reimplementing keypress events
     def keyPressEvent(self, e):
         # Ctrl-Z Functionality
