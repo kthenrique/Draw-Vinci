@@ -58,8 +58,8 @@
 #define X_AXIS_NEG 0x08
 #define DONT_MOVE 0
 
-#define PEN_DOWN  (uint16_t)((7.5) * PERIOD_CCU40/100)
-#define PEN_UP    (uint16_t)((6) * PERIOD_CCU40/100)
+#define PEN_DOWN  (uint16_t)((10) * PERIOD_CCU40/100)
+#define PEN_UP    (uint16_t)((7.5) * PERIOD_CCU40/100)
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
@@ -396,7 +396,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
                     // delay to lower the pen
-                    OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
@@ -404,7 +404,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
                     // delay to raise the pen
-                    OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 // MOVE PLOTTER HORIZONTALLY
                 // beginning position
