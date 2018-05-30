@@ -58,8 +58,8 @@
 #define X_AXIS_NEG 0x08
 #define DONT_MOVE 0
 
-#define PEN_DOWN  (uint16_t)((7.5) * 93.74)
-#define PEN_UP    (uint16_t)((5) * 93.74)
+#define PEN_DOWN  (uint16_t)((7.5) * PERIOD_CCU40/100)
+#define PEN_UP    (uint16_t)((6) * PERIOD_CCU40/100)
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
@@ -273,7 +273,7 @@ static void AppTaskCom (void *p_arg){
     OS_ERR      err, err_;
     OS_MSG_SIZE msg_size;
     CPU_CHAR    msg[MAX_MSG_LENGTH];
-    CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
+    CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 50];
 
     bool volatile valid;
     CODE volatile packet[NUM_MSG];
@@ -330,7 +330,11 @@ static void AppTaskCom (void *p_arg){
                 (OS_OPT     ) OS_OPT_POST_FIFO,
                 (OS_ERR    *) &err);
         if (err != OS_ERR_NONE){
-            APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
+            APP_TRACE_DBG("ERROR OSTaskQPost: AppTaskPlot\n");
+            if (err == OS_ERR_Q_MAX)
+                APP_TRACE_DBG("OS_ERR_Q_MAX");
+            if (err == OS_ERR_MSG_POOL_EMPTY)
+                APP_TRACE_DBG("OS_ERR_MSG_POOL_EMPTY");
             continue;
         }
         //here the packets should be set to false
@@ -358,15 +362,15 @@ static void AppTaskPlot(void *p_arg){
     OS_MSG_SIZE msg_size;
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
-    uint16_t step_x, dir_x, step_y, dir_y;
+    int16_t step_x, dir_x, step_y, dir_y;
     int error = 0, error_ = 0;
-    uint8_t s_x, s_y;
+    int8_t s_x, s_y;
     int current_position[2] = {0x0, 0x0};
     int next_position[2]    = {0x0, 0x0};
     int end_position[2]     = {0x0, 0x0};
     volatile uint16_t counter = 0xfff;
 
-CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
+CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
 
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
@@ -378,6 +382,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 30];
         if (err != OS_ERR_NONE)
             APP_TRACE_DBG ("Error OSTaskQPend: AppTaskManMode\n");
 
+        APP_TRACE_INFO ("*********************** AppTaskPlot\n");
         switch(packet->cmd){
             case 0:                             // G00 
                 APP_TRACE_DBG ("G00\n");
@@ -443,9 +448,7 @@ sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d
         error, error_);
 APP_TRACE_INFO (debug_msg);
 
-OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_HMSM_STRICT, &err);
                     APP_TRACE_DBG ("moving G01\n");
-                    //setPixel(x0,y0);
                     while(current_position[0] != next_position[0]){
                         APP_TRACE_DBG ("moving G01: x axis\n");
                         _mcp23s08_reset_ss(MCP23S08_SS);
@@ -453,7 +456,7 @@ OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_HMSM_STRICT, &err);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
                         while(--counter);
-                        counter = 0xffff;
+                        counter = 0xff;
 
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -468,7 +471,7 @@ OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_HMSM_STRICT, &err);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
                         while(--counter);
-                        counter = 0xffff;
+                        counter = 0xff;
 
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -559,6 +562,7 @@ OSTimeDlyHMSM(0,0,1,0, OS_OPT_TIME_HMSM_STRICT, &err);
         step_y         = 0;
 
         packet->isFree = true;
+        APP_TRACE_INFO ("********************************\n");
     }
 }
 
