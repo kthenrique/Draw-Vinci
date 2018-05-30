@@ -276,8 +276,12 @@ static void AppTaskCom (void *p_arg){
     CODE volatile packet[NUM_MSG];
     uint8_t volatile current = 0;
 
+    for(uint8_t j = 0; j < NUM_MSG; j++){
+        packet[j].isFree = true;
+        packet[j].x_axis = 0;
+        packet[j].y_axis = 0;
+    }
     (void) p_arg; // Just to silence compiler
-
     APP_TRACE_INFO ("AppTaskCom Loop...\n");
     while (DEF_ON) {
         // empty the message buffer
@@ -326,7 +330,7 @@ static void AppTaskCom (void *p_arg){
             APP_TRACE_DBG ("Error OSTaskQPost: AppTaskPwm1\n");
             continue;
         }
-
+        //here the packets should be set to false
         while(!packet[current].isFree){
             current++;
             current %= NUM_MSG;
@@ -379,10 +383,12 @@ static void AppTaskPlot(void *p_arg){
                 // PEN UP X PEN DOWN
                 if(packet->z_axis == 1 && penUp){
                     APP_TRACE_DBG ("Pen down\n");
-                    compare = (uint16_t)((10) * 93.74);
+                    compare = (uint16_t)((7.5) * 93.74);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
+                    // delay to lower the pen
+                    OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
@@ -390,6 +396,8 @@ static void AppTaskPlot(void *p_arg){
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, compare);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
+                    // delay to raise the pen
+                    OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 // MOVE PLOTTER HORIZONTALLY
                 // beginning position
@@ -452,7 +460,7 @@ static void AppTaskPlot(void *p_arg){
                         current_position[1] += s_y;
                     }
 
-                    if(current_position[0] == end_position[0] || current_position[1] == end_position[1]) break;
+                    if(current_position[0] == end_position[0] && current_position[1] == end_position[1]) break;
                     error_ = 2 * error;
                     if(error_ >= step_y){ error += step_y; next_position[0] += s_x;}
                     if(error_ <= step_x){ error += step_x; next_position[1] += s_y;}
@@ -484,7 +492,8 @@ static void AppTaskPlot(void *p_arg){
                 XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                 packet->z_axis = 0;
                 penUp = true;
-
+                // delay to raise the pen
+                OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 while(ENDLEFT != 0 && ENDBOTTOM != 0){
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
