@@ -1207,7 +1207,7 @@ background-color: rgb(255, 255, 255);
     <property name="title">
      <string>Setti&amp;ngs</string>
     </property>
-    <addaction name="actionPreferences"/>
+    <addaction name="actionSetSvgDir"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -1278,6 +1278,11 @@ background-color: rgb(255, 255, 255);
   <action name="actionDocs">
    <property name="text">
     <string>Docs</string>
+   </property>
+  </action>
+  <action name="actionSetSvgDir">
+   <property name="text">
+    <string>Set SVG Directory</string>
    </property>
   </action>
  </widget>

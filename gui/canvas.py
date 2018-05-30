@@ -32,6 +32,7 @@ class MainScene(QGraphicsScene):
         self.toolLabel = toolLabel
         self.statusbar = self.toolLabel.parentWidget()
         self.svg_index = svg_index
+        self.svg       = SVG
         self.textTools = None
         self.view      = None
 
@@ -148,7 +149,7 @@ class MainScene(QGraphicsScene):
                 self.tools[self.index].setBottomRight(self.clickedPos)
                 self.item = self.addRect(self.tools[self.index])
             elif self.index == 11: # import
-                parsed = getElements(SVG[self.svg_index], toScale = True)
+                parsed = getElements(self.svg[self.svg_index], toScale = True)
                 if parsed:
                     for element in parsed:
                         self.item = self.addItem(element)

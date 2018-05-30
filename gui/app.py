@@ -72,6 +72,7 @@ class AppWindow(QMainWindow):
         self.toolsButtonGroup.addButton(self.ui.importButton, 11)
 
         # Initialise import tool
+        self.svg = SVG
         self.svg_index = 0
         self.ui.nextSVGButton.clicked.connect(self.nextSVG)
 
@@ -142,6 +143,7 @@ class AppWindow(QMainWindow):
         self.ui.actionSave_As.triggered.connect(self.saveFileAs)  # Save as
         self.ui.actionAbout.triggered.connect(self.about)         # About
         self.ui.actionQuit.triggered.connect(self.close)          # Quit
+        self.ui.actionSetSvgDir.triggered.connect(self.setSVGDir) # Set SVG dir
 
         # Control Buttons Initialisation
         self.controlButtonGroup = QButtonGroup()
@@ -496,11 +498,18 @@ class AppWindow(QMainWindow):
             self.ui.termEdit.append('<')
             self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
 
+    def setSVGDir(self):
+        path = QFileDialog.getExistingDirectory(self, "Choose a directory to import SVG's from")
+        svg_dir  = path
+        self.svg = [os.path.join(svg_dir, f) for f in os.listdir(svg_dir)]
+        self.scene.svg = self.svg
+        self.nextSVG()
+
     def nextSVG(self):
         self.svg_index += 1
-        self.svg_index = self.svg_index % len(SVG)
+        self.svg_index = self.svg_index % len(self.svg)
         self.scene.svg_index = self.svg_index
-        pix = QPixmap(SVG[self.svg_index])
+        pix = QPixmap(self.svg[self.svg_index])
         self.ui.nextSVGButton.setIcon(QIcon(pix))
 
 if __name__ == '__main__':
