@@ -63,7 +63,7 @@ class MainScene(QGraphicsScene):
 
     def resetTools(self):
         # The drawable elements
-        self.tools     = [1,
+        self.tools     = [None,
                           QPainterPath(),
                           QLineF(),
                           '',          # str instead of QString
@@ -89,9 +89,8 @@ class MainScene(QGraphicsScene):
             self.index = self.toolsButtonGroup.checkedId()
             if self.index == 0: # eraser
                 self.item = self.itemAt(self.clickedPos, QTransform())
-                self.tools[self.index] = self.tools[self.index] - 0.1
                 if self.item:
-                    self.item.setOpacity(self.tools[self.index])
+                    self.removeItem(self.item)
             elif self.index == 1: # freehand
                 self.tools[self.index].moveTo(pos)
                 self.item = self.addPath(self.tools[self.index])
@@ -168,7 +167,9 @@ class MainScene(QGraphicsScene):
             pos = e.scenePos()
             mousePos = QPointF(pos.x(), pos.y())
             if self.index == 0: # eraser
-                pass
+                self.item = self.itemAt(mousePos, QTransform())
+                if self.item:
+                    self.removeItem(self.item)
             elif self.index == 1: # freehand
                 self.tools[self.index].lineTo(pos)
                 self.item.setPath(self.tools[self.index])
