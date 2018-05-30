@@ -39,9 +39,11 @@ bool scrutinise(char *str, volatile CODE *packet){
             packet->z_axis = 2;
         } else
             if (strncmp((const char *)token_ptr,(const char *)"G01",3) == 0){
-                APP_TRACE_DBG ("G01...\n");
                 packet->cmd    = 1;
             } else
+                if (strncmp((const char *)token_ptr,(const char *)"G02",3) == 0){
+                    packet->cmd    = 5;
+                } else
                 if (strncmp((const char *)token_ptr,(const char *)"G90",3) == 0){
                     packet->cmd    = 2;
                 } else 
@@ -61,9 +63,15 @@ bool scrutinise(char *str, volatile CODE *packet){
                             if ((token_ptr[0] == 'y') || (token_ptr[0] == 'Y')){
                                 packet->y_axis = SCALE*strtol((const char *)&token_ptr[1], &endptr, 10);
                             } else
-                                if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
-                                    packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
-                                } //else
+                                if ((token_ptr[0] == 'i') || (token_ptr[0] == 'I')){
+                                    packet->i_offset = SCALE*strtol((const char *)&token_ptr[1], &endptr, 10);
+                                } else
+                                    if ((token_ptr[0] == 'j') || (token_ptr[0] == 'J')){
+                                        packet->j_offset = SCALE*strtol((const char *)&token_ptr[1], &endptr, 10);
+                                    } else
+                                        if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
+                                            packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                                        } //else
                                     //return false;
         if (token_ptr == NULL){
             break;

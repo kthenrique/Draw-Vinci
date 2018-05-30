@@ -478,10 +478,10 @@ static void AppTaskPlot(void *p_arg){
     OS_MSG_SIZE msg_size;
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
-    int16_t step_x, dir_x, step_y, dir_y;
+    int16_t step_x, dir_x, step_y, dir_y, center[2];
     uint16_t dimension[2] = {0x0, 0x0};
     int error = 0, error_ = 0;
-    int8_t s_x, s_y;
+    int8_t s_x, s_y, quadrant = 1;
     int current_position[2] = {0x0, 0x0};
     int next_position[2]    = {0x0, 0x0};
     int end_position[2]     = {0x0, 0x0};
@@ -683,8 +683,109 @@ APP_TRACE_INFO (debug_msg);
                 break;
             case 5:                             // G02
                 APP_TRACE_DBG ("G02\n");
+                // beginning position
+                next_position[0] = current_position[0];
+                next_position[1] = current_position[1];
+                // End position
+                end_position[0] += packet->x_axis;
+                end_position[1] += packet->y_axis;
+                if(!isRelative){                        // ABSOLUTE
+                    APP_TRACE_DBG ("Absolute Positioning\n");
+                    end_position[0] = packet->x_axis;
+                    end_position[1] = packet->y_axis;
+                }
+
+                // can we use sqrt() from math lib?
+                //s_x = -sqrt((abs(packet->i_offset) + abs(packet->j_offset)));
+                error_ = abs(packet->i_offset); // this is radius
+                step_x = -error;
+                step_y = 0;
+                error = 2-2*error_;
+                // Circle center
+                center[0] = current_position[0]+packet->i_offset;
+                center[1] = current_position[1]+packet->j_offset;
+
+                // MOVE!
+                do{
+                    APP_TRACE_DBG ("moving G01\n");
+                    switch(quadrant){
+                        case 1:
+                            next_position[0] = center[0] - step_x;
+                            next_position[1] = center[1] + step_y;
+                            s_x = -1;
+                            s_y = 1;
+                            break;
+                        case 2:
+                            next_position[0] = center[0] - step_x;
+                            next_position[1] = center[1] - step_y;
+                            s_x = -1;
+                            s_y = -1;
+                            break;
+                        case 3:
+                            next_position[0] = center[0] + step_x;
+                            next_position[1] = center[1] - step_y;
+                            s_x = 1;
+                            s_y = -1;
+                            break;
+                        case 4:
+                            next_position[0] = center[0] + step_x;
+                            next_position[1] = center[1] + step_y;
+                            s_x = 1;
+                            s_y = 1;
+                            break;
+                    }
+                    if (s_x < 0) dir_x = X_AXIS_NEG;
+                    else         dir_x = X_AXIS_POS;
+                    if (s_y < 0) dir_y = Y_AXIS_NEG;
+                    else         dir_y = Y_AXIS_POS;
+                    while(current_position[0] != next_position[0]){
+                        APP_TRACE_DBG ("moving G02: x axis\n");
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
+
+                        while(--counter);
+                        counter = 0xff;
+
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
+
+                        current_position[0] += s_x;
+                    }
+                    while(current_position[1] != next_position[1]){
+                        APP_TRACE_DBG ("moving G02: y axis\n");
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
+
+                        while(--counter);
+                        counter = 0xff;
+
+                        _mcp23s08_reset_ss(MCP23S08_SS);
+                        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+                        _mcp23s08_set_ss(MCP23S08_SS);
+
+                        current_position[1] += s_y;
+                    }
+
+                    error_ = error;
+                    if(error_ <= step_y) error += ++step_y*2+1;
+                    if(error_ > step_x || error > step_y) error += ++step_x*2+1;
+
+                    if (s_x >= 0){
+                        error_ = abs(packet->i_offset); // this is radius
+                        s_x = -error;
+                        s_y = 0;
+                        error = 2-2*error_;
+                        quadrant ++;
+                    }
+                } while(quadrant < 5);
+
+                step_x    = 0;
+                step_y    = 0;
+                quadrant  = 1;
                 break;
-                //default:
         }
 
         if(!isRelative){
