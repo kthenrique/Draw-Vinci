@@ -49,11 +49,13 @@
 #endif
 
 /******************************************************************** DEFINES */
+#define BUG_IT
+
 #define MAX_MSG_LENGTH         20
 #define NUM_MSG                32
 
-#define Y_AXIS_POS 0x02
-#define Y_AXIS_NEG 0x03
+#define Y_AXIS_POS 0x03
+#define Y_AXIS_NEG 0x02
 #define X_AXIS_POS 0x0C
 #define X_AXIS_NEG 0x08
 #define DONT_MOVE 0
@@ -82,6 +84,120 @@ static void AppTaskStart    (void *p_arg);
 static void AppTaskCom      (void *p_arg);
 static void AppTaskPlot     (void *p_arg);
 
+void init_plotter(uint16_t *dimension){
+    volatile uint16_t counter = 0xfff;
+    CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
+
+    // delay to raise the pen
+    while(ENDLEFT != 0 && ENDTOP != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+    while(ENDTOP != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+    while(ENDLEFT != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+    while(ENDBOTTOM != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_POS,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        dimension[0]++;
+#ifdef BUG_IT
+sprintf (debug_msg, "dimension: (%d, %d)\n", dimension[0], dimension[1]);
+APP_TRACE_INFO (debug_msg);
+#endif
+    }
+    while(ENDRIGHT != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_POS,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        dimension[1]++;
+#ifdef BUG_IT
+sprintf (debug_msg, "dimension: (%d, %d)\n", dimension[0], dimension[1]);
+APP_TRACE_INFO (debug_msg);
+#endif
+    }
+    while(ENDLEFT != 0 && ENDTOP != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+    while(ENDTOP != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+    while(ENDLEFT != 0){
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,X_AXIS_NEG,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+
+        while(--counter);
+        counter = 0xff;
+
+        _mcp23s08_reset_ss(MCP23S08_SS);
+        _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
+        _mcp23s08_set_ss(MCP23S08_SS);
+    }
+}
 /*********************************************************************** MAIN */
 /**
  * \function main
@@ -363,6 +479,7 @@ static void AppTaskPlot(void *p_arg){
     CODE volatile *packet;
     bool volatile isRelative = false, penUp = true;
     int16_t step_x, dir_x, step_y, dir_y;
+    uint16_t dimension[2] = {0x0, 0x0};
     int error = 0, error_ = 0;
     int8_t s_x, s_y;
     int current_position[2] = {0x0, 0x0};
@@ -370,7 +487,22 @@ static void AppTaskPlot(void *p_arg){
     int end_position[2]     = {0x0, 0x0};
     volatile uint16_t counter = 0xfff;
 
+#ifdef BUG_IT
 CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
+#endif
+
+    // raise the pen
+    XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_UP);
+    XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
+    penUp = true;
+    OSTimeDlyHMSM(0, 0, 0, 150, OS_OPT_TIME_HMSM_STRICT, &err);
+
+    init_plotter(dimension);
+
+#ifdef BUG_IT
+sprintf (debug_msg, "DIMENSION: (%d, %d)\n", dimension[0], dimension[1]);
+APP_TRACE_INFO (debug_msg);
+#endif
 
     APP_TRACE_INFO ("AppTaskManMode Loop...\n");
     while (DEF_ON){
@@ -396,7 +528,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
                     // delay to lower the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 650, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
@@ -404,8 +536,9 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
                     // delay to raise the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 650, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
+
                 // MOVE PLOTTER HORIZONTALLY
                 // beginning position
                 next_position[0] = current_position[0];
@@ -433,21 +566,24 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
                 step_y = -abs(packet->y_axis);
                 error = step_x + step_y;
 
+#ifdef BUG_IT
 sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
         current_position[0], current_position[1],\
         next_position[0], next_position[1],\
         end_position[0], end_position[1],\
         error, error_);
 APP_TRACE_INFO (debug_msg);
+#endif
                 // MOVE!
                 while(1){
+#ifdef BUG_IT
 sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
         current_position[0], current_position[1],\
         next_position[0], next_position[1],\
         end_position[0], end_position[1],\
         error, error_);
 APP_TRACE_INFO (debug_msg);
-
+#endif
                     APP_TRACE_DBG ("moving G01\n");
                     while(current_position[0] != next_position[0]){
                         APP_TRACE_DBG ("moving G01: x axis\n");
@@ -506,7 +642,7 @@ APP_TRACE_INFO (debug_msg);
                 penUp = true;
                 // delay to raise the pen
                 OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
-                while(ENDLEFT != 0 && ENDBOTTOM != 0){
+                while(ENDLEFT != 0 && ENDTOP != 0){
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,(Y_AXIS_NEG | X_AXIS_NEG),MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
@@ -518,7 +654,7 @@ APP_TRACE_INFO (debug_msg);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);
                 }
-                while(ENDBOTTOM != 0){
+                while(ENDTOP != 0){
                     _mcp23s08_reset_ss(MCP23S08_SS);
                     _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,Y_AXIS_NEG,MCP23S08_WR);
                     _mcp23s08_set_ss(MCP23S08_SS);

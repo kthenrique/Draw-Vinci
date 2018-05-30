@@ -22,6 +22,8 @@
 #include <SEGGER_RTT_Conf.h>
 #endif
 
+#define SCALE 1
+
 bool scrutinise(char *str, volatile CODE *packet){
     char *endptr = NULL, *token_ptr = NULL, *sav_p;
     const char delim[] = ":";
@@ -54,10 +56,10 @@ bool scrutinise(char *str, volatile CODE *packet){
                         }
                         if ((token_ptr[0] == 'x') || (token_ptr[0] == 'X')){
                             APP_TRACE_DBG ("Changing value of X...\n");
-                            packet->x_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                            packet->x_axis = SCALE*strtol((const char *)&token_ptr[1], &endptr, 10);
                         } else
                             if ((token_ptr[0] == 'y') || (token_ptr[0] == 'Y')){
-                                packet->y_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
+                                packet->y_axis = SCALE*strtol((const char *)&token_ptr[1], &endptr, 10);
                             } else
                                 if ((token_ptr[0] == 'z') || (token_ptr[0] == 'Z')){
                                     packet->z_axis = strtol((const char *)&token_ptr[1], &endptr, 10);
