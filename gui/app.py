@@ -423,10 +423,8 @@ class AppWindow(QMainWindow):
                     self.hasChanged = False
 
     def saveFile(self):
-        try:
+        if self.scene.tools[7]:
             self.scene.removeItem(self.scene.tools[7])
-        except:
-            print('no selection to remove')
         if self.isSaved:
             generator = QSvgGenerator()
             generator.setFileName(self.path)
@@ -447,9 +445,8 @@ class AppWindow(QMainWindow):
     def saveFileAs(self):
             path = QFileDialog.getSaveFileName(self, 'Save File', '', "SVG files (*.svg)")
 
-            if not path:
-                print(path)
-                print("Smth went wrong")
+            if not path[0]:
+                print("NOT SAVED!")
                 return
 
             self.path = str(path[0])
