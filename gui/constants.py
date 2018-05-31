@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : constants.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 30
+# -- Last update: 2018 Mai 31
 # ----------------------------------------------------------------------------
 # -- Description: All relevant constants for the GUI
 # ----------------------------------------------------------------------------
@@ -36,4 +36,10 @@ GOLEFT = '#G01:X-100$'
 GORIGHT= '#G01:X100$'
 
 # Scale of SVG
-SCALE = 150
+SCALE = 250
+
+# Number of points/cubic_bézier
+CUBIC_BEZIER = 12
+
+# Number of points/quadratic_bézier
+QUAD_BEZIER = 12

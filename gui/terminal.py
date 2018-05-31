@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 24
+# -- Last update: 2018 Mai 31
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
@@ -133,5 +133,5 @@ class Terminal(QThread):
                         self.mutex.unlock()
 
         #self.auto_port.close()
-        #os.remove(self.path)
+        os.remove(self.path)
         self.exit()

@@ -45,6 +45,7 @@ def getElements(filename, writeCode = False, toScale = False):
             g_code.close()
         return False
 
+    print("****************************** PARSING SVG FILE ******************************")
     # Acquiring dimensions & viewBox parameters
     rootElement = doc.documentElement()
     svg_width  = rootElement.attribute('width')
@@ -60,7 +61,7 @@ def getElements(filename, writeCode = False, toScale = False):
         print('viewbox delta: ({0}, {1})'.format(dx_scale, dy_scale))
 
         REPOSITION = (-viewBox[0], -viewBox[1]) # Just for plotter
-        if viewBox[2] > CANVAS_WIDTH or viewBox[3] > CANVAS_HEIGHT:
+        if viewBox[2] > CANVAS_WIDTH or viewBox[3] > CANVAS_HEIGHT: # rescale when image is bigger than canvas
             RESCALE  = SCALE/viewBox[3]
         else:
             RESCALE  = 1
@@ -279,7 +280,6 @@ def getElements(filename, writeCode = False, toScale = False):
             if trafo and (trafo[0],trafo[1],trafo[2],trafo[3]) != (1,0,0,1): # i.e. it's not a translation transform
                 print('NOT TRANSLATING PATH')
                 trafo = None
-            print(trafo)
 
             paths = (pat.attribute('d'))
             # Normalise string
@@ -307,6 +307,7 @@ def getElements(filename, writeCode = False, toScale = False):
                     if toScale:
                         coord[index] = RESCALE * coord[index]
                 if path[0]   == 'M':        # moveTo
+                    print(' -M-',end='',flush=True)
                     newPat.moveTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
@@ -320,6 +321,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
                 elif path[0] == 'm':        # moveTo relative
+                    print(' -m-',end='',flush=True)
                     newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
@@ -332,6 +334,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             text += '#G91$\n'
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
                 elif path[0] == 'L':        # lineTo
+                    print(' -L-',end='',flush=True)
                     newPat.lineTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
@@ -345,6 +348,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
                 elif path[0] == 'l':        # lineTo relative
+                    print(' -l-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
@@ -358,6 +362,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
                         text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
                 elif path[0] == 'H':        # horizontal lineTo
+                    print(' -H-',end='',flush=True)
                     newPat.lineTo(coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
@@ -371,6 +376,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         text  += '#G01:X{0}$\n'.format(x)
                 elif path[0] == 'h':        # horizontal lineTo relative
+                    print(' -h-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
@@ -383,6 +389,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
                         text  += '#G01:X{0}$\n'.format(x)
                 elif path[0] == 'V':        # vertical lineTo
+                    print(' -V-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x(), coord[0])
                     # G-CODE
                     if writeCode:
@@ -396,6 +403,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         text  += '#G01:Y{1}$\n'.format(y)
                 elif path[0] == 'v':        # vertical lineTo relative
+                    print(' -v-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     # G-CODE
                     if writeCode:
@@ -408,40 +416,61 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = True
                         text  += '#G01:Y{0}$\n'.format(y)
                 elif path[0] == 'C':        # curveto
-                    lastCubicCtrl = QPointF(coord[2], coord[3])
-                    newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
-                    Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
+                    print(' -C-',end='',flush=True)
                     # G-CODE
                     if writeCode:
-                        ctrl1  = (coord[0] + REPOSITION[0], coord[1] + REPOSITION[1])
-                        ctrl2  = (coord[2] + REPOSITION[0], coord[3] + REPOSITION[1])
-                        endP   = (coord[4] + REPOSITION[0], coord[5] + REPOSITION[1])
+                        P0x = (newPat.currentPosition()).x()
+                        P0y = (newPat.currentPosition()).y()
+                        P1x = coord[0] + REPOSITION[0]
+                        P1y = coord[1] + REPOSITION[1]
+                        P2x = coord[2] + REPOSITION[0]
+                        P2y = coord[3] + REPOSITION[1]
+                        P3x = coord[4] + REPOSITION[0]
+                        P3y = coord[5] + REPOSITION[1]
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        #text  += '#G01:Y{1}$\n'.format(y)
+                        for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/CUBIC_BEZIER
+                            B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
+                            B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
+                            text += '#G01:X{0}:Y{1}$\n'.format(B[0],B[1])
+                    lastCubicCtrl = QPointF(coord[2], coord[3])
+                    newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
+                    Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
                 elif path[0] == 'c':        # curveto relative
+                    print(' -c-',end='',flush=True)
+                    # G-CODE
+                    if writeCode:
+                        P0x = (newPat.currentPosition()).x()
+                        P0y = (newPat.currentPosition()).y()
+                        P1x = P0x + coord[0] + REPOSITION[0]
+                        P1y = P0y + coord[1] + REPOSITION[1]
+                        P2x = P0x + coord[2] + REPOSITION[0]
+                        P2y = P0y + coord[3] + REPOSITION[1]
+                        P3x = P0x + coord[4] + REPOSITION[0]
+                        P3y = P0y + coord[5] + REPOSITION[1]
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/CUBIC_BEZIER
+                            B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
+                            B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
+                            text += '#G01:X{0}:Y{1}$\n'.format(B[0],B[1])
                     lastCubicCtrl = newPat.currentPosition()+QPointF(coord[2], coord[3])
                     newPat.cubicTo(newPat.currentPosition()+QPointF(coord[0],coord[1]),\
                                     newPat.currentPosition()+QPointF(coord[2],coord[3]),\
                                     newPat.currentPosition()+QPointF(coord[4],coord[5]))
                     Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
-                    # G-CODE
-                    if writeCode:
-                        ctrl1  = newPat.currentPosition()+QPointF(coord[0] + REPOSITION[0],coord[1] + REPOSITION[1])
-                        ctrl2  = newPat.currentPosition()+QPointF(coord[2] + REPOSITION[0],coord[3] + REPOSITION[1])
-                        endP   = newPat.currentPosition()+QPointF(coord[4] + REPOSITION[0],coord[5] + REPOSITION[1])
-                        if penUp:
-                            text += '#G01:Z1$\n'
-                            penUp = False
-                        if isRelative:
-                            text += '#G90$\n'
-                            isRelative = False
-                        #text  += '#G01:Y{1}$\n'.format(y)
                 elif path[0] == 'S':        # smooth curveto
+                    print(' -S-',end='',flush=True)
                     if lastCubicCtrl:
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
                         lastCubicCtrl = QPointF(coord[0], coord[1])
@@ -449,11 +478,13 @@ def getElements(filename, writeCode = False, toScale = False):
                                         QPointF(coord[0], coord[1]),\
                                         QPointF(coord[2], coord[3]))
                     else:
+                        print("smooth without last ctrl")
                         newPat.cubicTo(newPat.currentPosition().x(),\
                                         newPat.currentPosition().y(),\
                                         coord[0], coord[1],\
                                         coord[2], coord[3])
                 elif path[0] == 's':        # smooth curveto relative
+                    print(' -s-',end='',flush=True)
                     if lastCubicCtrl:
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
                         lastCubicCtrl = QPointF(newPat.currentPosition().x()+coord[0],\
@@ -465,6 +496,7 @@ def getElements(filename, writeCode = False, toScale = False):
                                         newPat.currentPosition().x()+coord[2],\
                                         newPat.currentPosition().y()+coord[3])
                     else:
+                        print("smooth without last ctrl")
                         newPat.cubicTo(newPat.currentPosition().x(),\
                                         newPat.currentPosition().y(),\
                                         newPat.currentPosition().x()+coord[0],\
@@ -472,13 +504,16 @@ def getElements(filename, writeCode = False, toScale = False):
                                         newPat.currentPosition().x()+coord[2],\
                                         newPat.currentPosition().y()+coord[3])
                 elif path[0] == 'Q':        # quadratic Bézier curve
+                    print(' -Q-',end='',flush=True)
                     lastQuadCtrl = QPointF(coord[0], coord[1])
                     newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
                 elif path[0] == 'q':        # quadratic Bézier curve relative
+                    print(' -q-',end='',flush=True)
                     lastQuadCtrl = newPat.currentPosition()+QPointF(coord[0], coord[1])
                     newPat.quadTo(newPat.currentPosition()+QPointf(coord[0], coord[1]),\
                                     newPat.currentPosition()+QPointf(coord[2], coord[3]))
                 elif path[0] == 'T':        # smooth quadratic Bézier curveto
+                    print(' -T-',end='',flush=True)
                     if lastQuadCtrl:
                         Ctrl = newPat.currentPosition() - (lastQuadCtrl-newPat.currentPosition())
                         newPat.quadTo(Ctrl, QPointF(coord[0], coord[1]))
@@ -488,6 +523,7 @@ def getElements(filename, writeCode = False, toScale = False):
                                         QPointF(coord[0], coord[1]))
                         lastQuadCtrl = newPat.currentPosition()
                 elif path[0] == 't':        # smooth quadratic Bézier curveto relative
+                    print(' -t-',end='',flush=True)
                     if lastQuadCtrl:
                         Ctrl = newPat.currentPosition() - (lastQuadCtrl-newPat.currentPosition())
                         newPat.quadTo(Ctrl, newPat.currentPosition()+QPointF(coord[0], coord[1]))
@@ -497,15 +533,19 @@ def getElements(filename, writeCode = False, toScale = False):
                                         newPat.currentPosition()+QPointF(coord[0], coord[1]))
                         lastQuadCtrl = newPat.currentPosition()
                 elif path[0] == 'A':        # elliptical arc
+                    print(' -A-',end='',flush=True)
                     pass
                 elif path[0] == 'a':        # elliptical arc relative
+                    print(' -a-',end='',flush=True)
                     pass
                 elif path[0] == 'Z' or path[0] == 'z':        # closePath
+                    print(' -Z-',end='',flush=True)
                     newPat.closeSubpath()
                 else:
                     print('Strange Command at path tag in SVG file')
                     print(path)
 
+            print('')
             newCanvasPat.setPath(newPat)
             listOfItems.append(newCanvasPat)
             pat = pat.nextSiblingElement('path')
@@ -542,6 +582,7 @@ def getElements(filename, writeCode = False, toScale = False):
             listOfItems.append(newCanvasTex)
             tex = tex.nextSiblingElement('text')
 
+    print("******************************************************************************")
     if writeCode:
         g_code.write(text)
     file_.close()
