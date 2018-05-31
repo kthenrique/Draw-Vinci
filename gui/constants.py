@@ -36,4 +36,4 @@ GOLEFT = '#G01:X-100$'
 GORIGHT= '#G01:X100$'
 
 # Scale of SVG
-SCALE = 100
+SCALE = 150

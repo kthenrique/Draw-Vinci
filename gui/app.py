@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 30
+# -- Last update: 2018 Mai 31
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -132,6 +132,7 @@ class AppWindow(QMainWindow):
         self.scene.textTools = (self.ui.fontBox, self.ui.fontSizeBox,\
                 self.ui.italicButton, self.ui.underlineButton)
         self.scene.changed.connect(self.updateFileState)
+        self.ui.canvas.setSceneRect(self.scene.sceneRect())
         self.ui.canvas.show()
 
         self.nextSVG()
