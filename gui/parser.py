@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
 from PyQt5.QtGui import QPolygonF, QPainterPath, QFont
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
-from constants import CANVAS_HEIGHT, CANVAS_WIDTH, SCALE
+from constants import CANVAS_HEIGHT, CANVAS_WIDTH, SCALE, CUBIC_BEZIER, QUAD_BEZIER
 
 
 def getElements(filename, writeCode = False, toScale = False):
@@ -435,9 +435,10 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
                             t = i/CUBIC_BEZIER
+                            B = ['','']
                             B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
                             B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
-                            text += '#G01:X{0}:Y{1}$\n'.format(B[0],B[1])
+                            text += '#G01:X{0:.2f}:Y{1:.2f}$\n'.format(B[0],B[1])
                     lastCubicCtrl = QPointF(coord[2], coord[3])
                     newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
                     Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
@@ -461,9 +462,10 @@ def getElements(filename, writeCode = False, toScale = False):
                             isRelative = False
                         for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
                             t = i/CUBIC_BEZIER
+                            B = ['','']
                             B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
                             B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
-                            text += '#G01:X{0}:Y{1}$\n'.format(B[0],B[1])
+                            text += '#G01:X{0:.2f}:Y{1:.2f}$\n'.format(B[0],B[1])
                     lastCubicCtrl = newPat.currentPosition()+QPointF(coord[2], coord[3])
                     newPat.cubicTo(newPat.currentPosition()+QPointF(coord[0],coord[1]),\
                                     newPat.currentPosition()+QPointF(coord[2],coord[3]),\
