@@ -39,7 +39,7 @@ GORIGHT= '#G01:X100$'
 SCALE = 250
 
 # Number of points/cubic_bézier
-CUBIC_BEZIER = 12
+CUBIC_BEZIER = 10
 
 # Number of points/quadratic_bézier
-QUAD_BEZIER = 12
+QUAD_BEZIER = 10

@@ -182,10 +182,10 @@ def getElements(filename, writeCode = False, toScale = False):
             points = points.split()
             coord1 = points[0].split(',')
             coord2 = points[1].split(',')
-            x1 = float(coord1[0]) + REPOSITION[0]
-            y1 = float(coord1[1]) + REPOSITION[1]
-            x2 = float(coord2[0]) + REPOSITION[0]
-            y2 = float(coord2[1]) + REPOSITION[1]
+            x1 = float(coord1[0])
+            y1 = float(coord1[1])
+            x2 = float(coord2[0])
+            y2 = float(coord2[1])
 
             if toScale:
                 x1     = RESCALE * x1
@@ -198,10 +198,10 @@ def getElements(filename, writeCode = False, toScale = False):
 
             # G-CODE
             if writeCode:
-                x1      = int(x1)
-                y1      = int(y1)
-                x2      = int(x2)
-                y2      = int(y2)
+                x1      = int(x1) + REPOSITION[0]
+                y1      = int(y1) + REPOSITION[1]
+                x2      = int(x2) + REPOSITION[0]
+                y2      = int(y2) + REPOSITION[1]
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
@@ -419,8 +419,8 @@ def getElements(filename, writeCode = False, toScale = False):
                     print(' -C-',end='',flush=True)
                     # G-CODE
                     if writeCode:
-                        P0x = (newPat.currentPosition()).x()
-                        P0y = (newPat.currentPosition()).y()
+                        P0x = (newPat.currentPosition()).x() + REPOSITION[0]
+                        P0y = (newPat.currentPosition()).y() + REPOSITION[1]
                         P1x = coord[0] + REPOSITION[0]
                         P1y = coord[1] + REPOSITION[1]
                         P2x = coord[2] + REPOSITION[0]
@@ -438,7 +438,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             B = ['','']
                             B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
                             B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
-                            text += '#G01:X{0:.2f}:Y{1:.2f}$\n'.format(B[0],B[1])
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
                     lastCubicCtrl = QPointF(coord[2], coord[3])
                     newPat.cubicTo(coord[0], coord[1], coord[2], coord[3], coord[4], coord[5])
                     Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
@@ -446,8 +446,8 @@ def getElements(filename, writeCode = False, toScale = False):
                     print(' -c-',end='',flush=True)
                     # G-CODE
                     if writeCode:
-                        P0x = (newPat.currentPosition()).x()
-                        P0y = (newPat.currentPosition()).y()
+                        P0x = (newPat.currentPosition()).x() + REPOSITION[0]
+                        P0y = (newPat.currentPosition()).y() + REPOSITION[1]
                         P1x = P0x + coord[0] + REPOSITION[0]
                         P1y = P0y + coord[1] + REPOSITION[1]
                         P2x = P0x + coord[2] + REPOSITION[0]
@@ -465,7 +465,7 @@ def getElements(filename, writeCode = False, toScale = False):
                             B = ['','']
                             B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
                             B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
-                            text += '#G01:X{0:.2f}:Y{1:.2f}$\n'.format(B[0],B[1])
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
                     lastCubicCtrl = newPat.currentPosition()+QPointF(coord[2], coord[3])
                     newPat.cubicTo(newPat.currentPosition()+QPointF(coord[0],coord[1]),\
                                     newPat.currentPosition()+QPointF(coord[2],coord[3]),\
