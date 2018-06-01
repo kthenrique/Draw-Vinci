@@ -52,7 +52,7 @@
 #define BUG_IT
 
 #define MAX_MSG_LENGTH         20
-#define NUM_MSG                32
+#define NUM_MSG                64
 
 #define Y_AXIS_POS 0x03
 #define Y_AXIS_NEG 0x02
@@ -60,8 +60,8 @@
 #define X_AXIS_NEG 0x08
 #define DONT_MOVE 0
 
-#define PEN_DOWN  (uint16_t)((10) * PERIOD_CCU40/100)
-#define PEN_UP    (uint16_t)((7.5) * PERIOD_CCU40/100)
+#define PEN_DOWN  (uint16_t)((7.5) * PERIOD_CCU40/100)
+#define PEN_UP    (uint16_t)((5) * PERIOD_CCU40/100)
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
