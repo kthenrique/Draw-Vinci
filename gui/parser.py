@@ -60,8 +60,9 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
         dy_scale = viewBox[3]-viewBox[1]
         print('viewbox delta: ({0}, {1})'.format(dx_scale, dy_scale))
 
-        REPOSITION = (-viewBox[0]+abs(viewBox[0]), -viewBox[1]+abs(viewBox[1])) # Just for plotter
+        REPOSITION = (int(-viewBox[0]+abs(viewBox[0])), int(-viewBox[1]+abs(viewBox[1]))) # Just for plotter
         RESOLUTION /= CANVAS_WIDTH  # Just for plotter
+        RESOLUTION = int(RESOLUTION)
         if viewBox[2] > CANVAS_WIDTH or viewBox[3] > CANVAS_HEIGHT: # rescale when image is bigger than canvas
             RESCALE  = SCALE/viewBox[3]
         else:
@@ -95,10 +96,10 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
             # G-CODE
             if writeCode:
-                x      = int(x) + REPOSITION[0]
-                y      = int(y) + REPOSITION[1]
-                width  = int(width)
-                height = int(height)
+                x      = RESOLUTION * (int(x) + REPOSITION[0])
+                y      = RESOLUTION * (int(y) + REPOSITION[1])
+                width  = RESOLUTION * (int(width))
+                height = RESOLUTION * (int(height))
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
@@ -163,9 +164,9 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
             listOfItems.append(newCanvasCir)
 
             if writeCode:
-                x      = int(x) + REPOSITION[0]
-                y      = int(y) + REPOSITION[1]
-                r      = int(width/2)
+                x      = RESOLUTION * (int(x) + REPOSITION[0])
+                y      = RESOLUTION * (int(y) + REPOSITION[1])
+                r      = RESOLUTION * (int(width/2))
                 if isRelative:
                     text += '#G90$\n'
                     isRelative = False
@@ -199,10 +200,10 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
             # G-CODE
             if writeCode:
-                x1      = int(x1) + REPOSITION[0]
-                y1      = int(y1) + REPOSITION[1]
-                x2      = int(x2) + REPOSITION[0]
-                y2      = int(y2) + REPOSITION[1]
+                x1      = RESOLUTION * (int(x1) + REPOSITION[0])
+                y1      = RESOLUTION * (int(y1) + REPOSITION[1])
+                x2      = RESOLUTION * (int(x2) + REPOSITION[0])
+                y2      = RESOLUTION * (int(y2) + REPOSITION[1])
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
@@ -240,8 +241,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
                 # G-CODE
                 if writeCode:
-                    x  = int(coord[0])
-                    y  = int(coord[1])
+                    x  = RESOLUTION * (int(coord[0]))
+                    y  = RESOLUTION * (int(coord[1]))
                     if points.index(point) == 0:
                         if not penUp:
                             text += '#G01:Z0$\n'
@@ -312,8 +313,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.moveTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
-                        y  = int(coord[1]) + REPOSITION[1]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
@@ -326,8 +327,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
-                        y  = int(coord[1]) + REPOSITION[1]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
@@ -339,8 +340,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.lineTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
-                        y  = int(coord[1]) + REPOSITION[1]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -353,8 +354,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
-                        y  = int(coord[1]) + REPOSITION[1]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -367,7 +368,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.lineTo(coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
                         #y  = int(newPat.currentPosition().y()) + REPOSITION[1]
                         if penUp:
                             text += '#G01:Z1$\n'
@@ -381,7 +382,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = int(coord[0]) + REPOSITION[0]
+                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -395,7 +396,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     # G-CODE
                     if writeCode:
                         #x  = int(newPat.currentPosition().x()) + REPOSITION[0]
-                        y  = int(coord[0]) + REPOSITION[1]
+                        y  = RESOLUTION * (int(coord[0]) + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -408,7 +409,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     # G-CODE
                     if writeCode:
-                        y  = int(coord[0]) + REPOSITION[1]
+                        y  = RESOLUTION * (int(coord[0]) + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -420,14 +421,14 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     print(' -C-',end='',flush=True)
                     # G-CODE
                     if writeCode:
-                        P0x = (newPat.currentPosition()).x() + REPOSITION[0]
-                        P0y = (newPat.currentPosition()).y() + REPOSITION[1]
-                        P1x = coord[0] + REPOSITION[0]
-                        P1y = coord[1] + REPOSITION[1]
-                        P2x = coord[2] + REPOSITION[0]
-                        P2y = coord[3] + REPOSITION[1]
-                        P3x = coord[4] + REPOSITION[0]
-                        P3y = coord[5] + REPOSITION[1]
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (coord[0] + REPOSITION[0])
+                        P1y = RESOLUTION * (coord[1] + REPOSITION[1])
+                        P2x = RESOLUTION * (coord[2] + REPOSITION[0])
+                        P2y = RESOLUTION * (coord[3] + REPOSITION[1])
+                        P3x = RESOLUTION * (coord[4] + REPOSITION[0])
+                        P3y = RESOLUTION * (coord[5] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -447,14 +448,14 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     print(' -c-',end='',flush=True)
                     # G-CODE
                     if writeCode:
-                        P0x = (newPat.currentPosition()).x() + REPOSITION[0]
-                        P0y = (newPat.currentPosition()).y() + REPOSITION[1]
-                        P1x = P0x + coord[0] + REPOSITION[0]
-                        P1y = P0y + coord[1] + REPOSITION[1]
-                        P2x = P0x + coord[2] + REPOSITION[0]
-                        P2y = P0y + coord[3] + REPOSITION[1]
-                        P3x = P0x + coord[4] + REPOSITION[0]
-                        P3y = P0y + coord[5] + REPOSITION[1]
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (P0x + coord[0] + REPOSITION[0])
+                        P1y = RESOLUTION * (P0y + coord[1] + REPOSITION[1])
+                        P2x = RESOLUTION * (P0x + coord[2] + REPOSITION[0])
+                        P2y = RESOLUTION * (P0y + coord[3] + REPOSITION[1])
+                        P3x = RESOLUTION * (P0x + coord[4] + REPOSITION[0])
+                        P3y = RESOLUTION * (P0y + coord[5] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
