@@ -63,6 +63,8 @@
 #define PEN_DOWN  (uint16_t)((7.5) * PERIOD_CCU40/100)
 #define PEN_UP    (uint16_t)((5) * PERIOD_CCU40/100)
 
+#define SLEEP_COUNTER 0xffff
+
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
 static  OS_TCB   AppTaskCom_TCB;
@@ -85,7 +87,7 @@ static void AppTaskCom      (void *p_arg);
 static void AppTaskPlot     (void *p_arg);
 
 void init_plotter(uint16_t *dimension){
-    volatile uint16_t counter = 0xfff;
+    volatile uint16_t counter = SLEEP_COUNTER;
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
 
     // delay to raise the pen
@@ -95,7 +97,7 @@ void init_plotter(uint16_t *dimension){
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -107,7 +109,7 @@ void init_plotter(uint16_t *dimension){
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -119,7 +121,7 @@ void init_plotter(uint16_t *dimension){
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -131,7 +133,7 @@ void init_plotter(uint16_t *dimension){
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -149,7 +151,7 @@ APP_TRACE_INFO (debug_msg);
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -167,7 +169,7 @@ APP_TRACE_INFO (debug_msg);
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -179,7 +181,7 @@ APP_TRACE_INFO (debug_msg);
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -191,7 +193,7 @@ APP_TRACE_INFO (debug_msg);
         _mcp23s08_set_ss(MCP23S08_SS);
 
         while(--counter);
-        counter = 0xff;
+        counter = SLEEP_COUNTER;
 
         _mcp23s08_reset_ss(MCP23S08_SS);
         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
@@ -497,7 +499,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
     penUp = true;
     OSTimeDlyHMSM(0, 0, 0, 150, OS_OPT_TIME_HMSM_STRICT, &err);
 
-    init_plotter(dimension);
+//    init_plotter(dimension);
 
 #ifdef BUG_IT
 sprintf (debug_msg, "DIMENSION: (%d, %d)\n", dimension[0], dimension[1]);
