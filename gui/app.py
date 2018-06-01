@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 31
+# -- Last update: 2018 Jun 01
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ from PyQt5.Qt import Qt                              # Some relevant constants
 from PyQt5.QtCore import QIODevice, QThreadPool, QRect, QThread, QSize
 from PyQt5.QtGui import QIntValidator, QPainter, QPixmap, QIcon
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QButtonGroup, QLabel,
-        QProgressBar, QFileDialog, QMessageBox, QWidget)
+        QProgressBar, QFileDialog, QMessageBox, QWidget, QActionGroup)
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt5.QtSvg import QSvgGenerator
 
@@ -146,6 +146,17 @@ class AppWindow(QMainWindow):
         self.ui.actionQuit.triggered.connect(self.close)          # Quit
         self.ui.actionSetSvgDir.triggered.connect(self.setSVGDir) # Set SVG dir
 
+        # Step motor config
+        self.StepConfig = QActionGroup(self)
+        self.StepConfig.addAction(self.ui.actionFullStep)
+        self.StepConfig.addAction(self.ui.actionHalfStep)
+        self.StepConfig.addAction(self.ui.actionQuarterStep)
+        self.StepConfig.addAction(self.ui.actionEighthStep)
+        self.StepConfig.addAction(self.ui.actionSixteenthStep)
+        self.ui.actionQuarterStep.setChecked(True)
+
+        self.StepConfig.triggered.connect(self.updateStepConfig)
+
         # Control Buttons Initialisation
         self.controlButtonGroup = QButtonGroup()
         self.controlButtonGroup.setExclusive(True)
@@ -166,6 +177,8 @@ class AppWindow(QMainWindow):
         self.ui.leftButton.clicked.connect(self.goLeft)            # left
         self.ui.rightButton.clicked.connect(self.goRight)          # right
         self.ui.penButton.toggled.connect(self.togglePen)          # pen
+
+        self.manualResolution = str(int(QUARTER_STEP[1]/50))+'$'
 
         # Listening to incoming messages
         self.port.readyRead.connect(self.updateTerm)
@@ -345,25 +358,25 @@ class AppWindow(QMainWindow):
 
     def goUp(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg(GOUP)
+            self.sendSingleMsg(GOUP+self.manualResolution)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goDown(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg(GODOWN)
+            self.sendSingleMsg(GODOWN+self.manualResolution)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goLeft(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg(GOLEFT)
+            self.sendSingleMsg(GOLEFT+self.manualResolution)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
     def goRight(self):
         if self.ui.playButton.isChecked():
-            self.sendSingleMsg(GORIGHT)
+            self.sendSingleMsg(GORIGHT+self.manualResolution)
         else:
             self.ui.statusbar.showMessage(self.ui.statusbar.tr("Plotter not listening! Press play ..."), TIMEOUT_STATUS)
 
@@ -482,6 +495,9 @@ class AppWindow(QMainWindow):
                 QMessageBox.Close).exec()
 
     def updateFileState(self):
+        '''
+        Updates the state of canvas to avoid losing work
+        '''
         if self.hasChanged:
             self.hasChanged = False
         else:
@@ -497,6 +513,9 @@ class AppWindow(QMainWindow):
             self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
 
     def setSVGDir(self):
+        '''
+        Sets the SVG's directory to be used when browsing for the import tool
+        '''
         path = QFileDialog.getExistingDirectory(self, "Choose a directory to import SVG's from")
         svg_dir  = path
         self.svg = [os.path.join(svg_dir, f) for f in os.listdir(svg_dir)]
@@ -504,11 +523,35 @@ class AppWindow(QMainWindow):
         self.nextSVG()
 
     def nextSVG(self):
+        '''
+        Browsing of SVG's available for import tool
+        '''
         self.svg_index += 1
         self.svg_index = self.svg_index % len(self.svg)
         self.scene.svg_index = self.svg_index
         pix = QPixmap(self.svg[self.svg_index])
         self.ui.nextSVGButton.setIcon(QIcon(pix))
+
+    def updateStepConfig(self, a):
+        '''
+        Updates the step resolution for scaling of auto mode plotting
+        '''
+        if a == self.ui.actionFullStep:
+            self.terminalThread.scale = FULL_STEP
+            self.manualResolution = str(int(FULL_STEP[1]/50))+'$'
+        elif a == self.ui.actionHalfStep:
+            self.terminalThread.scale = HALF_STEP
+            self.manualResolution = str(int(HALF_STEP[1]/50))+'$'
+        elif a == self.ui.actionQuarterStep:
+            self.terminalThread.scale = QUARTER_STEP
+            self.manualResolution = str(int(QUARTER_STEP[1]/50))+'$'
+        elif a == self.ui.actionEighthStep:
+            self.terminalThread.scale = EIGHTH_STEP
+            self.manualResolution = str(int(EIGHTH_STEP[1]/50))+'$'
+        else:
+            self.terminalThread.scale = SIXTEENTH_STEP
+            self.manualResolution = str(int(SIXTEENTH_STEP[1]/50))+'$'
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

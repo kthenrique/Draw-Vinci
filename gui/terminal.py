@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : terminal.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 31
+# -- Last update: 2018 Jun 01
 # ----------------------------------------------------------------------------
 # -- Description: Thread responsible for communicating with the plotter
 # ----------------------------------------------------------------------------
@@ -16,7 +16,7 @@ import serial
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QIODevice, QWaitCondition, QMutex
 from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 
-from constants import TIMEOUT_STATUS
+from constants import *
 from parser import getElements
 
 class Terminal(QThread):
@@ -40,6 +40,7 @@ class Terminal(QThread):
         self.nav = QWaitCondition()
         self.mutex = QMutex()
 
+        self.scale = QUARTER_STEP[1]
         self.path  = None
         self.port  = None
         self.auto_port = None
@@ -54,7 +55,7 @@ class Terminal(QThread):
     @pyqtSlot()
     def run(self):
         self.fileLines = []
-        getElements(self.path, writeCode = True, toScale = False)
+        getElements(self.path, writeCode = True, toScale = False, RESOLUTION=self.scale)
         self.path = self.path.replace('.svg', '.gcode')
         file_size = os.path.getsize(self.path)
         with open(self.path) as code:

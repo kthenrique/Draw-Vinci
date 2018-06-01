@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Mai 31
+# -- Last update: 2018 Jun 01
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -19,10 +19,10 @@ from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
 from PyQt5.QtGui import QPolygonF, QPainterPath, QFont
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 
-from constants import CANVAS_HEIGHT, CANVAS_WIDTH, SCALE, CUBIC_BEZIER, QUAD_BEZIER
+from constants import *
 
 
-def getElements(filename, writeCode = False, toScale = False):
+def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUARTER_STEP[1]):
     '''
     SVG Parser
     '''
@@ -60,7 +60,8 @@ def getElements(filename, writeCode = False, toScale = False):
         dy_scale = viewBox[3]-viewBox[1]
         print('viewbox delta: ({0}, {1})'.format(dx_scale, dy_scale))
 
-        REPOSITION = (-viewBox[0], -viewBox[1]) # Just for plotter
+        REPOSITION = (-viewBox[0]+abs(viewBox[0]), -viewBox[1]+abs(viewBox[1])) # Just for plotter
+        RESOLUTION /= CANVAS_WIDTH  # Just for plotter
         if viewBox[2] > CANVAS_WIDTH or viewBox[3] > CANVAS_HEIGHT: # rescale when image is bigger than canvas
             RESCALE  = SCALE/viewBox[3]
         else:

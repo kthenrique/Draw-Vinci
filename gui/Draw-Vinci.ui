@@ -1210,7 +1210,18 @@ background-color: rgb(255, 255, 255);
     <property name="title">
      <string>Setti&amp;ngs</string>
     </property>
+    <widget class="QMenu" name="menuStep_Motor">
+     <property name="title">
+      <string>Step Motor</string>
+     </property>
+     <addaction name="actionFullStep"/>
+     <addaction name="actionHalfStep"/>
+     <addaction name="actionQuarterStep"/>
+     <addaction name="actionEighthStep"/>
+     <addaction name="actionSixteenthStep"/>
+    </widget>
     <addaction name="actionSetSvgDir"/>
+    <addaction name="menuStep_Motor"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -1285,7 +1296,50 @@ background-color: rgb(255, 255, 255);
   </action>
   <action name="actionSetSvgDir">
    <property name="text">
-    <string>Set SVG Directory</string>
+    <string>SVG Directory</string>
+   </property>
+  </action>
+  <action name="actionFullStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Full Step</string>
+   </property>
+  </action>
+  <action name="actionHalfStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Half Step</string>
+   </property>
+  </action>
+  <action name="actionQuarterStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Quarter Step</string>
+   </property>
+  </action>
+  <action name="actionEighthStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Eighth Step</string>
+   </property>
+  </action>
+  <action name="actionSixteenthStep">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sixteenth Step</string>
    </property>
   </action>
  </widget>
