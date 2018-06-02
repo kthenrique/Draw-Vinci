@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Jun 01
+# -- Last update: 2018 Jun 02
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -313,62 +313,62 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     newPat.moveTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
-                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
+                        y  = RESOLUTION * (coord[1] + REPOSITION[1])
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 elif path[0] == 'm':        # moveTo relative
                     print(' -m-',end='',flush=True)
                     newPat.moveTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
-                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
+                        y  = RESOLUTION * (coord[1] + REPOSITION[1])
                         if not penUp:
                             text += '#G01:Z0$\n'
                             penUp = True
                         if not isRelative:
                             text += '#G91$\n'
-                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 elif path[0] == 'L':        # lineTo
                     print(' -L-',end='',flush=True)
                     newPat.lineTo(coord[0], coord[1])
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
-                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
+                        y  = RESOLUTION * (coord[1] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 elif path[0] == 'l':        # lineTo relative
                     print(' -l-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition() + QPointF(coord[0], coord[1]))
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
-                        y  = RESOLUTION * (int(coord[1]) + REPOSITION[1])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
+                        y  = RESOLUTION * (coord[1] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if not isRelative:
                             text += '#G91$\n'
                             isRelative = True
-                        text  += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                        text  += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 elif path[0] == 'H':        # horizontal lineTo
                     print(' -H-',end='',flush=True)
                     newPat.lineTo(coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
                         #y  = int(newPat.currentPosition().y()) + REPOSITION[1]
                         if penUp:
                             text += '#G01:Z1$\n'
@@ -376,47 +376,47 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        text  += '#G01:X{0}$\n'.format(x)
+                        text  += '#G01:X{0}$\n'.format(int(x))
                 elif path[0] == 'h':        # horizontal lineTo relative
                     print(' -h-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x()+coord[0], newPat.currentPosition().y())
                     # G-CODE
                     if writeCode:
-                        x  = RESOLUTION * (int(coord[0]) + REPOSITION[0])
+                        x  = RESOLUTION * (coord[0] + REPOSITION[0])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if not isRelative:
                             text += '#G91$\n'
                             isRelative = True
-                        text  += '#G01:X{0}$\n'.format(x)
+                        text  += '#G01:X{0}$\n'.format(int(x))
                 elif path[0] == 'V':        # vertical lineTo
                     print(' -V-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x(), coord[0])
                     # G-CODE
                     if writeCode:
                         #x  = int(newPat.currentPosition().x()) + REPOSITION[0]
-                        y  = RESOLUTION * (int(coord[0]) + REPOSITION[1])
+                        y  = RESOLUTION * (coord[0] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        text  += '#G01:Y{1}$\n'.format(y)
+                        text  += '#G01:Y{1}$\n'.format(int(y))
                 elif path[0] == 'v':        # vertical lineTo relative
                     print(' -v-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
                     # G-CODE
                     if writeCode:
-                        y  = RESOLUTION * (int(coord[0]) + REPOSITION[1])
+                        y  = RESOLUTION * (coord[0] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
                         if not isRelative:
                             text += '#G91$\n'
                             isRelative = True
-                        text  += '#G01:Y{0}$\n'.format(y)
+                        text  += '#G01:Y{0}$\n'.format(int(y))
                 elif path[0] == 'C':        # curveto
                     print(' -C-',end='',flush=True)
                     # G-CODE
@@ -450,12 +450,12 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     if writeCode:
                         P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
                         P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
-                        P1x = RESOLUTION * (P0x + coord[0] + REPOSITION[0])
-                        P1y = RESOLUTION * (P0y + coord[1] + REPOSITION[1])
-                        P2x = RESOLUTION * (P0x + coord[2] + REPOSITION[0])
-                        P2y = RESOLUTION * (P0y + coord[3] + REPOSITION[1])
-                        P3x = RESOLUTION * (P0x + coord[4] + REPOSITION[0])
-                        P3y = RESOLUTION * (P0y + coord[5] + REPOSITION[1])
+                        P1x = RESOLUTION * (newPat.currentPosition().x() + coord[0] + REPOSITION[0])
+                        P1y = RESOLUTION * (newPat.currentPosition().y() + coord[1] + REPOSITION[1])
+                        P2x = RESOLUTION * (newPat.currentPosition().x() + coord[2] + REPOSITION[0])
+                        P2y = RESOLUTION * (newPat.currentPosition().y() + coord[3] + REPOSITION[1])
+                        P3x = RESOLUTION * (newPat.currentPosition().x() + coord[4] + REPOSITION[0])
+                        P3y = RESOLUTION * (newPat.currentPosition().y() + coord[5] + REPOSITION[1])
                         if penUp:
                             text += '#G01:Z1$\n'
                             penUp = False
@@ -477,42 +477,118 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     print(' -S-',end='',flush=True)
                     if lastCubicCtrl:
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
-                        lastCubicCtrl = QPointF(coord[0], coord[1])
-                        newPat.cubicTo(Ctrl,\
-                                        QPointF(coord[0], coord[1]),\
-                                        QPointF(coord[2], coord[3]))
                     else:
-                        print("smooth without last ctrl")
-                        newPat.cubicTo(newPat.currentPosition().x(),\
-                                        newPat.currentPosition().y(),\
-                                        coord[0], coord[1],\
-                                        coord[2], coord[3])
+                        Ctrl = newPat.currentPosition()
+                    # G-CODE
+                    if writeCode:
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (Ctrl.x() + REPOSITION[0])
+                        P1y = RESOLUTION * (Ctrl.y() + REPOSITION[1])
+                        P2x = RESOLUTION * (coord[0] + REPOSITION[0])
+                        P2y = RESOLUTION * (coord[1] + REPOSITION[1])
+                        P3x = RESOLUTION * (coord[2] + REPOSITION[0])
+                        P3y = RESOLUTION * (coord[3] + REPOSITION[1])
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/CUBIC_BEZIER
+                            B = ['','']
+                            B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
+                            B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
+
+                    lastCubicCtrl = QPointF(coord[0], coord[1])
+                    newPat.cubicTo(Ctrl,\
+                                    QPointF(coord[0], coord[1]),\
+                                    QPointF(coord[2], coord[3]))
                 elif path[0] == 's':        # smooth curveto relative
                     print(' -s-',end='',flush=True)
                     if lastCubicCtrl:
                         Ctrl = newPat.currentPosition() - (lastCubicCtrl-newPat.currentPosition())
-                        lastCubicCtrl = QPointF(newPat.currentPosition().x()+coord[0],\
-                                                newPat.currentPosition().y()+coord[1])
-                        newPat.cubicTo(Ctrl.x(),\
-                                        Ctrl.y(),\
-                                        newPat.currentPosition().x()+coord[0],\
-                                        newPat.currentPosition().y()+coord[1],\
-                                        newPat.currentPosition().x()+coord[2],\
-                                        newPat.currentPosition().y()+coord[3])
                     else:
                         print("smooth without last ctrl")
-                        newPat.cubicTo(newPat.currentPosition().x(),\
-                                        newPat.currentPosition().y(),\
-                                        newPat.currentPosition().x()+coord[0],\
-                                        newPat.currentPosition().y()+coord[1],\
-                                        newPat.currentPosition().x()+coord[2],\
-                                        newPat.currentPosition().y()+coord[3])
+                        Ctrl = newPat.currentPosition()
+                    # G-CODE
+                    if writeCode:
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (Ctrl.x() + REPOSITION[0])
+                        P1y = RESOLUTION * (Ctrl.y() + REPOSITION[1])
+                        P2x = RESOLUTION * (newPat.currentPosition().x() + coord[0] + REPOSITION[0])
+                        P2y = RESOLUTION * (newPat.currentPosition().y() + coord[1] + REPOSITION[1])
+                        P3x = RESOLUTION * (newPat.currentPosition().x() + coord[2] + REPOSITION[0])
+                        P3y = RESOLUTION * (newPat.currentPosition().y() + coord[3] + REPOSITION[1])
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        for i in range(CUBIC_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/CUBIC_BEZIER
+                            B = ['','']
+                            B[0] = P0x*(1-t)**3 + P1x*3*t*(1-t)**2 + P2x*3*(t**2)*(1-t) + P3x*t**3
+                            B[1] = P0y*(1-t)**3 + P1y*3*t*(1-t)**2 + P2y*3*(t**2)*(1-t) + P3y*t**3
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
+                    lastCubicCtrl = QPointF(newPat.currentPosition().x()+coord[0],\
+                                            newPat.currentPosition().y()+coord[1])
+                    newPat.cubicTo(Ctrl.x(),\
+                                    Ctrl.y(),\
+                                    newPat.currentPosition().x()+coord[0],\
+                                    newPat.currentPosition().y()+coord[1],\
+                                    newPat.currentPosition().x()+coord[2],\
+                                    newPat.currentPosition().y()+coord[3])
                 elif path[0] == 'Q':        # quadratic Bézier curve
                     print(' -Q-',end='',flush=True)
+                    # G-CODE
+                    if writeCode:
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (coord[0] + REPOSITION[0])
+                        P1y = RESOLUTION * (coord[1] + REPOSITION[1])
+                        P2x = RESOLUTION * (coord[2] + REPOSITION[0])
+                        P2y = RESOLUTION * (coord[3] + REPOSITION[1])
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        for i in range(QUAD_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/QUAD_BEZIER
+                            B = ['','']
+                            B[0] = P0x*(1-t)**2 + P1x*2*t*(1-t) + P2x*t**2
+                            B[1] = P0y*(1-t)**2 + P1y*2*t*(1-t) + P2y*t**2
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
                     lastQuadCtrl = QPointF(coord[0], coord[1])
                     newPat.quadTo(coord[0], coord[1], coord[2], coord[3])
                 elif path[0] == 'q':        # quadratic Bézier curve relative
                     print(' -q-',end='',flush=True)
+                    # G-CODE
+                    if writeCode:
+                        P0x = RESOLUTION * ((newPat.currentPosition()).x() + REPOSITION[0])
+                        P0y = RESOLUTION * ((newPat.currentPosition()).y() + REPOSITION[1])
+                        P1x = RESOLUTION * (newPat.currentPosition().x() + coord[0] + REPOSITION[0])
+                        P1y = RESOLUTION * (newPat.currentPosition().y() + coord[1] + REPOSITION[1])
+                        P2x = RESOLUTION * (newPat.currentPosition().x() + coord[2] + REPOSITION[0])
+                        P2y = RESOLUTION * (newPat.currentPosition().y() + coord[3] + REPOSITION[1])
+                        if penUp:
+                            text += '#G01:Z1$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        for i in range(QUAD_BEZIER+1):      # Transform cubic bézier in lines
+                            t = i/QUAD_BEZIER
+                            B = ['','']
+                            B[0] = P0x*(1-t)**2 + P1x*2*t*(1-t) + P2x*t**2
+                            B[1] = P0y*(1-t)**2 + P1y*2*t*(1-t) + P2y*t**2
+                            text += '#G01:X{0}:Y{1}$\n'.format(int(B[0]),int(B[1]))
                     lastQuadCtrl = newPat.currentPosition()+QPointF(coord[0], coord[1])
                     newPat.quadTo(newPat.currentPosition()+QPointf(coord[0], coord[1]),\
                                     newPat.currentPosition()+QPointf(coord[2], coord[3]))
@@ -545,6 +621,17 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                 elif path[0] == 'Z' or path[0] == 'z':        # closePath
                     print(' -Z-',end='',flush=True)
                     newPat.closeSubpath()
+                    # G-CODE
+                    if writeCode:
+                        x  = RESOLUTION * (newPat.currentPosition().x() + REPOSITION[0])
+                        y  = RESOLUTION * (newPat.currentPosition().y() + REPOSITION[1])
+                        if penUp:
+                            text += '#G01:Z0$\n'
+                            penUp = False
+                        if isRelative:
+                            text += '#G90$\n'
+                            isRelative = False
+                        text  += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 else:
                     print('Strange Command at path tag in SVG file')
                     print(path)
