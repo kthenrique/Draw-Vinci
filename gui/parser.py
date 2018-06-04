@@ -60,8 +60,8 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
         dy_scale = viewBox[3]-viewBox[1]
         print('viewbox delta: ({0}, {1})'.format(dx_scale, dy_scale))
 
-        REPOSITION = (int(-viewBox[0]+abs(viewBox[0])), int(-viewBox[1]+abs(viewBox[1]))) # Just for plotter
-        RESOLUTION /= CANVAS_WIDTH  # Just for plotter
+        REPOSITION = (int(-viewBox[0]+abs(viewBox[0]))/CANVAS_WIDTH, int(-viewBox[1]+abs(viewBox[1]))/CANVAS_WIDTH) # Just for plotter
+        RESOLUTION = RESOLUTION / CANVAS_WIDTH  # Just for plotter
         RESOLUTION = int(RESOLUTION)
         if viewBox[2] > CANVAS_WIDTH or viewBox[3] > CANVAS_HEIGHT: # rescale when image is bigger than canvas
             RESCALE  = SCALE/viewBox[3]
@@ -170,8 +170,14 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                 if isRelative:
                     text += '#G90$\n'
                     isRelative = False
-                text += '#G01:X{0}:Y{1}$\n'.format(x-r,y)
-                text += '#G02:X{0}:Y{1}:I{2}:J{3}$\n'.format(x+r,y,-r,0)
+                if not penUp:
+                    text += '#G01:Z0$\n'
+                    penUp = True
+                text += '#G01:X{0}:Y{1}$\n'.format(x+r,y)
+                if penUp:
+                    text += '#G01:Z1$\n'
+                    penUp = False
+                text += '#G02:X{0}:Y{1}:I{2}:J{3}$\n'.format(x-2*r,y,-r,0)
 
             cir = cir.nextSiblingElement('circle')
 
@@ -675,6 +681,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
     print("******************************************************************************")
     if writeCode:
+        text += '#G28$'
         g_code.write(text)
     file_.close()
     if writeCode:
