@@ -49,10 +49,10 @@
 #endif
 
 /******************************************************************** DEFINES */
-#define BUG_IT
+//#define BUG_IT
 
-#define MAX_MSG_LENGTH         20
-#define NUM_MSG                64
+#define MAX_MSG_LENGTH         40
+#define NUM_MSG                32
 
 #define Y_AXIS_POS 0x03
 #define Y_AXIS_NEG 0x02
@@ -568,24 +568,8 @@ APP_TRACE_INFO (debug_msg);
                 step_y = -abs(packet->y_axis);
                 error = step_x + step_y;
 
-#ifdef BUG_IT
-sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
-        current_position[0], current_position[1],\
-        next_position[0], next_position[1],\
-        end_position[0], end_position[1],\
-        error, error_);
-APP_TRACE_INFO (debug_msg);
-#endif
                 // MOVE!
                 while(1){
-#ifdef BUG_IT
-sprintf (debug_msg, "current: (%d, %d)\tnext: (%d, %d)\nend: (%d, %d)\nerror: %d\terror_: %d\n",\
-        current_position[0], current_position[1],\
-        next_position[0], next_position[1],\
-        end_position[0], end_position[1],\
-        error, error_);
-APP_TRACE_INFO (debug_msg);
-#endif
                     APP_TRACE_DBG ("moving G01\n");
                     while(current_position[0] != next_position[0]){
                         APP_TRACE_DBG ("moving G01: x axis\n");
@@ -700,12 +684,15 @@ APP_TRACE_INFO (debug_msg);
                 // can we use sqrt() from math lib?
                 //s_x = -sqrt((abs(packet->i_offset) + abs(packet->j_offset)));
                 error_ = abs(packet->i_offset); // this is radius
-                step_x = -error;
+                step_x = -error_;
                 step_y = 0;
                 error = 2-2*error_;
                 // Circle center
                 center[0] = current_position[0]+packet->i_offset;
                 center[1] = current_position[1]+packet->j_offset;
+
+                // Begin with first quadrant
+                quadrant = 1;
 
                 // MOVE!
                 do{
@@ -718,8 +705,8 @@ APP_TRACE_INFO (debug_msg);
                             s_y = 1;
                             break;
                         case 2:
-                            next_position[0] = center[0] - step_x;
-                            next_position[1] = center[1] - step_y;
+                            next_position[0] = center[0] - step_y;
+                            next_position[1] = center[1] - step_x;
                             s_x = -1;
                             s_y = -1;
                             break;
@@ -730,8 +717,8 @@ APP_TRACE_INFO (debug_msg);
                             s_y = -1;
                             break;
                         case 4:
-                            next_position[0] = center[0] + step_x;
-                            next_position[1] = center[1] + step_y;
+                            next_position[0] = center[0] + step_y;
+                            next_position[1] = center[1] + step_x;
                             s_x = 1;
                             s_y = 1;
                             break;
@@ -775,10 +762,10 @@ APP_TRACE_INFO (debug_msg);
                     if(error_ <= step_y) error += ++step_y*2+1;
                     if(error_ > step_x || error > step_y) error += ++step_x*2+1;
 
-                    if (s_x >= 0){
+                    if (step_x >= 0){
                         error_ = abs(packet->i_offset); // this is radius
-                        s_x = -error;
-                        s_y = 0;
+                        step_x = -error_;
+                        step_y = 0;
                         error = 2-2*error_;
                         quadrant ++;
                     }
@@ -786,7 +773,6 @@ APP_TRACE_INFO (debug_msg);
 
                 step_x    = 0;
                 step_y    = 0;
-                quadrant  = 1;
                 break;
         }
 
