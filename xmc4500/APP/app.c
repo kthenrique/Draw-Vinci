@@ -455,10 +455,14 @@ static void AppTaskCom (void *p_arg){
                 APP_TRACE_DBG("OS_ERR_MSG_POOL_EMPTY");
             continue;
         }
-        //here the packets should be set to false
+        // here the packets should be set to false
+        // and reset
         while(!packet[current].isFree){
             current++;
             current %= NUM_MSG;
+            packet[current].x_axis = 0;
+            packet[current].y_axis = 0;
+            packet[current].z_axis = 2;
         }
         APP_TRACE_INFO ("=======================\n");
     }
@@ -518,9 +522,6 @@ APP_TRACE_INFO (debug_msg);
 
         APP_TRACE_INFO ("*********************** AppTaskPlot\n");
         switch(packet->cmd){
-            case 0:                             // G00 
-                APP_TRACE_DBG ("G00\n");
-                break;
             case 1:                             // G01
                 APP_TRACE_DBG ("G01\n");
                 // PEN UP X PEN DOWN
@@ -546,8 +547,8 @@ APP_TRACE_INFO (debug_msg);
                 next_position[0] = current_position[0];
                 next_position[1] = current_position[1];
                 // End position
-                end_position[0] += packet->x_axis;
-                end_position[1] += packet->y_axis;
+                end_position[0] = current_position[0] + packet->x_axis;
+                end_position[1] = current_position[1] + packet->y_axis;
                 if(!isRelative){                        // ABSOLUTE
                     APP_TRACE_DBG ("Absolute Positioning\n");
                     end_position[0] = packet->x_axis;
