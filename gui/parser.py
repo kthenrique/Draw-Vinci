@@ -96,25 +96,25 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
             # G-CODE
             if writeCode:
-                x      = RESOLUTION * (int(x) + REPOSITION[0])
-                y      = RESOLUTION * (int(y) + REPOSITION[1])
-                width  = RESOLUTION * (int(width))
-                height = RESOLUTION * (int(height))
+                x      = RESOLUTION * (x + REPOSITION[0])
+                y      = RESOLUTION * (y + REPOSITION[1])
+                width  = RESOLUTION * (width)
+                height = RESOLUTION * (height)
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
                 if isRelative:
                     text += '#G90$\n'
                     isRelative = False
-                text += '#G01:X{0}:Y{1}$\n'.format(x,y)
+                text += '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
                 if penUp:
                     text += '#G01:Z1$\n'
                     penUp = False
 
-                text += '#G01:X{0}:Y{1}$\n'.format(x+width,y)+\
-                        '#G01:X{0}:Y{1}$\n'.format(x+width,y+height)+\
-                        '#G01:X{0}:Y{1}$\n'.format(x,y+height)+\
-                        '#G01:X{0}:Y{1}$\n'.format(x,y)
+                text += '#G01:X{0}:Y{1}$\n'.format(int(x+width),int(y))+\
+                        '#G01:X{0}:Y{1}$\n'.format(int(x+width),int(y+height))+\
+                        '#G01:X{0}:Y{1}$\n'.format(int(x),int(y+height))+\
+                        '#G01:X{0}:Y{1}$\n'.format(int(x),int(y))
 
             rect = rect.nextSiblingElement('rect')
 

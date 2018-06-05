@@ -15,7 +15,6 @@ import serial
 from sys import platform as _platform
 
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QIODevice, QWaitCondition, QMutex
-from PyQt5.QtSerialPort import QSerialPort, QSerialPortInfo
 
 from constants import *
 from parser import getElements
@@ -44,7 +43,6 @@ class Terminal(QThread):
         self.scale = QUARTER_STEP[1]
         self.path  = None
         self.port  = None
-        self.auto_port = None
         self.com = 0
         self.fileLines = []
 
@@ -60,15 +58,6 @@ class Terminal(QThread):
         self.path = self.path.replace('.svg', '.gcode')
         file_size = os.path.getsize(self.path)
         with open(self.path) as code:
-            #self.auto_port = QSerialPort(self.port)
-            #self.auto_port.setBaudRate(QSerialPort.Baud9600)
-            #self.auto_port.setDataBits(QSerialPort.Data8)
-            #self.auto_port.setParity(QSerialPort.NoParity)
-            #self.auto_port.setStopBits(QSerialPort.OneStop)
-            #self.auto_port.setFlowControl(QSerialPort.NoFlowControl)
-            #if not self.auto_port.open(QIODevice.ReadWrite):
-            #    print('NOT CONNECTED')
-            #self.auto_port.clear()
             if _platform == "win32" or _platform == "win64":
                 self.port = 'COM1'
             else:
@@ -137,6 +126,5 @@ class Terminal(QThread):
                             self.com = 0
                         self.mutex.unlock()
 
-        #self.auto_port.close()
         os.remove(self.path)
         self.exit()
