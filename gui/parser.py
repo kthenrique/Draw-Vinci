@@ -145,12 +145,31 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
         cir = gNode.firstChildElement('circle')
         while not cir.isNull():
             print("circle")
+            # Taking the transform matrix
+            trafo = gNode.toElement()
+            trafo = trafo.attribute('transform')
+            trafo = trafo.replace('matrix(', '')
+            trafo = trafo.replace(')', '')
+            trafo = trafo.replace(',', ' ')
+            trafo = trafo.split()
+            for index in range(len(trafo)):
+                trafo[index] = float(trafo[index])
+            if trafo and (trafo[0],trafo[1],trafo[2],trafo[3]) != (1,0,0,1): # i.e. it's not a translation transform
+                print('NOT TRANSLATING CIRCLE')
+                trafo = None
+
+
             newCanvasCir = QGraphicsEllipseItem()
             cx = float(cir.attribute('cx'))
             cy = float(cir.attribute('cy'))
             width = 2*float(cir.attribute('r'))
             height = width
-
+            
+            # Translate
+            if trafo:
+                cx += trafo[4]
+                cy += trafo[5]
+            
             x = cx - float(cir.attribute('r'))
             y = cy - float(cir.attribute('r'))
 
@@ -159,25 +178,27 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                 y      = RESCALE * y
                 width  = RESCALE * width
                 height = RESCALE * height
+                cx     = RESCALE * cx
+                cy     = RESCALE * cy
 
             newCanvasCir.setRect(x, y, width, height)
             listOfItems.append(newCanvasCir)
 
             if writeCode:
-                x      = RESOLUTION * (int(x) + REPOSITION[0])
-                y      = RESOLUTION * (int(y) + REPOSITION[1])
-                r      = RESOLUTION * (int(width/2))
+                x      = RESOLUTION * (cx + REPOSITION[0])
+                y      = RESOLUTION * (cy + REPOSITION[1])
+                r      = RESOLUTION * (width/2)
                 if isRelative:
                     text += '#G90$\n'
                     isRelative = False
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
-                text += '#G01:X{0}:Y{1}$\n'.format(x+r,y)
+                text += '#G01:X{0}:Y{1}$\n'.format(int(x+r),int(y))
                 if penUp:
                     text += '#G01:Z1$\n'
                     penUp = False
-                text += '#G02:X{0}:Y{1}:I{2}:J{3}$\n'.format(x-2*r,y,-r,0)
+                text += '#G02:X{0}:Y{1}:I{2}:J{3}$\n'.format(int(x-2*r),int(y),int(-r),0)
 
             cir = cir.nextSiblingElement('circle')
 
@@ -206,22 +227,22 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
             # G-CODE
             if writeCode:
-                x1      = RESOLUTION * (int(x1) + REPOSITION[0])
-                y1      = RESOLUTION * (int(y1) + REPOSITION[1])
-                x2      = RESOLUTION * (int(x2) + REPOSITION[0])
-                y2      = RESOLUTION * (int(y2) + REPOSITION[1])
+                x1      = RESOLUTION * (x1 + REPOSITION[0])
+                y1      = RESOLUTION * (y1 + REPOSITION[1])
+                x2      = RESOLUTION * (x2 + REPOSITION[0])
+                y2      = RESOLUTION * (y2 + REPOSITION[1])
                 if not penUp:
                     text += '#G01:Z0$\n'
                     penUp = True
                 if isRelative:
                     text += '#G90$\n'
                     isRelative = False
-                text  += '#G01:X{0}:Y{1}$\n'.format(x1,y1)
+                text  += '#G01:X{0}:Y{1}$\n'.format(int(x1),int(y1))
                 if penUp:
                     text += '#G01:Z1$\n'
                     penUp = False
 
-                text += '#G01:X{0}:Y{1}$\n'.format(x2,y2)
+                text += '#G01:X{0}:Y{1}$\n'.format(int(x2),int(y2))
 
             lin = lin.nextSiblingElement('polyline')
 
