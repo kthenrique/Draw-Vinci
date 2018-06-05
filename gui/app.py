@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : app.py
 # -- Authors    : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Jun 01
+# -- Last update: 2018 Jun 05
 # ----------------------------------------------------------------------------
 # -- Description: Main window initialisation
 # ----------------------------------------------------------------------------
@@ -178,7 +178,7 @@ class AppWindow(QMainWindow):
         self.ui.rightButton.clicked.connect(self.goRight)          # right
         self.ui.penButton.toggled.connect(self.togglePen)          # pen
 
-        self.manualResolution = str(int(QUARTER_STEP[1]/50))+'$'
+        self.manualResolution = str(int(QUARTER_STEP[0]/50))+'$'
 
         # Listening to incoming messages
         self.port.readyRead.connect(self.updateTerm)
@@ -537,20 +537,20 @@ class AppWindow(QMainWindow):
         Updates the step resolution for scaling of auto mode plotting
         '''
         if a == self.ui.actionFullStep:
-            self.terminalThread.scale = FULL_STEP[1]
-            self.manualResolution = str(int(FULL_STEP[1]/50))+'$'
+            self.terminalThread.scale = FULL_STEP[0]
+            self.manualResolution = str(int(FULL_STEP[0]/50))+'$'
         elif a == self.ui.actionHalfStep:
-            self.terminalThread.scale = HALF_STEP[1]
-            self.manualResolution = str(int(HALF_STEP[1]/50))+'$'
+            self.terminalThread.scale = HALF_STEP[0]
+            self.manualResolution = str(int(HALF_STEP[0]/50))+'$'
         elif a == self.ui.actionQuarterStep:
-            self.terminalThread.scale = QUARTER_STEP[1]
-            self.manualResolution = str(int(QUARTER_STEP[1]/50))+'$'
+            self.terminalThread.scale = QUARTER_STEP[0]
+            self.manualResolution = str(int(QUARTER_STEP[0]/50))+'$'
         elif a == self.ui.actionEighthStep:
-            self.terminalThread.scale = EIGHTH_STEP[1]
-            self.manualResolution = str(int(EIGHTH_STEP[1]/50))+'$'
+            self.terminalThread.scale = EIGHTH_STEP[0]
+            self.manualResolution = str(int(EIGHTH_STEP[0]/50))+'$'
         else:
-            self.terminalThread.scale = SIXTEENTH_STEP[1]
-            self.manualResolution = str(int(SIXTEENTH_STEP[1]/50))+'$'
+            self.terminalThread.scale = SIXTEENTH_STEP[0]
+            self.manualResolution = str(int(SIXTEENTH_STEP[0]/50))+'$'
 
 
 if __name__ == '__main__':

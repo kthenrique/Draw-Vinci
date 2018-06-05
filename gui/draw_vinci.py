@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(660, 669)
+        MainWindow.resize(575, 678)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.canvas = QtWidgets.QGraphicsView(self.centralwidget)
-        self.canvas.setGeometry(QtCore.QRect(10, 0, 640, 460))
+        self.canvas.setGeometry(QtCore.QRect(10, 0, 555, 477))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -51,7 +51,7 @@ class Ui_MainWindow(object):
         self.canvas.setViewportUpdateMode(QtWidgets.QGraphicsView.FullViewportUpdate)
         self.canvas.setObjectName("canvas")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(10, 470, 640, 150))
+        self.tabWidget.setGeometry(QtCore.QRect(10, 487, 555, 141))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(18)
         sizePolicy.setVerticalStretch(12)
@@ -197,12 +197,12 @@ class Ui_MainWindow(object):
         self.freehandButton.setAutoExclusive(True)
         self.freehandButton.setObjectName("freehandButton")
         self.fontBox = QtWidgets.QFontComboBox(self.drawTab)
-        self.fontBox.setGeometry(QtCore.QRect(460, 10, 170, 25))
+        self.fontBox.setGeometry(QtCore.QRect(415, 10, 131, 25))
         self.fontBox.setEditable(False)
         self.fontBox.setFrame(True)
         self.fontBox.setObjectName("fontBox")
         self.fontSizeBox = QtWidgets.QComboBox(self.drawTab)
-        self.fontSizeBox.setGeometry(QtCore.QRect(460, 40, 55, 25))
+        self.fontSizeBox.setGeometry(QtCore.QRect(415, 40, 55, 25))
         self.fontSizeBox.setMinimumSize(QtCore.QSize(55, 25))
         self.fontSizeBox.setMaximumSize(QtCore.QSize(55, 25))
         self.fontSizeBox.setStyleSheet("QComboBox {\n"
@@ -217,7 +217,7 @@ class Ui_MainWindow(object):
         self.fontSizeBox.setEditable(True)
         self.fontSizeBox.setObjectName("fontSizeBox")
         self.underlineButton = QtWidgets.QPushButton(self.drawTab)
-        self.underlineButton.setGeometry(QtCore.QRect(600, 40, 25, 25))
+        self.underlineButton.setGeometry(QtCore.QRect(490, 40, 25, 25))
         self.underlineButton.setText("")
         icon8 = QtGui.QIcon()
         icon8.addPixmap(QtGui.QPixmap("img/underline.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -225,7 +225,7 @@ class Ui_MainWindow(object):
         self.underlineButton.setCheckable(True)
         self.underlineButton.setObjectName("underlineButton")
         self.italicButton = QtWidgets.QPushButton(self.drawTab)
-        self.italicButton.setGeometry(QtCore.QRect(570, 40, 25, 25))
+        self.italicButton.setGeometry(QtCore.QRect(520, 40, 25, 25))
         self.italicButton.setText("")
         icon9 = QtGui.QIcon()
         icon9.addPixmap(QtGui.QPixmap("img/italic.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -260,7 +260,7 @@ class Ui_MainWindow(object):
         self.squareButton.setAutoExclusive(True)
         self.squareButton.setObjectName("squareButton")
         self.nextSVGButton = QtWidgets.QPushButton(self.drawTab)
-        self.nextSVGButton.setGeometry(QtCore.QRect(320, 10, 91, 91))
+        self.nextSVGButton.setGeometry(QtCore.QRect(310, 10, 91, 91))
         self.nextSVGButton.setText("")
         self.nextSVGButton.setIconSize(QtCore.QSize(50, 50))
         self.nextSVGButton.setObjectName("nextSVGButton")
@@ -274,7 +274,7 @@ class Ui_MainWindow(object):
         self.importButton.setAutoExclusive(True)
         self.importButton.setObjectName("importButton")
         self.line_2 = QtWidgets.QFrame(self.drawTab)
-        self.line_2.setGeometry(QtCore.QRect(430, 10, 16, 101))
+        self.line_2.setGeometry(QtCore.QRect(400, 8, 16, 100))
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
@@ -282,7 +282,7 @@ class Ui_MainWindow(object):
         self.controlTab = QtWidgets.QWidget()
         self.controlTab.setObjectName("controlTab")
         self.upButton = QtWidgets.QPushButton(self.controlTab)
-        self.upButton.setGeometry(QtCore.QRect(40, 10, 41, 31))
+        self.upButton.setGeometry(QtCore.QRect(37, 7, 41, 31))
         self.upButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/up.png) 0 ;\n"
 "}\n"
@@ -297,7 +297,7 @@ class Ui_MainWindow(object):
         self.upButton.setText("")
         self.upButton.setObjectName("upButton")
         self.leftButton = QtWidgets.QPushButton(self.controlTab)
-        self.leftButton.setGeometry(QtCore.QRect(10, 40, 31, 41))
+        self.leftButton.setGeometry(QtCore.QRect(7, 37, 31, 41))
         self.leftButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/left.png) -1;\n"
 " }\n"
@@ -312,7 +312,7 @@ class Ui_MainWindow(object):
         self.leftButton.setText("")
         self.leftButton.setObjectName("leftButton")
         self.rightButton = QtWidgets.QPushButton(self.controlTab)
-        self.rightButton.setGeometry(QtCore.QRect(80, 40, 31, 41))
+        self.rightButton.setGeometry(QtCore.QRect(77, 37, 31, 41))
         self.rightButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/right.png) -1;\n"
 " }\n"
@@ -327,7 +327,7 @@ class Ui_MainWindow(object):
         self.rightButton.setText("")
         self.rightButton.setObjectName("rightButton")
         self.downButton = QtWidgets.QPushButton(self.controlTab)
-        self.downButton.setGeometry(QtCore.QRect(40, 80, 41, 31))
+        self.downButton.setGeometry(QtCore.QRect(37, 77, 41, 31))
         self.downButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/down.png) -1;\n"
 " }\n"
@@ -342,7 +342,7 @@ class Ui_MainWindow(object):
         self.downButton.setText("")
         self.downButton.setObjectName("downButton")
         self.penButton = QtWidgets.QPushButton(self.controlTab)
-        self.penButton.setGeometry(QtCore.QRect(40, 40, 41, 41))
+        self.penButton.setGeometry(QtCore.QRect(37, 37, 41, 41))
         self.penButton.setAutoFillBackground(False)
         self.penButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/pen_off.png) 0 ;\n"
@@ -360,7 +360,7 @@ class Ui_MainWindow(object):
         self.penButton.setFlat(False)
         self.penButton.setObjectName("penButton")
         self.termEdit = QtWidgets.QTextEdit(self.controlTab)
-        self.termEdit.setGeometry(QtCore.QRect(450, 10, 181, 101))
+        self.termEdit.setGeometry(QtCore.QRect(397, 10, 148, 96))
         font = QtGui.QFont()
         font.setFamily("Tlwg Typewriter")
         font.setPointSize(10)
@@ -405,14 +405,14 @@ class Ui_MainWindow(object):
         self.termEdit.setReadOnly(True)
         self.termEdit.setObjectName("termEdit")
         self.portsBox = QtWidgets.QComboBox(self.controlTab)
-        self.portsBox.setGeometry(QtCore.QRect(330, 10, 111, 27))
+        self.portsBox.setGeometry(QtCore.QRect(280, 10, 111, 27))
         self.portsBox.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.portsBox.setObjectName("portsBox")
         self.connectButton = QtWidgets.QPushButton(self.controlTab)
-        self.connectButton.setGeometry(QtCore.QRect(330, 40, 71, 27))
+        self.connectButton.setGeometry(QtCore.QRect(280, 40, 71, 27))
         self.connectButton.setObjectName("connectButton")
         self.promptEdit = QtWidgets.QLineEdit(self.controlTab)
-        self.promptEdit.setGeometry(QtCore.QRect(330, 80, 113, 27))
+        self.promptEdit.setGeometry(QtCore.QRect(280, 80, 113, 27))
         self.promptEdit.setStyleSheet("QLineEdit {\n"
 "background-color: rgb(255, 255, 255);\n"
 " }")
@@ -420,7 +420,7 @@ class Ui_MainWindow(object):
         self.promptEdit.setClearButtonEnabled(True)
         self.promptEdit.setObjectName("promptEdit")
         self.playButton = QtWidgets.QPushButton(self.controlTab)
-        self.playButton.setGeometry(QtCore.QRect(200, 70, 41, 41))
+        self.playButton.setGeometry(QtCore.QRect(177, 70, 31, 31))
         self.playButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/play_off.svg) 0;\n"
 " }\n"
@@ -442,7 +442,7 @@ class Ui_MainWindow(object):
         self.playButton.setAutoExclusive(True)
         self.playButton.setObjectName("playButton")
         self.stopButton = QtWidgets.QPushButton(self.controlTab)
-        self.stopButton.setGeometry(QtCore.QRect(240, 70, 41, 41))
+        self.stopButton.setGeometry(QtCore.QRect(207, 70, 31, 31))
         self.stopButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/stop_off.svg) 0;\n"
 " }\n"
@@ -465,7 +465,7 @@ class Ui_MainWindow(object):
         self.stopButton.setAutoExclusive(True)
         self.stopButton.setObjectName("stopButton")
         self.nextComButton = QtWidgets.QPushButton(self.controlTab)
-        self.nextComButton.setGeometry(QtCore.QRect(280, 70, 41, 41))
+        self.nextComButton.setGeometry(QtCore.QRect(237, 70, 31, 31))
         self.nextComButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/speed_up.svg) 0;\n"
 " }\n"
@@ -481,7 +481,7 @@ class Ui_MainWindow(object):
         self.nextComButton.setCheckable(False)
         self.nextComButton.setObjectName("nextComButton")
         self.pauseButton = QtWidgets.QPushButton(self.controlTab)
-        self.pauseButton.setGeometry(QtCore.QRect(160, 70, 41, 41))
+        self.pauseButton.setGeometry(QtCore.QRect(147, 70, 31, 31))
         self.pauseButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/pause_off.svg) 0;\n"
 " }\n"
@@ -503,7 +503,7 @@ class Ui_MainWindow(object):
         self.pauseButton.setAutoExclusive(True)
         self.pauseButton.setObjectName("pauseButton")
         self.prevComButton = QtWidgets.QPushButton(self.controlTab)
-        self.prevComButton.setGeometry(QtCore.QRect(120, 70, 41, 41))
+        self.prevComButton.setGeometry(QtCore.QRect(117, 70, 31, 31))
         self.prevComButton.setStyleSheet(" QPushButton {\n"
 "    border-image:url(./img/slow_down.svg) 0;\n"
 " }\n"
@@ -520,42 +520,36 @@ class Ui_MainWindow(object):
         self.prevComButton.setText("")
         self.prevComButton.setObjectName("prevComButton")
         self.clearTermButton = QtWidgets.QPushButton(self.controlTab)
-        self.clearTermButton.setGeometry(QtCore.QRect(410, 40, 31, 27))
+        self.clearTermButton.setGeometry(QtCore.QRect(360, 40, 31, 27))
         self.clearTermButton.setText("")
         icon14 = QtGui.QIcon()
         icon14.addPixmap(QtGui.QPixmap("img/clear.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.clearTermButton.setIcon(icon14)
         self.clearTermButton.setObjectName("clearTermButton")
-        self.layoutWidget = QtWidgets.QWidget(self.controlTab)
-        self.layoutWidget.setGeometry(QtCore.QRect(120, 10, 201, 29))
-        self.layoutWidget.setObjectName("layoutWidget")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget)
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.autoButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.line = QtWidgets.QFrame(self.controlTab)
+        self.line.setGeometry(QtCore.QRect(117, 50, 151, 16))
+        self.line.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.autoButton = QtWidgets.QPushButton(self.controlTab)
+        self.autoButton.setGeometry(QtCore.QRect(117, 10, 70, 27))
         self.autoButton.setMinimumSize(QtCore.QSize(10, 0))
         self.autoButton.setStyleSheet("")
         self.autoButton.setCheckable(True)
         self.autoButton.setChecked(True)
         self.autoButton.setAutoExclusive(True)
         self.autoButton.setObjectName("autoButton")
-        self.horizontalLayout.addWidget(self.autoButton)
-        self.manualButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.manualButton = QtWidgets.QPushButton(self.controlTab)
+        self.manualButton.setGeometry(QtCore.QRect(198, 10, 70, 27))
         self.manualButton.setMinimumSize(QtCore.QSize(0, 0))
         self.manualButton.setStyleSheet("")
         self.manualButton.setCheckable(True)
         self.manualButton.setAutoExclusive(True)
         self.manualButton.setObjectName("manualButton")
-        self.horizontalLayout.addWidget(self.manualButton)
-        self.line = QtWidgets.QFrame(self.controlTab)
-        self.line.setGeometry(QtCore.QRect(120, 50, 201, 16))
-        self.line.setFrameShape(QtWidgets.QFrame.HLine)
-        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
-        self.line.setObjectName("line")
         self.tabWidget.addTab(self.controlTab, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 660, 27))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 575, 27))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")

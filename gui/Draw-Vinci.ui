@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>669</height>
+    <width>575</width>
+    <height>678</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -46,8 +46,8 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>640</width>
-      <height>460</height>
+      <width>555</width>
+      <height>477</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -126,9 +126,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>470</y>
-      <width>640</width>
-      <height>150</height>
+      <y>487</y>
+      <width>555</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -437,9 +437,9 @@ QTabBar::tab:only-one {
      <widget class="QFontComboBox" name="fontBox">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>415</x>
         <y>10</y>
-        <width>170</width>
+        <width>131</width>
         <height>25</height>
        </rect>
       </property>
@@ -453,7 +453,7 @@ QTabBar::tab:only-one {
      <widget class="QComboBox" name="fontSizeBox">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>415</x>
         <y>40</y>
         <width>55</width>
         <height>25</height>
@@ -491,7 +491,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="underlineButton">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>490</x>
         <y>40</y>
         <width>25</width>
         <height>25</height>
@@ -511,7 +511,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="italicButton">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>520</x>
         <y>40</y>
         <width>25</width>
         <height>25</height>
@@ -609,7 +609,7 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="nextSVGButton">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>310</x>
         <y>10</y>
         <width>91</width>
         <height>91</height>
@@ -654,10 +654,10 @@ QTabBar::tab:only-one {
      <widget class="Line" name="line_2">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>10</y>
+        <x>400</x>
+        <y>8</y>
         <width>16</width>
-        <height>101</height>
+        <height>100</height>
        </rect>
       </property>
       <property name="orientation">
@@ -672,8 +672,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="upButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>10</y>
+        <x>37</x>
+        <y>7</y>
         <width>41</width>
         <height>31</height>
        </rect>
@@ -698,8 +698,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="leftButton">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>40</y>
+        <x>7</x>
+        <y>37</y>
         <width>31</width>
         <height>41</height>
        </rect>
@@ -724,8 +724,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="rightButton">
       <property name="geometry">
        <rect>
-        <x>80</x>
-        <y>40</y>
+        <x>77</x>
+        <y>37</y>
         <width>31</width>
         <height>41</height>
        </rect>
@@ -750,8 +750,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="downButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>80</y>
+        <x>37</x>
+        <y>77</y>
         <width>41</width>
         <height>31</height>
        </rect>
@@ -776,8 +776,8 @@ QTabBar::tab:only-one {
      <widget class="QPushButton" name="penButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>40</y>
+        <x>37</x>
+        <y>37</y>
         <width>41</width>
         <height>41</height>
        </rect>
@@ -816,10 +816,10 @@ QTabBar::tab:only-one {
      <widget class="QTextEdit" name="termEdit">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>397</x>
         <y>10</y>
-        <width>181</width>
-        <height>101</height>
+        <width>148</width>
+        <height>96</height>
        </rect>
       </property>
       <property name="font">
@@ -876,7 +876,7 @@ QScrollBar:vertical {
      <widget class="QComboBox" name="portsBox">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>280</x>
         <y>10</y>
         <width>111</width>
         <height>27</height>
@@ -889,7 +889,7 @@ QScrollBar:vertical {
      <widget class="QPushButton" name="connectButton">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>280</x>
         <y>40</y>
         <width>71</width>
         <height>27</height>
@@ -902,7 +902,7 @@ QScrollBar:vertical {
      <widget class="QLineEdit" name="promptEdit">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>280</x>
         <y>80</y>
         <width>113</width>
         <height>27</height>
@@ -923,10 +923,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="playButton">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>177</x>
         <y>70</y>
-        <width>41</width>
-        <height>41</height>
+        <width>31</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -960,10 +960,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="stopButton">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>207</x>
         <y>70</y>
-        <width>41</width>
-        <height>41</height>
+        <width>31</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1000,10 +1000,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="nextComButton">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>237</x>
         <y>70</y>
-        <width>41</width>
-        <height>41</height>
+        <width>31</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1029,10 +1029,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="pauseButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>147</x>
         <y>70</y>
-        <width>41</width>
-        <height>41</height>
+        <width>31</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1066,10 +1066,10 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="prevComButton">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>117</x>
         <y>70</y>
-        <width>41</width>
-        <height>41</height>
+        <width>31</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -1094,7 +1094,7 @@ background-color: rgb(255, 255, 255);
      <widget class="QPushButton" name="clearTermButton">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>360</x>
         <y>40</y>
         <width>31</width>
         <height>27</height>
@@ -1111,76 +1111,76 @@ background-color: rgb(255, 255, 255);
         <normaloff>img/clear.png</normaloff>img/clear.png</iconset>
       </property>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>10</y>
-        <width>201</width>
-        <height>29</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QPushButton" name="autoButton">
-         <property name="minimumSize">
-          <size>
-           <width>10</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Auto</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="manualButton">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Manual</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="Line" name="line">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>117</x>
         <y>50</y>
-        <width>201</width>
+        <width>151</width>
         <height>16</height>
        </rect>
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="autoButton">
+      <property name="geometry">
+       <rect>
+        <x>117</x>
+        <y>10</y>
+        <width>70</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>10</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>Auto</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="manualButton">
+      <property name="geometry">
+       <rect>
+        <x>198</x>
+        <y>10</y>
+        <width>70</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>Manual</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
       </property>
      </widget>
     </widget>
@@ -1191,7 +1191,7 @@ background-color: rgb(255, 255, 255);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>660</width>
+     <width>575</width>
      <height>27</height>
     </rect>
    </property>

@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Jun 02
+# -- Last update: 2018 Jun 05
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -22,7 +22,7 @@ from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
 from constants import *
 
 
-def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUARTER_STEP[1]):
+def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUARTER_STEP[0]):
     '''
     SVG Parser
     '''

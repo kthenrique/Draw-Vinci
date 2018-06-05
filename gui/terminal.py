@@ -40,7 +40,7 @@ class Terminal(QThread):
         self.nav = QWaitCondition()
         self.mutex = QMutex()
 
-        self.scale = QUARTER_STEP[1]
+        self.scale = QUARTER_STEP[0]
         self.path  = None
         self.port  = None
         self.com = 0

@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : constants.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Jun 01
+# -- Last update: 2018 Jun 05
 # ----------------------------------------------------------------------------
 # -- Description: All relevant constants for the GUI
 # ----------------------------------------------------------------------------
@@ -16,8 +16,8 @@ import os
 TIMEOUT_STATUS = 1000
 
 # Canvas properties
-CANVAS_WIDTH  = 640
-CANVAS_HEIGHT = 460
+CANVAS_WIDTH  = 555
+CANVAS_HEIGHT = 477
 VIEW_X        = 0
 VIEW_Y        = 0
 
@@ -35,7 +35,7 @@ GOUP   = '#G01:Y-'
 GOLEFT = '#G01:X-'
 GORIGHT= '#G01:X'
 
-# Scale of SVG
+# Scale of SVGs when they're bigger than canvas
 SCALE = 250
 
 # Number of points/cubic_bézier
