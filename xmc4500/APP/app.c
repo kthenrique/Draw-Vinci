@@ -696,7 +696,7 @@ APP_TRACE_INFO (debug_msg);
 
                 // MOVE!
                 do{
-                    APP_TRACE_DBG ("moving G01\n");
+                    APP_TRACE_DBG ("moving G02\n");
                     switch(quadrant){
                         case 1:
                             next_position[0] = center[0] - step_x;

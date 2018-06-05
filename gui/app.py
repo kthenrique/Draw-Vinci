@@ -537,19 +537,19 @@ class AppWindow(QMainWindow):
         Updates the step resolution for scaling of auto mode plotting
         '''
         if a == self.ui.actionFullStep:
-            self.terminalThread.scale = FULL_STEP
+            self.terminalThread.scale = FULL_STEP[1]
             self.manualResolution = str(int(FULL_STEP[1]/50))+'$'
         elif a == self.ui.actionHalfStep:
-            self.terminalThread.scale = HALF_STEP
+            self.terminalThread.scale = HALF_STEP[1]
             self.manualResolution = str(int(HALF_STEP[1]/50))+'$'
         elif a == self.ui.actionQuarterStep:
-            self.terminalThread.scale = QUARTER_STEP
+            self.terminalThread.scale = QUARTER_STEP[1]
             self.manualResolution = str(int(QUARTER_STEP[1]/50))+'$'
         elif a == self.ui.actionEighthStep:
-            self.terminalThread.scale = EIGHTH_STEP
+            self.terminalThread.scale = EIGHTH_STEP[1]
             self.manualResolution = str(int(EIGHTH_STEP[1]/50))+'$'
         else:
-            self.terminalThread.scale = SIXTEENTH_STEP
+            self.terminalThread.scale = SIXTEENTH_STEP[1]
             self.manualResolution = str(int(SIXTEENTH_STEP[1]/50))+'$'
 
 
