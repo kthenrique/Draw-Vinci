@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Jun 05
+# -- Last update: 2018 Jun 06
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -79,11 +79,29 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
         rect = gNode.firstChildElement('rect')
         while not rect.isNull():
             print("rectangle")
+            # Taking the transform matrix
+            trafo = gNode.toElement()
+            trafo = trafo.attribute('transform')
+            trafo = trafo.replace('matrix(', '')
+            trafo = trafo.replace(')', '')
+            trafo = trafo.replace(',', ' ')
+            trafo = trafo.split()
+            for index in range(len(trafo)):
+                trafo[index] = float(trafo[index])
+            if trafo and (trafo[0],trafo[1],trafo[2],trafo[3]) != (1,0,0,1): # i.e. it's not a translation transform
+                print('NOT TRANSLATING RECT')
+                trafo = None
+
             newCanvasRect = QGraphicsRectItem()
             x      = float(rect.attribute('x'))
             y      = float(rect.attribute('y'))
             width  = float(rect.attribute('width'))
             height = float(rect.attribute('height'))
+
+            # Translate
+            if trafo:
+                x += trafo[4]
+                y += trafo[5]
 
             if toScale:
                 x      = RESCALE * x
@@ -158,18 +176,17 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                 print('NOT TRANSLATING CIRCLE')
                 trafo = None
 
-
             newCanvasCir = QGraphicsEllipseItem()
             cx = float(cir.attribute('cx'))
             cy = float(cir.attribute('cy'))
             width = 2*float(cir.attribute('r'))
             height = width
-            
+
             # Translate
             if trafo:
                 cx += trafo[4]
                 cy += trafo[5]
-            
+
             x = cx - float(cir.attribute('r'))
             y = cy - float(cir.attribute('r'))
 
