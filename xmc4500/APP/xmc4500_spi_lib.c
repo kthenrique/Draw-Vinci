@@ -16,7 +16,7 @@
 */
 XMC_SPI_CH_CONFIG_t spi_config =
 {
-  .baudrate = 25000,
+  .baudrate = 75000,
   .bus_mode = XMC_SPI_CH_BUS_MODE_MASTER,
   .selo_inversion = XMC_SPI_CH_SLAVE_SEL_INV_TO_MSLS,
   .parity_mode = XMC_USIC_CH_PARITY_MODE_NONE
