@@ -49,7 +49,7 @@
 #endif
 
 /******************************************************************** DEFINES */
-//#define BUG_IT
+//#define BUG_IT 1
 
 #define MAX_MSG_LENGTH         40
 #define NUM_MSG                32
@@ -63,7 +63,7 @@
 #define PEN_DOWN  (uint16_t)((7.5) * PERIOD_CCU40/100)
 #define PEN_UP    (uint16_t)((5) * PERIOD_CCU40/100)
 
-#define SLEEP_COUNTER 0xffff
+#define SLEEP_COUNTER 0xff
 
 /********************************************************* FILE LOCAL GLOBALS */
 static  OS_TCB   AppTaskStart_TCB;
@@ -503,7 +503,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
     penUp = true;
     OSTimeDlyHMSM(0, 0, 0, 150, OS_OPT_TIME_HMSM_STRICT, &err);
 
-//    init_plotter(dimension);
+    //init_plotter(dimension);
 
 #ifdef BUG_IT
 sprintf (debug_msg, "DIMENSION: (%d, %d)\n", dimension[0], dimension[1]);
@@ -531,7 +531,7 @@ APP_TRACE_INFO (debug_msg);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
                     // delay to lower the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 650, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
@@ -539,7 +539,7 @@ APP_TRACE_INFO (debug_msg);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
                     // delay to raise the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 650, OS_OPT_TIME_HMSM_STRICT, &err);
+                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
 
                 // MOVE PLOTTER HORIZONTALLY
@@ -574,6 +574,14 @@ APP_TRACE_INFO (debug_msg);
                     APP_TRACE_DBG ("moving G01\n");
                     while(current_position[0] != next_position[0]){
                         APP_TRACE_DBG ("moving G01: x axis\n");
+/*                        if (ENDLEFT == 0 && dir_x == X_AXIS_NEG){*/
+/*                            current_position[0] = next_position[0];*/
+/*                            break;*/
+/*                        }*/
+/*                        else if (ENDRIGHT == 0 && dir_x == X_AXIS_POS){*/
+/*                            current_position[0] = next_position[0];*/
+/*                            break;*/
+/*                        }*/
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
@@ -589,6 +597,14 @@ APP_TRACE_INFO (debug_msg);
                     }
                     while(current_position[1] != next_position[1]){
                         APP_TRACE_DBG ("moving G01: y axis\n");
+/*                        if (ENDTOP == 0 && dir_y == Y_AXIS_NEG){*/
+/*                            current_position[1] = next_position[1];*/
+/*                            break;*/
+/*                        }*/
+/*                        else if (ENDBOTTOM == 0 && dir_y == Y_AXIS_POS){*/
+/*                            current_position[1] = next_position[1];*/
+/*                            break;*/
+/*                        }*/
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
@@ -730,6 +746,14 @@ APP_TRACE_INFO (debug_msg);
                     else         dir_y = Y_AXIS_POS;
                     while(current_position[0] != next_position[0]){
                         APP_TRACE_DBG ("moving G02: x axis\n");
+/*                        if (ENDLEFT == 0 && dir_x == X_AXIS_NEG){*/
+/*                            current_position[0] = next_position[0];*/
+/*                            break;*/
+/*                        }*/
+/*                        else if (ENDRIGHT == 0 && dir_x == X_AXIS_POS){*/
+/*                            current_position[0] = next_position[0];*/
+/*                            break;*/
+/*                        }*/
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_x,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
@@ -745,6 +769,14 @@ APP_TRACE_INFO (debug_msg);
                     }
                     while(current_position[1] != next_position[1]){
                         APP_TRACE_DBG ("moving G02: y axis\n");
+/*                        if (ENDTOP == 0 && dir_y == Y_AXIS_NEG && dir != 2){*/
+/*                            current_position[1] = next_position[1];*/
+/*                            break;*/
+/*                        }*/
+/*                        else if (ENDBOTTOM == 0 && dir_y == Y_AXIS_POS){*/
+/*                            current_position[1] = next_position[1];*/
+/*                            break;*/
+/*                        }*/
                         _mcp23s08_reset_ss(MCP23S08_SS);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,dir_y,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
