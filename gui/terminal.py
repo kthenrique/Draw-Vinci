@@ -64,7 +64,7 @@ class Terminal(QThread):
                 self.port = '/dev/'+self.port
             with serial.Serial(self.port) as ser:
                 while file_size > code.tell():
-                    self.sleep(1)
+                    self.msleep(300)
                     try:
                         self.fileLines.append(code.tell())
                         command = code.readline()
