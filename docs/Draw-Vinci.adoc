@@ -89,11 +89,11 @@ Key Combinations::
     
 ==== Draw Tab
 
-===== Tools
+===== Drawing Tools
 
 [cols="^.1s,<.3m"]
 |===
-| Eraser     | Increase opacity of item clicked upon. If clicking until item dissapear, it will make the item invisible.
+| Eraser     | Remove elements of canvas.
 | Freehand   | Permits to draw in a free style.
 | Line       | Used to draw lines.
 | Square     | Used to draw squares.
@@ -111,20 +111,23 @@ the mouse, the user can zoom out completely to the default scale.
 
 ==== Control Tab
 
-===== Connection
+===== Control Tools
 
-PromptEdit::
-    Terminal:::
-        Terminal displays the messages sent within manual mode onto xmc4500. Besides, it always display the incoming messages from xmc4500.
+[cols="^.1s,<.3m"]
+|===
+| Manual & Auto       | The mode should be set before pressing play to start a new permanent connection with the plotter.
+| PromptEdit          | Using the promptEdit the user can send single messages onto the XMC4500.
+| Mini Terminal       | Terminal displays the messages sent within manual mode onto xmc4500. Besides, it always display the incoming messages from xmc4500.
+| Directional Buttons | The user can manually control the motors when in manual mode.
+| Pen Button          | The user can manually control the pen position when in manual mode.
+| Clear Terminal      | It will clear the mini terminal completely.
 
-===== Mode
+|===
 
-Manual::
-    Directional & Pen Buttons:::
+Mode::
+    Manual:::
         In this mode one can use the directional and pen buttons to control the plotter.
-
-Auto:::
-    Flow Control Buttons:::
+    Auto:::
         In this mode one can generate g-code automatically when pressing the play  button. A progress bar will show the progress of the plotting. Using the pause
         button, the user can always pause the current plotting and use the flow control buttons to step through the g-code commands and plot the next or previous
         commands.
@@ -134,6 +137,13 @@ Auto:::
 .Servo Motor Function
 video::servoMotor.mp4[width=640]
 
+=== Algorithm
+
+Any time the XMC4500 receives something through its UART channel, it gets interrupted. The message is then read and forwarded onto the 'AppTaskCom' task. This task
+will check the message for protocol compliance and interpret the content. The 'AppTaskCom' task will finally send the interpreted message (now in the form of a
+structure) to the 'AppTaskPlot' task, that will execute the command received. 
+When the 'AppTaksPlot' is done with the g-code command it will send an acknowledge message. If a '#GX:...$' is sent, then the microcontroller will send at completion
+the string: '#GX:DONE$'.
 
 === Formats supported
 
