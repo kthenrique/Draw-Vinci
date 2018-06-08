@@ -86,6 +86,54 @@ static void AppTaskStart    (void *p_arg);
 static void AppTaskCom      (void *p_arg);
 static void AppTaskPlot     (void *p_arg);
 
+void send_ack(CODE volatile *packet){
+
+    switch(packet->cmd){
+        case 1:
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '#');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, 'G');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '0');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '1');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, ':');
+            break;
+        case 2:
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '#');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, 'G');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '9');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '0');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, ':');
+            break;
+        case 3:
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '#');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, 'G');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '9');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '1');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, ':');
+            break;
+        case 4:
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '#');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, 'G');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '2');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '8');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, ':');
+            break;
+        case 5:
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '#');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, 'G');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '0');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, '2');
+            XMC_UART_CH_Transmit(XMC_UART1_CH1, ':');
+            break;
+    }
+
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, 'D');
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, 'O');
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, 'N');
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, 'E');
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, '$');
+    XMC_UART_CH_Transmit(XMC_UART1_CH1, '\n');
+}
+
 void init_plotter(uint16_t *dimension){
     volatile uint16_t counter = SLEEP_COUNTER;
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
@@ -530,16 +578,12 @@ APP_TRACE_INFO (debug_msg);
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_DOWN);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = false;
-                    // delay to lower the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
                 if(packet->z_axis == 0 && !penUp){
                     APP_TRACE_DBG ("Pen up\n");
                     XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_UP);
                     XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
                     penUp = true;
-                    // delay to raise the pen
-                    //OSTimeDlyHMSM(0, 0, 0, 100, OS_OPT_TIME_HMSM_STRICT, &err);
                 }
 
                 // MOVE PLOTTER HORIZONTALLY
@@ -812,6 +856,9 @@ APP_TRACE_INFO (debug_msg);
                 step_y    = 0;
                 break;
         }
+
+        // ACK to GUI
+        send_ack(packet);
 
         if(!isRelative){
             packet->x_axis = current_position[0];
