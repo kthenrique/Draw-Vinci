@@ -22,4 +22,4 @@
 
 ### Docs
 
-(https://github.com/kthenrique/Draw-Vinci/docs/Draw-Vinci.adoc)
+[DOCUMENTATION](docs/Draw-Vinci.adoc)
