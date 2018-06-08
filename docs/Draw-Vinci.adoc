@@ -22,12 +22,71 @@ alternative you could devise a simple drawing application to do the same.
 
 == GUI
 
-[#GUI]
-.Main Window
+[#GUI_DRAW]
+.Main Window with draw tab
 image::gui_main.png[]
+
+[#GUI_CTRL]
+.Main Window with control tab
+image::gui_main_ctrl.png[]
+
+=== Scaling & Resolution
+
+Using baudrate of xxx for the spi, the following mesurements were found for the various step mode:
+
+[cols="^.1s,<.3m"]
+|===
+|FULL_STEP      | (2010, 1728)
+|HALF_STEP      | (4020, 3456)
+|QUARTER_STEP   | (8035, 6907)
+|EIGHTH_STEP    | (16061, 13806)
+|SIXTEENTH_STEP | (32107, 27607)
+
+|===
+
+The ratio of steps measured is ~1,1633, i.e. HEIGHT_STEP = ~0,86*WIDTH_STEP. The canvas where the user can draw something has the dimension: 555px X 477px,
+accounting for a ratio of ~1,1635.
+
+In effect, every point (x, y) in canvas, will be scaled as follows:
+
+    - x_to_plot = x . (WIDTH_STEP/CANVAS_WIDTH)
+    - y_to_plot = y . (WIDTH_STEP/CANVAS_WIDTH)
+
+so that for the point (0, 0) in GUI, the plotter will receive (0, 0) and
+for the point 555,477, the plotter will receive (WIDTH_STEP, ~0,86*WIDTH_STEP).
 
 === Functionalities
 
+Key Combinations::
+    Ctrl+N:::
+        Clear canvas for new work.
+    Ctrl+O:::
+        Opens new SVG file.
+    Ctrl+S:::
+        Save current canvas.
+    Ctrl+Shift+S:::
+        Save current canvas with a new name.
+    Ctrl+?:::
+        Opens about dialog.
+    Ctrl+Z:::
+        Remove last added item from canvas. 
+    Del:::
+        Remove selected item from canvas.
+
+==== Menus
+
+. **File**
+    .. New: clean canvas and start new project.
+    .. Open: opens a svg file.
+    .. Save: saves canvas to already saved file or calls save as if still not saved.
+    .. Save As: saves canvas with a new name.
+    .. Quit: closes app.
+. **Settings**
+    .. Svg Directory: define the directory to import the svg's from when using the import tool.
+    .. Step Motor: define the step resolution, according to section 'Scaling & Resolution'.
+. **Help**
+    .. About: basic info about this app.
+    
 ==== Draw Tab
 
 ===== Tools
@@ -50,39 +109,25 @@ the mouse, the user can zoom out completely to the default scale.
 
 |===
 
-Key Combinations::
-    Ctrl+N:::
-        Clear canvas for new work.
-    Ctrl+O:::
-        Opens new SVG file.
-    Ctrl+S:::
-        Save current canvas.
-    Ctrl+Shift+S:::
-        Save current canvas with a new name.
-    Ctrl+?:::
-        Opens about dialog.
-    Ctrl+Z:::
-        Remove last added item from canvas. 
-    Del:::
-        Remove selected item from canvas.
-
 ==== Control Tab
 
 ===== Connection
 
 PromptEdit::
     Terminal:::
-        Say something about terminal
+        Terminal displays the messages sent within manual mode onto xmc4500. Besides, it always display the incoming messages from xmc4500.
 
 ===== Mode
 
 Manual::
     Directional & Pen Buttons:::
-        Say something about manual mode
+        In this mode one can use the directional and pen buttons to control the plotter.
 
 Auto:::
     Flow Control Buttons:::
-        Say something about auto mode
+        In this mode one can generate g-code automatically when pressing the play  button. A progress bar will show the progress of the plotting. Using the pause
+        button, the user can always pause the current plotting and use the flow control buttons to step through the g-code commands and plot the next or previous
+        commands.
 
 == XMC4500
 
@@ -108,6 +153,7 @@ Here is the subset of SVG parameters supported and recognised when opening, impo
 | polygone | Polygones
 | path     | Paths
 | text     | Texts
+| transform| Just the translation matrix is supported til now
 
 |===
 
@@ -147,7 +193,6 @@ Here is the subset of G-CODE currently supported
 [cols="^.1s,<.3m"]
 |===
 |G28 | Perform homing routine
-|G00 | Rapid positioning
 |G90 | Absolute mode positioning
 |G91 | Relative mode positioning
 |G01 | Linear interpolation
@@ -158,7 +203,6 @@ Here is the subset of G-CODE currently supported
 Possible commands:
 
 . #G28$             : Plotter will move to the top-left side.
-. #G00:XA:YB$       : Plotter will move to the spot (A, B) as fast as reasonable.
 . #G90$             : Plotter will interprete all subsequent commands as absolute movements.
 . #G91$             : Plotter will interprete all subsequent commands as relative to the current position.
 . #G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.
@@ -214,4 +258,12 @@ Dependencies::
         . https://launchpad.net/gcc-arm-embedded/5.0/5-2016-q3-update/+download/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
     SEGGER J-Link:::
         . https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
+
+To build the firmware for the xmc4500:
+    
+    Inside the project directory go to: ./xmc4500/APP/ and call 'make flash'
+
+to run the app:
+
+    Inside the project directory go to: ./gui/ and call 'python3 app.py'
 

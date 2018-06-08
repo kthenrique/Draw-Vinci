@@ -836,6 +836,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#_gui">GUI</a>
 <ul class="sectlevel2">
+<li><a href="#_scaling_resolution">Scaling &amp; Resolution</a></li>
 <li><a href="#_functionalities">Functionalities</a></li>
 </ul>
 </li>
@@ -880,14 +881,166 @@ alternative you could devise a simple drawing application to do the same.
 <div class="sect1">
 <h2 id="_gui">GUI</h2>
 <div class="sectionbody">
-<div id="GUI" class="imageblock">
+<div id="GUI_DRAW" class="imageblock">
 <div class="content">
 <img src="img/gui_main.png" alt="gui main">
 </div>
-<div class="title">Figure 2. Main Window</div>
+<div class="title">Figure 2. Main Window with draw tab</div>
+</div>
+<div id="GUI_CTRL" class="imageblock">
+<div class="content">
+<img src="img/gui_main_ctrl.png" alt="gui main ctrl">
+</div>
+<div class="title">Figure 3. Main Window with control tab</div>
+</div>
+<div class="sect2">
+<h3 id="_scaling_resolution">Scaling &amp; Resolution</h3>
+<div class="paragraph">
+<p>Using baudrate of xxx for the spi, the following mesurements were found for the various step mode:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>FULL_STEP</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(2010, 1728)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>HALF_STEP</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(4020, 3456)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>QUARTER_STEP</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(8035, 6907)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>EIGHTH_STEP</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(16061, 13806)</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>SIXTEENTH_STEP</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>(32107, 27607)</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The ratio of steps measured is ~1,1633, i.e. HEIGHT_STEP = ~0,86*WIDTH_STEP. The canvas where the user can draw something has the dimension: 555px X 477px,
+accounting for a ratio of ~1,1635.</p>
+</div>
+<div class="paragraph">
+<p>In effect, every point (x, y) in canvas, will be scaled as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>x_to_plot = x . (WIDTH_STEP/CANVAS_WIDTH)</p>
+</li>
+<li>
+<p>y_to_plot = y . (WIDTH_STEP/CANVAS_WIDTH)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>so that for the point (0, 0) in GUI, the plotter will receive (0, 0) and
+for the point 555,477, the plotter will receive (WIDTH_STEP, ~0,86*WIDTH_STEP).</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_functionalities">Functionalities</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Key Combinations</dt>
+<dd>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Ctrl+N</dt>
+<dd>
+<p>Clear canvas for new work.</p>
+</dd>
+<dt class="hdlist1">Ctrl+O</dt>
+<dd>
+<p>Opens new SVG file.</p>
+</dd>
+<dt class="hdlist1">Ctrl+S</dt>
+<dd>
+<p>Save current canvas.</p>
+</dd>
+<dt class="hdlist1">Ctrl+Shift+S</dt>
+<dd>
+<p>Save current canvas with a new name.</p>
+</dd>
+<dt class="hdlist1">Ctrl+?</dt>
+<dd>
+<p>Opens about dialog.</p>
+</dd>
+<dt class="hdlist1">Ctrl+Z</dt>
+<dd>
+<p>Remove last added item from canvas.</p>
+</dd>
+<dt class="hdlist1">Del</dt>
+<dd>
+<p>Remove selected item from canvas.</p>
+</dd>
+</dl>
+</div>
+</dd>
+</dl>
+</div>
+<div class="sect3">
+<h4 id="_menus">Menus</h4>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>File</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>New: clean canvas and start new project.</p>
+</li>
+<li>
+<p>Open: opens a svg file.</p>
+</li>
+<li>
+<p>Save: saves canvas to already saved file or calls save as if still not saved.</p>
+</li>
+<li>
+<p>Save As: saves canvas with a new name.</p>
+</li>
+<li>
+<p>Quit: closes app.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Settings</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Svg Directory: define the directory to import the svg&#8217;s from when using the import tool.</p>
+</li>
+<li>
+<p>Step Motor: define the step resolution, according to section 'Scaling &amp; Resolution'.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><strong>Help</strong></p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>About: basic info about this app.</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
 <div class="sect3">
 <h4 id="_draw_tab">Draw Tab</h4>
 <div class="sect4">
@@ -949,45 +1102,6 @@ the mouse, the user can zoom out completely to the default scale.</code></p></td
 </tr>
 </tbody>
 </table>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Key Combinations</dt>
-<dd>
-<div class="dlist">
-<dl>
-<dt class="hdlist1">Ctrl+N</dt>
-<dd>
-<p>Clear canvas for new work.</p>
-</dd>
-<dt class="hdlist1">Ctrl+O</dt>
-<dd>
-<p>Opens new SVG file.</p>
-</dd>
-<dt class="hdlist1">Ctrl+S</dt>
-<dd>
-<p>Save current canvas.</p>
-</dd>
-<dt class="hdlist1">Ctrl+Shift+S</dt>
-<dd>
-<p>Save current canvas with a new name.</p>
-</dd>
-<dt class="hdlist1">Ctrl+?</dt>
-<dd>
-<p>Opens about dialog.</p>
-</dd>
-<dt class="hdlist1">Ctrl+Z</dt>
-<dd>
-<p>Remove last added item from canvas.</p>
-</dd>
-<dt class="hdlist1">Del</dt>
-<dd>
-<p>Remove selected item from canvas.</p>
-</dd>
-</dl>
-</div>
-</dd>
-</dl>
-</div>
 </div>
 </div>
 <div class="sect3">
@@ -1002,7 +1116,7 @@ the mouse, the user can zoom out completely to the default scale.</code></p></td
 <dl>
 <dt class="hdlist1">Terminal</dt>
 <dd>
-<p>Say something about terminal</p>
+<p>Terminal displays the messages sent within manual mode onto xmc4500. Besides, it always display the incoming messages from xmc4500.</p>
 </dd>
 </dl>
 </div>
@@ -1020,12 +1134,14 @@ the mouse, the user can zoom out completely to the default scale.</code></p></td
 <dl>
 <dt class="hdlist1">Directional &amp; Pen Buttons</dt>
 <dd>
-<p>Say something about manual mode</p>
+<p>In this mode one can use the directional and pen buttons to control the plotter.</p>
 </dd>
 <dt class="hdlist1">Auto</dt>
 <dt class="hdlist1">Flow Control Buttons</dt>
 <dd>
-<p>Say something about auto mode</p>
+<p>In this mode one can generate g-code automatically when pressing the play  button. A progress bar will show the progress of the plotting. Using the pause
+button, the user can always pause the current plotting and use the flow control buttons to step through the g-code commands and plot the next or previous
+commands.</p>
 </dd>
 </dl>
 </div>
@@ -1103,6 +1219,10 @@ Your browser does not support the video tag.
 <td class="tableblock halign-center valign-top"><p class="tableblock"><strong>text</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Texts</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>transform</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Just the translation matrix is supported til now</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="admonitionblock note">
@@ -1132,7 +1252,7 @@ Your browser does not support the video tag.
 <div class="content">
 <img src="img/frame.png" alt="Frame of Protocol">
 </div>
-<div class="title">Figure 3. Protocol Frame</div>
+<div class="title">Figure 4. Protocol Frame</div>
 </div>
 <div class="paragraph">
 <p>Where:</p>
@@ -1186,10 +1306,6 @@ Your browser does not support the video tag.
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Perform homing routine</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G00</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Rapid positioning</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G90</strong></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Absolute mode positioning</code></p></td>
 </tr>
@@ -1216,9 +1332,6 @@ Your browser does not support the video tag.
 <p>#G28$             : Plotter will move to the top-left side.</p>
 </li>
 <li>
-<p>#G00:XA:YB$       : Plotter will move to the spot (A, B) as fast as reasonable.</p>
-</li>
-<li>
 <p>#G90$             : Plotter will interprete all subsequent commands as absolute movements.</p>
 </li>
 <li>
@@ -1242,7 +1355,7 @@ Your browser does not support the video tag.
 <div class="content">
 <img src="img/portErrorsTable.png" alt="portErrorsTable">
 </div>
-<div class="title">Figure 4. Possible errors codes by connection</div>
+<div class="title">Figure 5. Possible errors codes by connection</div>
 </div>
 </div>
 <div class="sect2">
@@ -1449,13 +1562,29 @@ Your browser does not support the video tag.
 </dd>
 </dl>
 </div>
+<div class="paragraph">
+<p>To build the firmware for the xmc4500:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Inside the project directory go to: ./xmc4500/APP/ and call 'make flash'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>to run the app:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>Inside the project directory go to: ./gui/ and call 'python3 app.py'</pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-05-25 13:49:56 CEST
+Last updated 2018-06-08 12:43:10 CEST
 </div>
 </div>
 </body>
