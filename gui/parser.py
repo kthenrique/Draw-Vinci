@@ -447,7 +447,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                         if isRelative:
                             text += '#G90$\n'
                             isRelative = False
-                        text  += '#G01:Y{1}$\n'.format(int(y))
+                        text  += '#G01:Y{0}$\n'.format(int(y))
                 elif path[0] == 'v':        # vertical lineTo relative
                     print(' -v-',end='',flush=True)
                     newPat.lineTo(newPat.currentPosition().x(), newPat.currentPosition().y()+coord[0])
