@@ -277,8 +277,10 @@ class AppWindow(QMainWindow):
                 self.ui.manualButton.setEnabled(False)
                 if self.ui.autoButton.isChecked():                 # AUTO MODE
                     if self.isSaved:
+                        self.port.flush()
                         self.port.close()
                         self.terminalThread.path = self.path
+                        self.terminalThread.updateTerm = self.updateTerm
                         self.terminalThread.port = self.ui.portsBox.currentText()
                         self.terminalThread.start(QThread.HighestPriority)
                     else:
