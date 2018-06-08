@@ -10,8 +10,8 @@ Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
 == Introduction
 
 [#portErrors]
-.MakeBlock XY Plotter
-image::plotter.jpeg[]
+.MakeBlock XY Plotter + XMC4500
+image::hw.png[]
 
 === Project Description
 
