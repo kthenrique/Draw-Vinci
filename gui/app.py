@@ -505,14 +505,30 @@ class AppWindow(QMainWindow):
         else:
             self.hasChanged = True
 
-    def updateTerm(self):#, by):
+    def updateTerm(self):
         '''
         It is signaled every time there's incoming message from uC
         '''
         if self.port.isOpen():
-            wasRead = self.port.readLine()
-            self.ui.termEdit.append('<')
-            self.ui.termEdit.append((wasRead.data()).decode('utf-8'))
+            if self.port.canReadLine():
+                wasRead = self.port.readLine()
+                try:
+                    wasRead = wasRead.data().decode('utf-8')
+                except:
+                    wasRead = ''
+                tx = '<'
+                tx += wasRead
+                self.ui.termEdit.append(tx)
+        elif self.terminalThread.porta.isOpen():
+            if self.terminalThread.porta.canReadLine():
+                wasRead = self.terminalThread.porta.readLine()
+                try:
+                    wasRead = wasRead.data().decode('utf-8')
+                except:
+                    wasRead = ''
+                tx = '<'
+                tx += wasRead
+                self.ui.termEdit.append(tx)
 
     def setSVGDir(self):
         '''

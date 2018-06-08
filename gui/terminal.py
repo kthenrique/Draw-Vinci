@@ -35,6 +35,7 @@ class Terminal(QThread):
         self.drawingProgress = drawingProgress
         self.statusbar = self.drawingProgress.parentWidget()
         self.pauseButton = pauseButton
+        self.updateTerm = None
 
         self.nav = QWaitCondition()
         self.mutex = QMutex()
