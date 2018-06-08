@@ -1,5 +1,7 @@
 # Draw-Vinci
 
+Firmware and GUI app to draw SVG images with the MakeBlock XY Plotter and the XMC4500 Infineon uC.
+
 ### Motivation
 
 - University project at the FH Technikum Wien
