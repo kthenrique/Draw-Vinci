@@ -57,21 +57,19 @@ for the point (555, 477), the plotter will receive (WIDTH_STEP, ~0,86*WIDTH_STEP
 
 === Functionalities
 
-Key Combinations::
-    Ctrl+N:::
-        Clear canvas for new work.
-    Ctrl+O:::
-        Opens new SVG file.
-    Ctrl+S:::
-        Save current canvas.
-    Ctrl+Shift+S:::
-        Save current canvas with a new name.
-    Ctrl+?:::
-        Opens about dialog.
-    Ctrl+Z:::
-        Remove last added item from canvas. 
-    Del:::
-        Remove selected item from canvas.
+==== Key Combinations
+
+[cols="^.1s,<.3m"]
+|===
+| Ctrl+N      | Clear canvas and start new drawing
+| Ctrl+O      | Open a new SVG file
+| Ctrl+S      | Save current canvas
+| Ctrl+Shift+S| Save current canvas with a new name
+| Ctrl+?      | Open about dialog
+| Ctrl+Z      | Remove last added item from canvas
+| Del         | Remove selected item from canvas
+
+|===
 
 ==== Menus
 
