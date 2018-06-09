@@ -824,7 +824,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="details">
 <span id="author" class="author">Andreas Hofschweiger</span><br>
 <span id="author2" class="author">Kelve T. Henrique</span><br>
-<span id="email2" class="email"><a href="mailto:kelvehenrique@hotmail.com">kelvehenrique@hotmail.com</a></span><br>
+<span id="email2" class="email"><a href="mailto:kelvehenrique@pm.me">kelvehenrique@pm.me</a></span><br>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -832,6 +832,12 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_introduction">Introduction</a>
 <ul class="sectlevel2">
 <li><a href="#_project_description">Project Description</a></li>
+</ul>
+</li>
+<li><a href="#_formats_supported">Formats supported</a>
+<ul class="sectlevel2">
+<li><a href="#_images">Images</a></li>
+<li><a href="#_g_code_specification">G-CODE Specification</a></li>
 </ul>
 </li>
 <li><a href="#_gui">GUI</a>
@@ -843,17 +849,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#_xmc4500">XMC4500</a>
 <ul class="sectlevel2">
 <li><a href="#_algorithm">Algorithm</a></li>
-<li><a href="#_formats_supported">Formats supported</a></li>
-<li><a href="#_images">Images</a></li>
 </ul>
 </li>
 <li><a href="#_communication">Communication</a>
 <ul class="sectlevel2">
-<li><a href="#_g_code_specification">G-CODE Specification</a></li>
+<li><a href="#_protocol">Protocol</a></li>
 <li><a href="#_error_table">Error Table</a></li>
-<li><a href="#_building_the_app">Building the App</a></li>
 </ul>
 </li>
+<li><a href="#_build">Build</a></li>
 </ul>
 </div>
 </div>
@@ -875,6 +879,142 @@ Design and develop both a multi-threaded PC GUI application as well as an XMC RT
 either case you can select a file format (G-Code, Excellon, HPGL or SVG — see below) to determine the content that shall be drawn using the machine. As an
 alternative you could devise a simple drawing application to do the same.
 </blockquote>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_formats_supported">Formats supported</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_images">Images</h3>
+<div class="paragraph">
+<p>Here is the subset of SVG parameters supported and recognised when opening, importing or saving:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>width</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Width of display</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>height</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Height of display</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>viewbox</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Dimensions of view</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>rect</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Rectangles</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>ellipse</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ellipses</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>circle</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Circles</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>polyline</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Group of lines</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>polygone</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Polygones</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>path</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Paths</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>text</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Texts</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>transform</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Just the translation matrix is supported til now</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Colors not supported!</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_g_code_specification">G-CODE Specification</h3>
+<div class="paragraph">
+<p>Here is the subset of G-CODE currently supported</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 75%;">
+</colgroup>
+<tbody>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G28</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Perform homing routine</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G90</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Absolute mode positioning</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G91</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Relative mode positioning</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G01</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Linear interpolation</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G02</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Circular interpolation</code></p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Possible commands:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>#G28$             : Plotter will move to its (0, 0) position and stop there.</p>
+</li>
+<li>
+<p>#G90$             : Plotter will interprete all subsequent commands as absolute movements.</p>
+</li>
+<li>
+<p>#G91$             : Plotter will interprete all subsequent commands as relative to the current position.</p>
+</li>
+<li>
+<p>#G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.</p>
+</li>
+<li>
+<p>#G01:ZK$          : Plotter&#8217;s pen will be dropped (K = 1) or lifted up (K = 0).</p>
+</li>
+<li>
+<p>#G02:XA:YB:IC:JD$ : Plotter will move in a circular way to the point (A, B), taking as reference the center at (A+C, B+D) - relative or absolute.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
@@ -1188,90 +1328,16 @@ When the 'AppTaksPlot' is done with the g-code command it will send an acknowled
 the string: '#GX:DONE$'.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_formats_supported">Formats supported</h3>
-
-</div>
-<div class="sect2">
-<h3 id="_images">Images</h3>
-<div class="paragraph">
-<p>Here is the subset of SVG parameters supported and recognised when opening, importing or saving:</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>width</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Width of display</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>height</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Height of display</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>viewbox</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Dimensions of view</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>rect</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Rectangles</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>ellipse</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Ellipses</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>circle</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Circles</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>polyline</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Group of lines</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>polygone</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Polygones</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>path</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Paths</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>text</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Texts</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>transform</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Just the translation matrix is supported til now</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Colors not supported!</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_communication">Communication</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The communication between GUI and the uC XMC4500 happens through UART, using the followins scheme as protocol:</p>
+<p>The communication between GUI and the XMC4500 happens through UART, using the following scheme as protocol.</p>
 </div>
+<div class="sect2">
+<h3 id="_protocol">Protocol</h3>
 <div class="imageblock">
 <div class="content">
 <img src="img/frame.png" alt="Frame of Protocol">
@@ -1314,64 +1380,6 @@ the string: '#GX:DONE$'.</p>
 </tr>
 </table>
 </div>
-<div class="sect2">
-<h3 id="_g_code_specification">G-CODE Specification</h3>
-<div class="paragraph">
-<p>Here is the subset of G-CODE currently supported</p>
-</div>
-<table class="tableblock frame-all grid-all spread">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 75%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G28</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Perform homing routine</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G90</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Absolute mode positioning</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G91</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Relative mode positioning</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G01</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Linear interpolation</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><strong>G02</strong></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Circular interpolation</code></p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>Possible commands:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>#G28$             : Plotter will move to the top-left side.</p>
-</li>
-<li>
-<p>#G90$             : Plotter will interprete all subsequent commands as absolute movements.</p>
-</li>
-<li>
-<p>#G91$             : Plotter will interprete all subsequent commands as relative to the current position.</p>
-</li>
-<li>
-<p>#G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.</p>
-</li>
-<li>
-<p>#G01:ZK$          : Plotter&#8217;s pen will lift up (K = 1) or drop (K = 0).</p>
-</li>
-<li>
-<p>#G02:XA:YB:IC:JD$ : Plotter will move in a circular way to the point (A, B), taking as reference the center at (A+C, B+D) - relative or absolute.</p>
-</li>
-</ol>
-</div>
 </div>
 <div class="sect2">
 <h3 id="_error_table">Error Table</h3>
@@ -1382,8 +1390,11 @@ the string: '#GX:DONE$'.</p>
 <div class="title">Figure 5. Possible errors codes by connection</div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_building_the_app">Building the App</h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_build">Build</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>The software comprising this project was built and tested using the following environment:</p>
 </div>
@@ -1605,10 +1616,9 @@ the string: '#GX:DONE$'.</p>
 </div>
 </div>
 </div>
-</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-06-09 13:40:00 CEST
+Last updated 2018-06-09 21:06:39 CEST
 </div>
 </div>
 </body>

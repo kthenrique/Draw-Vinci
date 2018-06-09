@@ -1,5 +1,5 @@
 = Draw-Vinci
-Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@hotmail.com>
+Andreas Hofschweiger; Kelve T. Henrique <kelvehenrique@pm.me>
 :Date: 2018 Mai 18
 :description: Documenting Draw-Vinci Makeblock XY_Plotter Project
 :source-highlighter: coderay
@@ -19,6 +19,57 @@ image::hw.png[]
 Design and develop both a multi-threaded PC GUI application as well as an XMC RTOS application using uCOS-III to control a MakeBlock XY plotter as shown below. In
 either case you can select a file format (G-Code, Excellon, HPGL or SVG — see below) to determine the content that shall be drawn using the machine. As an
 alternative you could devise a simple drawing application to do the same.
+
+== Formats supported
+
+=== Images
+
+Here is the subset of SVG parameters supported and recognised when opening, importing or saving:
+
+[cols="^.1s,<.3m"]
+|===
+| width    | Width of display
+| height   | Height of display
+| viewbox  | Dimensions of view
+| rect     | Rectangles
+| ellipse  | Ellipses
+| circle   | Circles
+| polyline | Group of lines
+| polygone | Polygones
+| path     | Paths
+| text     | Texts
+| transform| Just the translation matrix is supported til now
+
+|===
+
+[NOTE]
+====
+Colors not supported!
+
+====
+
+=== G-CODE Specification
+
+Here is the subset of G-CODE currently supported
+
+[cols="^.1s,<.3m"]
+|===
+|G28 | Perform homing routine
+|G90 | Absolute mode positioning
+|G91 | Relative mode positioning
+|G01 | Linear interpolation
+|G02 | Circular interpolation
+
+|===
+
+Possible commands:
+
+. #G28$             : Plotter will move to its (0, 0) position and stop there.
+. #G90$             : Plotter will interprete all subsequent commands as absolute movements.
+. #G91$             : Plotter will interprete all subsequent commands as relative to the current position.
+. #G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.
+. #G01:ZK$          : Plotter's pen will be dropped (K = 1) or lifted up (K = 0).
+. #G02:XA:YB:IC:JD$ : Plotter will move in a circular way to the point (A, B), taking as reference the center at (A+C, B+D) - relative or absolute.
 
 == GUI
 
@@ -143,37 +194,11 @@ structure) to the 'AppTaskPlot' task, that will execute the command received.
 When the 'AppTaksPlot' is done with the g-code command it will send an acknowledge message. If a '#GX:...$' is sent, then the microcontroller will send at completion
 the string: '#GX:DONE$'.
 
-=== Formats supported
-
-=== Images
-
-Here is the subset of SVG parameters supported and recognised when opening, importing or saving:
-
-[cols="^.1s,<.3m"]
-|===
-| width    | Width of display
-| height   | Height of display
-| viewbox  | Dimensions of view
-| rect     | Rectangles
-| ellipse  | Ellipses
-| circle   | Circles
-| polyline | Group of lines
-| polygone | Polygones
-| path     | Paths
-| text     | Texts
-| transform| Just the translation matrix is supported til now
-
-|===
-
-[NOTE]
-====
-Colors not supported!
-
-====
-
 == Communication
 
-The communication between GUI and the uC XMC4500 happens through UART, using the followins scheme as protocol:
+The communication between GUI and the XMC4500 happens through UART, using the following scheme as protocol.
+
+=== Protocol
 
 [protocol_frame]
 .Protocol Frame
@@ -194,36 +219,14 @@ The number of arguments in a message should conform to the G command
 
 ====
 
-=== G-CODE Specification
-
-Here is the subset of G-CODE currently supported
-
-[cols="^.1s,<.3m"]
-|===
-|G28 | Perform homing routine
-|G90 | Absolute mode positioning
-|G91 | Relative mode positioning
-|G01 | Linear interpolation
-|G02 | Circular interpolation
-
-|===
-
-Possible commands:
-
-. #G28$             : Plotter will move to the top-left side.
-. #G90$             : Plotter will interprete all subsequent commands as absolute movements.
-. #G91$             : Plotter will interprete all subsequent commands as relative to the current position.
-. #G01:XA:YB$       : Plotter will move linearly to the point (A, B) - relative or absolute.
-. #G01:ZK$          : Plotter's pen will lift up (K = 1) or drop (K = 0).
-. #G02:XA:YB:IC:JD$ : Plotter will move in a circular way to the point (A, B), taking as reference the center at (A+C, B+D) - relative or absolute.
-
 === Error Table
 
 [#portErrors]
 .Possible errors codes by connection
 image::portErrorsTable.png[]
 
-=== Building the App
+== Build
+
 The software comprising this project was built and tested using the following environment:
 
 Hardware::
