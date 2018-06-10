@@ -261,14 +261,15 @@ Framework & Tools::
         . Asciidoctor
             .. asciidoctor-pdf
 
-Dependencies::
-    Python3:::
-        . PyQt5
-        . pyudev
-    arm-none-eabi:::
-        . https://launchpad.net/gcc-arm-embedded/5.0/5-2016-q3-update/+download/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
-    SEGGER J-Link:::
-        . https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
+=== Dependencies
+
+Python3::
+    . PyQt5
+    . pyudev
+arm-none-eabi::
+    . https://launchpad.net/gcc-arm-embedded/5.0/5-2016-q3-update/+download/gcc-arm-none-eabi-5_4-2016q3-20160926-linux.tar.bz2
+SEGGER J-Link::
+    . https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
 
 To build the firmware for the xmc4500:
     
