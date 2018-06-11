@@ -85,13 +85,14 @@ image::gui_main.png[470,470]
 
 Using baudrate of 75000 for the spi, the following mesurements were found for the various step mode:
 
-[cols="^.1s,<.3m"]
+[cols="<.1m,^2m,<.3m",options="header"]
 |===
-|FULL_STEP      | (2010, 1728)
-|HALF_STEP      | (4020, 3456)
-|QUARTER_STEP   | (8035, 6907)
-|EIGHTH_STEP    | (16061, 13806)
-|SIXTEENTH_STEP | (32107, 27607)
+| HW-Adjustment         | Mode             | x, y-Dimension
+| S1=L, S2=L, S3=L      | FULL_STEP        | (2010, 1728)
+| S1=H, S2=L, S3=L      | HALF_STEP        | (4020, 3456)
+| S1=L, S2=H, S3=L      | QUARTER_STEP     | (8035, 6907)
+| S1=H, S2=H, S3=L      | EIGHTH_STEP      | (16061, 13806)
+| S1=H, S2=H, S3=H      | SIXTEENTH_STEP   | (32107, 27607)
 
 |===
 
