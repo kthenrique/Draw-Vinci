@@ -86,6 +86,16 @@ static void AppTaskStart    (void *p_arg);
 static void AppTaskCom      (void *p_arg);
 static void AppTaskPlot     (void *p_arg);
 
+/*************************************************************** send_ack */
+/**
+ * \function send_ack
+ * \params packet ... argument passed to send_ack() by
+ *                    AppTaskPlot()
+ * \returns none
+ *
+ * \brief Function to sent an acknowledgement back to the gui after
+ *        the AppTaskPlot()-Task has finished his operation.
+ */
 void send_ack(CODE volatile *packet){
 
     switch(packet->cmd){
@@ -134,6 +144,16 @@ void send_ack(CODE volatile *packet){
     XMC_UART_CH_Transmit(XMC_UART1_CH1, '\n');
 }
 
+/*************************************************************** init_plotter */
+/**
+ * \function init_plotter
+ * \params dimension ... argument passed to init_plotter() by
+ *                    AppTaskCom()
+ * \returns none
+ *
+ * \brief Function to initialize the plotter, here we measure the steps of the
+ *        plotter in x-dimension and y-dimension.
+ */
 void init_plotter(uint16_t *dimension){
     volatile uint16_t counter = SLEEP_COUNTER;
     CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
@@ -420,7 +440,7 @@ static void AppTaskStart (void *p_arg){
  * \returns none
  *
  * \brief It communicates with the UART_ISR (getting the messages comming from
- *        PC) and with the AppTaskPwm Task (to manage the memory used by the packets
+ *        PC) and with the AppTaskPlot Task (to manage the memory used by the packets
  *        structs).
  *        After receiving the msgs from UART_ISR, they're sent to a compliance test
  *        (scrutinise()); according to the msg, this task send messages to the relevant
@@ -431,8 +451,7 @@ static void AppTaskStart (void *p_arg){
  *        (1) Debug or Flash the application.
  *        (2) Connect a TTL-USB UART cable:
  *            GND (BLACK) - GND, TX (GREEN) - P0.0, RX (WHITE) - P0.1
- *        (3) Launch a terminal program and connect with 9600-8N1 or launch the GUI or
- *            use the buttons to control the brightness of the leds on board
+ *        (3) Launch the GUI and operate through the drawing program the plotter.
  */
 static void AppTaskCom (void *p_arg){
     void        *p_msg;
@@ -518,13 +537,13 @@ static void AppTaskCom (void *p_arg){
 
 /************************************************************************************/
 /**
- * \function AppTaskManMode
- * \ params p_arg ... argument passed to AppTaskManMode() at creation
+ * \function AppTaskPlot
+ * \ params p_arg ... argument passed to AppTaskPlot() at creation
  * \returns none
  *
  * \brief It waits until a message arrives in its queue.
- *        After receiving something, it will adjust the duty cycle of the output
- *        in the respective pin.
+ *        After receiving something, depending on the received command,
+ *        it will execute some functions.
  */
 
 static void AppTaskPlot(void *p_arg){
@@ -551,6 +570,7 @@ CPU_CHAR    debug_msg[MAX_MSG_LENGTH + 90];
     penUp = true;
     OSTimeDlyHMSM(0, 0, 0, 150, OS_OPT_TIME_HMSM_STRICT, &err);
 
+    // function to measure the dimension of the plotter
     //init_plotter(dimension);
 
 #ifdef BUG_IT
@@ -638,7 +658,6 @@ APP_TRACE_INFO (debug_msg);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
-/*                        current_position[0] += s_x;*/
                     }
                     while(current_position[1] != next_position[1]){
                         APP_TRACE_DBG ("moving G01: y axis\n");
@@ -662,7 +681,6 @@ APP_TRACE_INFO (debug_msg);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
-/*                        current_position[1] += s_y;*/
                     }
 
                     if(current_position[0] == end_position[0] && current_position[1] == end_position[1]) break;
@@ -683,7 +701,7 @@ APP_TRACE_INFO (debug_msg);
                 isRelative = true;
                 break;
             case 4:                             // G28
-                APP_TRACE_DBG ("G28\n");
+                APP_TRACE_DBG ("G28\n");        // positioning to the start position
                 // raise the pen
                 XMC_CCU4_SLICE_SetTimerCompareMatch(SLICE_CCU4_C, PEN_UP);
                 XMC_CCU4_EnableShadowTransfer(MODULE_CCU4, SLICE_TRANSFER_C);
@@ -812,7 +830,6 @@ APP_TRACE_INFO (debug_msg);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
-/*                        current_position[0] += s_x;*/
                     }
                     while(current_position[1] != next_position[1]){
                         APP_TRACE_DBG ("moving G02: y axis\n");
@@ -836,7 +853,6 @@ APP_TRACE_INFO (debug_msg);
                         _mcp23s08_reg_xfer(XMC_SPI1_CH0,MCP23S08_GPIO,0x00,MCP23S08_WR);
                         _mcp23s08_set_ss(MCP23S08_SS);
 
-/*                        current_position[1] += s_y;*/
                     }
 
                     error_ = error;
