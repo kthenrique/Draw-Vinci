@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : canvas.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Mai 31
+# -- Last update: 2018 Jun 13
 # ----------------------------------------------------------------------------
 # -- Description: Dealing with the drawing functionality
 # ----------------------------------------------------------------------------
@@ -92,6 +92,8 @@ class MainScene(QGraphicsScene):
                 self.item = self.itemAt(self.clickedPos, QTransform())
                 if self.item:
                     self.removeItem(self.item)
+                    self.tools[1] = QPainterPath()
+                    self.item = None
             elif self.index == 1: # freehand
                 self.tools[self.index].moveTo(pos)
                 self.item = self.addPath(self.tools[self.index])
@@ -171,6 +173,8 @@ class MainScene(QGraphicsScene):
                 self.item = self.itemAt(mousePos, QTransform())
                 if self.item:
                     self.removeItem(self.item)
+                    self.tools[1] = QPainterPath()
+                    self.item = None
             elif self.index == 1: # freehand
                 self.tools[self.index].lineTo(pos)
                 self.item.setPath(self.tools[self.index])
