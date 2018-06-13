@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : parser.py
 # -- Author     : Kelve T. Henrique
-# -- Last update: 2018 Jun 06
+# -- Last update: 2018 Jun 13
 # ----------------------------------------------------------------------------
 # -- Description: It parses a svg file:
 # --                 - reads svg file
@@ -18,6 +18,8 @@ from PyQt5.QtWidgets import (QGraphicsRectItem, QGraphicsEllipseItem,
         QGraphicsTextItem)
 from PyQt5.QtGui import QPolygonF, QPainterPath, QFont
 from PyQt5.QtXml import QDomDocument, QDomNodeList, QDomNode, QDomElement
+
+from math import sqrt
 
 from constants import *
 
@@ -140,11 +142,29 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
         elli = gNode.firstChildElement('ellipse')
         while not elli.isNull():
             print("ellipse")
+            # Taking the transform matrix
+            trafo = gNode.toElement()
+            trafo = trafo.attribute('transform')
+            trafo = trafo.replace('matrix(', '')
+            trafo = trafo.replace(')', '')
+            trafo = trafo.replace(',', ' ')
+            trafo = trafo.split()
+            for index in range(len(trafo)):
+                trafo[index] = float(trafo[index])
+            if trafo and (trafo[0],trafo[1],trafo[2],trafo[3]) != (1,0,0,1): # i.e. it's not a translation transform
+                print('NOT TRANSLATING ELLIPSE')
+                trafo = None
+
             newCanvasElli = QGraphicsEllipseItem()
             cx = float(elli.attribute('cx'))
             cy = float(elli.attribute('cy'))
             width = 2*float(elli.attribute('rx'))
             height = 2*float(elli.attribute('ry'))
+
+            # Translate
+            if trafo:
+                cx += trafo[4]
+                cy += trafo[5]
 
             x = cx - float(elli.attribute('rx'))
             y = cy - float(elli.attribute('ry'))
@@ -157,6 +177,36 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
 
             newCanvasElli.setRect(x, y, width, height)
             listOfItems.append(newCanvasElli)
+
+            # G-CODE
+            if writeCode:
+                x      = RESOLUTION * (cx + REPOSITION[0])
+                y      = RESOLUTION * (cy + REPOSITION[1])
+                rx     = RESOLUTION * (float(elli.attribute('rx')))
+                ry     = RESOLUTION * (float(elli.attribute('ry')))
+
+                if isRelative:
+                    text += '#G90$\n'
+                    isRelative = False
+                if not penUp:
+                    text += '#G01:Z0$\n'
+                    penUp = True
+                text += '#G01:X{0}:Y{1}$\n'.format(int(x+rx),int(y))
+                if penUp:
+                    text += '#G01:Z1$\n'
+                    penUp = False
+
+                underSide  = []
+                for step in range(1,ELLIPSES+1):
+                    nextX = x+rx - step*2*rx/ELLIPSES
+                    nextY = y + sqrt(ry**2 - (ry*(nextX-x)/rx)**2)
+                    underSide.append((nextX, -nextY))
+                    text += '#G01:X{0}:Y{1}$\n'.format(int(nextX),int(nextY))
+
+                for step in range(1,ELLIPSES+1):
+                    nextX,nextY = underSide.pop()
+                    text += '#G01:X{0}:Y{1}$\n'.format(int(nextX),int(nextY))
+
             elli = elli.nextSiblingElement('ellipse')
 
         # circles
@@ -201,6 +251,7 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
             newCanvasCir.setRect(x, y, width, height)
             listOfItems.append(newCanvasCir)
 
+            # G-CODE
             if writeCode:
                 x      = RESOLUTION * (cx + REPOSITION[0])
                 y      = RESOLUTION * (cy + REPOSITION[1])

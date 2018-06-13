@@ -5,7 +5,7 @@
 # ----------------------------------------------------------------------------
 # -- File       : constants.py
 # -- Author     : Kelve T. Henrique - Andreas Hofschweiger
-# -- Last update: 2018 Jun 05
+# -- Last update: 2018 Jun 13
 # ----------------------------------------------------------------------------
 # -- Description: All relevant constants for the GUI
 # ----------------------------------------------------------------------------
@@ -43,6 +43,9 @@ CUBIC_BEZIER = 10
 
 # Number of points/quadratic_bézier
 QUAD_BEZIER = 10
+
+# Number of points/quadratic_bézier
+ELLIPSES = 10
 
 # Number of steps for each config of motor
 FULL_STEP      = (2010, 1728)
