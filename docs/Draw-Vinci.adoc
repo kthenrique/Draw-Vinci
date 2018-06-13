@@ -247,6 +247,8 @@ Operating Systems::
             * Desktop
         . Ubuntu 18.04
             * Desktop
+        . Fedora 28
+            * Desktop
 
 Framework & Tools::
     GUI:::
@@ -272,11 +274,20 @@ arm-none-eabi::
 SEGGER J-Link::
     . https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack
 
-To build the firmware for the xmc4500:
+==== Installation of dependencies:
+
+ sudo -H pip3 install pyqt5
+ sudo -H pip3 install pyudev
+
+If you're using Fedora, maybe you'll need:
+
+ dnf install python3-pyudev-qt5
+
+==== Flashing the XMC4500
     
     Inside the project directory go to: ./xmc4500/APP/ and call 'make flash'
 
-to run the app:
+==== Running the app
 
     Inside the project directory go to: ./gui/ and call 'python3 app.py'
 
