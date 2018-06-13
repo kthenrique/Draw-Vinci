@@ -36,7 +36,7 @@ GOLEFT = '#G01:X-'
 GORIGHT= '#G01:X'
 
 # Scale of SVGs when they're bigger than canvas
-SCALE = 250
+SCALE = int(CANVAS_WIDTH/2)
 
 # Number of points/cubic_bézier
 CUBIC_BEZIER = 10
