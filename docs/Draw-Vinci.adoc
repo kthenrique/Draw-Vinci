@@ -19,6 +19,7 @@ image::hw.png[]
 Design and develop both a multi-threaded PC GUI application as well as an XMC RTOS application using uCOS-III to control a MakeBlock XY plotter as shown below. In
 either case you can select a file format (G-Code, Excellon, HPGL or SVG — see below) to determine the content that shall be drawn using the machine. As an
 alternative you could devise a simple drawing application to do the same.
+The stepper motors and the servo motor are controlled by the XMC4500 via an IO expander board and several driver boards. 
 
 == Formats supported
 
