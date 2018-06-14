@@ -45,7 +45,7 @@ CUBIC_BEZIER = 10
 QUAD_BEZIER = 10
 
 # Number of points/quadratic_bézier
-ELLIPSES = 10
+ELLIPSES = 50
 
 # Number of steps for each config of motor
 FULL_STEP      = (2010, 1728)

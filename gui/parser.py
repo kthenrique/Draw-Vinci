@@ -197,16 +197,18 @@ def getElements(filename, writeCode = False, toScale = False, RESOLUTION = QUART
                     penUp = False
 
                 underSide  = []
-                for step in range(1,ELLIPSES+1):
+                underSide.append(((x+rx),y))
+                for step in range(ELLIPSES+1):
                     nextX = x+rx - step*2*rx/ELLIPSES
                     nextY = y + sqrt(ry**2 - (ry*(nextX-x)/rx)**2)
-                    underSide.append((nextX, -nextY))
+                    underSide.append((nextX, 2*y-nextY))
                     text += '#G01:X{0}:Y{1}$\n'.format(int(nextX),int(nextY))
 
-                for step in range(1,ELLIPSES+1):
+                for step in range(ELLIPSES+1):
                     nextX,nextY = underSide.pop()
                     text += '#G01:X{0}:Y{1}$\n'.format(int(nextX),int(nextY))
 
+                text += '#G01:X{0}:Y{1}$\n'.format(int(nextX),int(nextY))
             elli = elli.nextSiblingElement('ellipse')
 
         # circles
